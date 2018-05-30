@@ -1,4 +1,4 @@
-z//添加插件
+//添加插件
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
@@ -11,8 +11,8 @@ if (localPropertiesFile.exists()) {
 
 /*读取字段*/
 def key_ProjectVCS = properties.getProperty('project.vcs')
-def key_ProjectName = 'ScrollPicker'//项目名称
-def key_ProjectDesc = 'A simple and beautiful picker.'//项目描述
+def key_ProjectName = 'BadgeView'//项目名称
+def key_ProjectDesc = ''//项目描述
 def key_ProjectGroupId = properties.getProperty('project.groupId')
 def key_ProjectWebsite = properties.getProperty('project.website')
 def key_ProjectVersion = '1.0.1'//项目版本
