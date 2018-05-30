@@ -27,10 +27,6 @@
     <attr name="loop" format="boolean" />
 
     <declare-styleable name="ScrollPickerView">
-        <!-- View的宽 -->
-        <attr name="android:layout_width" />
-        <!-- View的高 -->
-        <attr name="android:layout_height" />
         <!--显示行数-->
         <attr name="rows" />
         <!--行间距-->

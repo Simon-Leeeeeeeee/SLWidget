@@ -1,4 +1,4 @@
-package cn.simonlee.demo.widget;
+package cn.simonlee.widgetdemo;
 
 import android.app.Application;
 

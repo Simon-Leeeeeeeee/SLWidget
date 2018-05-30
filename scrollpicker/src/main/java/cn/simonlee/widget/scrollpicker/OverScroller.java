@@ -1,4 +1,4 @@
-package cn.simonlee.widget;
+package cn.simonlee.widget.scrollpicker;
 
 import android.hardware.SensorManager;
 import android.util.Log;

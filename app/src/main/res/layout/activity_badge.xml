@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <cn.simonlee.widgetdemo.widget.BadgeLinearLayout
+        android:id="@+id/linearlayout_badgelayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:padding="20dp"
+        android:orientation="horizontal">
+
+        <cn.simonlee.widgetdemo.widget.BadgeImageView
+            android:id="@+id/imageview_badgeimage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_launcher_background"
+            app:boldText_badge="true"
+            app:textColor_badge="@color/white"
+            app:textSize_badge="10sp" />
+
+        <cn.simonlee.widget.badgeview.BadgeView
+            android:id="@+id/badgeview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:background_badge="@drawable/shape_badge"
+            app:boldText_badge="true"
+            app:textColor_badge="@color/white"
+            app:textSize_badge="10sp" />
+
+        <cn.simonlee.widgetdemo.widget.BadgeTextView
+            android:id="@+id/textview_badgetext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/green"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="BadgeTextView" />
+
+        <cn.simonlee.widgetdemo.widget.BadgeButton
+            android:id="@+id/button_badgebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:text="BadgeButton"
+            android:textAllCaps="false"
+            app:textColor_badge="@color/white"
+            app:textSize_badge="10sp" />
+
+    </cn.simonlee.widgetdemo.widget.BadgeLinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/bold"
+                    android:textColor="@color/black" />
+
+                <Switch
+                    android:id="@+id/swicth_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
+
+            </LinearLayout>
+
+            <!--字体大小-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/text_size"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_textsize"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="30"
+                    android:progress="16" />
+
+                <TextView
+                    android:id="@+id/tv_textsize"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--内边距-左-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/paddingLeft"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_paddingleft"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_paddingleft"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--内边距-上-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/paddingTop"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_paddingtop"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_paddingtop"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--内边距-右-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/paddingRight"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_paddingright"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_paddingright"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--内边距-下-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/paddingBottom"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_paddingbottom"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_paddingbottom"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--外边距-左-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/marginLeft"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_marginleft"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_marginleft"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--外边距-上-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/marginTop"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_margintop"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_margintop"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--外边距-右-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/marginRight"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_marginright"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_marginright"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--外边距-下-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/marginBottom"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_marginbottom"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_marginbottom"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="X"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/gravity"
+                    android:textColor="@color/black" />
+
+                <cn.simonlee.widgetdemo.widget.RadioButton
+                    android:id="@+id/radio_gravityleft"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:text="@string/gravity_left" />
+
+                <cn.simonlee.widgetdemo.widget.RadioButton
+                    android:id="@+id/radio_gravitytop"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:text="@string/gravity_top" />
+
+                <cn.simonlee.widgetdemo.widget.RadioButton
+                    android:id="@+id/radio_gravityright"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:text="@string/gravity_right" />
+
+                <cn.simonlee.widgetdemo.widget.RadioButton
+                    android:id="@+id/radio_gravitybottom"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="@string/gravity_bottom" />
+
+                <cn.simonlee.widgetdemo.widget.RadioButton
+                    android:id="@+id/radio_gravitycenter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="@string/gravity_center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Text : "
+                    android:textColor="@color/black" />
+
+                <EditText
+                    android:id="@+id/et_badgetext"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:textColor="@color/gray" />
+
+                <Button
+                    android:id="@+id/button_hide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hide" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

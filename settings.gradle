@@ -1,1 +1,1 @@
-include ':app', ':scrollpicker'
+include ':app', ':scrollpicker', ':badgeview'

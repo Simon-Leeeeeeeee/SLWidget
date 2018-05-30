@@ -1,8 +1,8 @@
-package cn.simonlee.demo.widget;
+package cn.simonlee.widgetdemo;
 
 import java.text.DecimalFormat;
 
-import cn.simonlee.widget.PickAdapter;
+import cn.simonlee.widget.scrollpicker.PickAdapter;
 
 /**
  * @author Simon Lee

@@ -1,4 +1,4 @@
-package cn.simonlee.demo.widget;
+package cn.simonlee.widgetdemo;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.StringRes;

@@ -1,4 +1,4 @@
-package cn.simonlee.widget;
+package cn.simonlee.widget.scrollpicker;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -26,6 +26,11 @@ import android.view.ViewGroup;
  */
 @SuppressWarnings("unused")
 public class ScrollPickerView extends View {
+
+    /**
+     * dp&sp转px的系数
+     */
+    private float mDensityDP, mDensitySP;
 
     /**
      * LayoutParams宽度
@@ -138,19 +143,19 @@ public class ScrollPickerView extends View {
     private int mGravity;
 
     /**
-     * 文本对齐方式，居中
-     */
-    private final int GRAVITY_CENTER = 17;
-
-    /**
      * 文本对齐方式，居左
      */
-    private final int GRAVITY_LEFT = 3;
+    public static final int GRAVITY_LEFT = 3;
 
     /**
      * 文本对齐方式，居右
      */
-    private final int GRAVITY_RIGHT = 5;
+    public static final int GRAVITY_RIGHT = 5;
+
+    /**
+     * 文本对齐方式，居中
+     */
+    public static final int GRAVITY_CENTER = 17;
 
     /**
      * 文本绘制起始点的X坐标
@@ -209,7 +214,7 @@ public class ScrollPickerView extends View {
      */
     private VelocityTracker mVelocityTracker;
 
-    private Paint mPaint;
+    private TextPaint mTextPaint;
 
     private PickAdapter mAdapter;
 
@@ -222,27 +227,24 @@ public class ScrollPickerView extends View {
         void onItemSelected(View view, int position, String value);
     }
 
-    public ScrollPickerView(Context context, @Nullable AttributeSet attrs) {
+    public ScrollPickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context, attrs);
     }
 
-    public ScrollPickerView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ScrollPickerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context, attrs);
     }
 
     private void initView(Context context, AttributeSet attributeSet) {
-        float densityDP = getResources().getDisplayMetrics().density;//DP密度
-        float densitySP = getResources().getDisplayMetrics().scaledDensity;//SP密度
+        mDensityDP = context.getResources().getDisplayMetrics().density;//DP密度
+        mDensitySP = context.getResources().getDisplayMetrics().scaledDensity;//SP密度
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ScrollPickerView);
 
-        this.mLayoutWidth = typedArray.getLayoutDimension(R.styleable.ScrollPickerView_android_layout_width, 0);//-2wrap_content -1match_parent
-        this.mLayoutHeight = typedArray.getLayoutDimension(R.styleable.ScrollPickerView_android_layout_height, 0);//-2wrap_content -1match_parent
-
         this.mTextRows = typedArray.getInteger(R.styleable.ScrollPickerView_rows, 5);
-        this.mTextSize = typedArray.getDimension(R.styleable.ScrollPickerView_textSize, 16 * densitySP);
+        this.mTextSize = typedArray.getDimension(R.styleable.ScrollPickerView_textSize, 16 * mDensityDP);
         this.mTextRatio = typedArray.getFloat(R.styleable.ScrollPickerView_textRatio, 2F);
         this.mRowSpacing = typedArray.getDimension(R.styleable.ScrollPickerView_spacing, 0);
         this.mTextFormat = typedArray.getString(R.styleable.ScrollPickerView_textFormat);
@@ -257,13 +259,58 @@ public class ScrollPickerView extends View {
         typedArray.recycle();
 
         //初始化画笔工具
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);//抗锯齿
-        mPaint.setFakeBoldText(true);//字体加粗
-        mPaint.setTextSize(mTextSize);//设置字体大小
-        mPaint.setTypeface(Typeface.MONOSPACE);//等宽字体
+        initTextPaint();
+        //计算行高
+        measureTextHeight();
 
-        Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
+        mMatrix = new Matrix();//用户记录偏移量并设置给颜色渐变工具
+        mTextBounds = new Rect();//用于计算每行文本边界区域
+        //滑动辅助器
+        mOverScroller = new OverScroller(mDensityDP);
+    }
+
+    /**
+     * 初始化画笔工具
+     */
+    private void initTextPaint() {
+        mTextPaint = new TextPaint();
+        //防抖动
+        mTextPaint.setDither(true);
+        //抗锯齿
+        mTextPaint.setAntiAlias(true);
+        //不要文本缓存
+        mTextPaint.setLinearText(true);
+        //设置亚像素
+        mTextPaint.setSubpixelText(true);
+        //字体加粗
+        mTextPaint.setFakeBoldText(true);
+
+        //设置字体大小
+        mTextPaint.setTextSize(mTextSize);
+        //等宽字体
+        mTextPaint.setTypeface(Typeface.MONOSPACE);
+        //设置对齐方式
+        switch (mGravity) {
+            case GRAVITY_LEFT: {
+                mTextPaint.setTextAlign(Paint.Align.LEFT);
+                break;
+            }
+            case GRAVITY_CENTER: {
+                mTextPaint.setTextAlign(Paint.Align.CENTER);
+                break;
+            }
+            case GRAVITY_RIGHT: {
+                mTextPaint.setTextAlign(Paint.Align.RIGHT);
+                break;
+            }
+        }
+    }
+
+    /**
+     * 计算行高
+     */
+    private void measureTextHeight() {
+        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
         //确定行高
         this.mRowHeight = Math.abs(fontMetrics.descent - fontMetrics.ascent) * (mTextRatio > 1 ? mTextRatio : 1);
         //行距不得小于负行高的一半
@@ -271,10 +318,6 @@ public class ScrollPickerView extends View {
             mRowSpacing = -mRowHeight / 2F;
         }
         mItemHeight = mRowHeight + mRowSpacing;
-        mMatrix = new Matrix();//用户记录偏移量并设置给颜色渐变工具
-        mTextBounds = new Rect();//用于计算每行文本边界区域
-        //滑动辅助器
-        mOverScroller = new OverScroller(densityDP);
     }
 
     public void setOnItemSelectedListener(OnItemSelectedListener itemSelectedListener) {
@@ -300,7 +343,7 @@ public class ScrollPickerView extends View {
 
         if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT && widthMode != MeasureSpec.EXACTLY) {//宽为WRAP
             if (mTextFormat != null) {
-                widthSize = (int) (mPaint.measureText(mTextFormat) * (mTextRatio > 1 ? mTextRatio : 1));
+                widthSize = (int) (mTextPaint.measureText(mTextFormat) * (mTextRatio > 1 ? mTextRatio : 1));
             } else {
                 widthSize = 200;
             }
@@ -310,7 +353,6 @@ public class ScrollPickerView extends View {
         }
         setMeasuredDimension(widthSize, heightSize);
         if (widthSize > 0 && heightSize > 0) {
-            setGravity(mGravity);//设置对齐方式并计算文本绘制起始点的X坐标
             measureOriginal();//计算初始状态下显示的行数、首行偏移量
             measureExtremOffset();//计算偏移量的极值
             setPaintShader();//设置颜色线性渐变
@@ -344,6 +386,21 @@ public class ScrollPickerView extends View {
             mOriginalFirstItemOffset = halfSurplusRem;
         }
         mCenterY = drawHeight / 2F + getPaddingTop();
+        //根据对齐方式计算绘制起点
+        switch (mGravity) {
+            case GRAVITY_LEFT: {
+                mDrawingOriginX = getPaddingLeft();
+                break;
+            }
+            case GRAVITY_CENTER: {
+                mDrawingOriginX = (getMeasuredWidth() + getPaddingLeft() - getPaddingRight()) / 2F;
+                break;
+            }
+            case GRAVITY_RIGHT: {
+                mDrawingOriginX = getMeasuredWidth() - getPaddingRight();
+                break;
+            }
+        }
     }
 
     /**
@@ -366,7 +423,7 @@ public class ScrollPickerView extends View {
         mLinearShader = new LinearGradient(0F, mCenterY - (0.5F * mRowHeight + mItemHeight), 0F, mCenterY + (0.5F * mRowHeight + mItemHeight),
                 new int[]{mTextColor_Unselected, mTextColor_Selected, mTextColor_Unselected}
                 , new float[]{0F, 0.5F, 1F}, LinearGradient.TileMode.CLAMP);
-        mPaint.setShader(mLinearShader);
+        mTextPaint.setShader(mLinearShader);
     }
 
     @Override
@@ -606,11 +663,11 @@ public class ScrollPickerView extends View {
         float scaling = getScaling(offsetY);
         canvas.scale(scaling, scaling, mDrawingOriginX, mRowHeight / 2F);
         //获取文本尺寸
-        mPaint.getTextBounds(text, 0, text.length(), mTextBounds);
+        mTextPaint.getTextBounds(text, 0, text.length(), mTextBounds);
         //根据文本尺寸计算基线位置
         float baseLineY = (mRowHeight - mTextBounds.top - mTextBounds.bottom) / 2F;
         //绘制文本
-        canvas.drawText(text, mDrawingOriginX, baseLineY, mPaint);
+        canvas.drawText(text, mDrawingOriginX, baseLineY, mTextPaint);
         canvas.restore();
     }
 
@@ -664,23 +721,86 @@ public class ScrollPickerView extends View {
      * 设置文本对齐方式，计算文本绘制起始点的X坐标
      */
     public void setGravity(int gravity) {
-        mGravity = gravity;
-        switch (mGravity) {
+        switch (gravity) {
             case GRAVITY_LEFT: {
-                mPaint.setTextAlign(Paint.Align.LEFT);
+                mTextPaint.setTextAlign(Paint.Align.LEFT);
                 mDrawingOriginX = getPaddingLeft();
                 break;
             }
             case GRAVITY_CENTER: {
-                mPaint.setTextAlign(Paint.Align.CENTER);
+                mTextPaint.setTextAlign(Paint.Align.CENTER);
                 mDrawingOriginX = (getMeasuredWidth() + getPaddingLeft() - getPaddingRight()) / 2F;
                 break;
             }
             case GRAVITY_RIGHT: {
-                mPaint.setTextAlign(Paint.Align.RIGHT);
+                mTextPaint.setTextAlign(Paint.Align.RIGHT);
                 mDrawingOriginX = getMeasuredWidth() - getPaddingRight();
                 break;
             }
+            default:
+                return;
+        }
+        mGravity = gravity;
+        super.invalidate();
+    }
+
+    public void setLoopable(boolean isChecked) {
+        //TODO
+//        if (mLoopEnable != isChecked) {
+//            mLoopEnable = isChecked;
+//            super.invalidate();
+//        }
+    }
+
+    /**
+     * 设置文本显示的行数，仅当高为WRAP_CONTENT时有效
+     */
+    public void setTextRows(int rows) {
+        if (mTextRows != rows) {
+            mTextRows = rows;
+            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                super.requestLayout();
+            }
+        }
+    }
+
+    /**
+     * 设置文本字体大小，单位sp
+     */
+    public void setTextSize(int textSize) {
+        mTextSize = textSize * mDensitySP;
+        mTextPaint.setTextSize(mTextSize);
+        measureTextHeight();
+        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            super.requestLayout();
+        } else {
+            super.invalidate();
+        }
+    }
+
+    /**
+     * 设置文本行间距，单位dp
+     */
+    public void setRowSpacing(int rowSpacing) {
+        mRowSpacing = rowSpacing * mDensityDP;
+        measureTextHeight();
+        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            super.requestLayout();
+        } else {
+            super.invalidate();
+        }
+    }
+
+    /**
+     * 设置放大倍数
+     */
+    public void setTextRatio(float textRatio) {
+        mTextRatio = textRatio;
+        measureTextHeight();
+        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            super.requestLayout();
+        } else {
+            super.invalidate();
         }
     }
 

@@ -1,10 +1,44 @@
 <resources>
     <string name="app_name">SLWidget</string>
+    <string name="catalog">目录</string>
+    <string name="badge">Badge</string>
+    <string name="scrollpicker">ScrollPicker</string>
+
+    <string name="feedback">反馈</string>
+    <string name="feedback_instructions">有问题记得提issue哦~</string>
+
+    <string name="juejin">掘金</string>
+    <string name="jianshu">简书</string>
+    <string name="github">GitHub</string>
+
     <string name="year">年</string>
     <string name="month">月</string>
     <string name="day">日</string>
     <string name="hour">时</string>
     <string name="minute">分</string>
-    <string name="time">时间</string>
-    <string name="datepick">时间选择</string>
+    <string name="rows">行数:</string>
+    <string name="spacing">行间距:</string>
+    <string name="text_size">字体大小:</string>
+    <string name="text_ratio">放大倍数:</string>
+    <string name="gravity">对齐方式:</string>
+    <string name="loop">循环:</string>
+
+    <string name="bold">加粗:</string>
+    <string name="paddingLeft">内边距-左:</string>
+    <string name="paddingTop">内边距-上:</string>
+    <string name="paddingRight">内边距-右:</string>
+    <string name="paddingBottom">内边距-下:</string>
+
+    <string name="marginLeft">外边距-左:</string>
+    <string name="marginTop">外边距-上:</string>
+    <string name="marginRight">外边距-右:</string>
+    <string name="marginBottom">外边距-下:</string>
+
+    <string name="gravity_left">左</string>
+    <string name="gravity_top">上</string>
+    <string name="gravity_right">右</string>
+    <string name="gravity_bottom">下</string>
+    <string name="gravity_center">中</string>
+    <string name="hide">隐藏</string>
+
 </resources>
