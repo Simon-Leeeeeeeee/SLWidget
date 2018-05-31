@@ -144,7 +144,7 @@ public class BadgeProxy {
         //字体颜色
         this.mBadgeTextColor = typedArray.getColor(R.styleable.Badge_textColor_badge, 0xFFFFFFFF);
         //字体加粗
-        this.mBoldTextEnable = typedArray.getBoolean(R.styleable.Badge_boldText_badge, false);
+        this.mBoldTextEnable = typedArray.getBoolean(R.styleable.Badge_boldText_badge, true);
 
         typedArray.recycle();
 
