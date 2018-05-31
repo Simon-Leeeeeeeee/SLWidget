@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:background="@color/gray"
         android:orientation="horizontal"
-        android:padding="20dp">
+        android:padding="20dp"
+        app:background_badge="@drawable/shape_badge_purple">
 
         <cn.simonlee.widgetdemo.widget.BadgeImageView
             android:id="@+id/imageview_badgeimage"
@@ -138,7 +139,7 @@
                     android:layout_marginBottom="1dp"
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="20"
                     android:progress="0" />
 
                 <TextView
@@ -172,7 +173,7 @@
                     android:layout_marginBottom="1dp"
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="20"
                     android:progress="0" />
 
                 <TextView
@@ -206,7 +207,7 @@
                     android:layout_marginBottom="1dp"
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="20"
                     android:progress="0" />
 
                 <TextView
@@ -240,7 +241,7 @@
                     android:layout_marginBottom="1dp"
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="20"
                     android:progress="0" />
 
                 <TextView

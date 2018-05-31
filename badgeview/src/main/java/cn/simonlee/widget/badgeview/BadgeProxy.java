@@ -330,8 +330,8 @@ public class BadgeProxy {
         float backgroundWidth, backgroundHeight;
         //先计算浮标的宽高
         if (mBadgeText.length() < 1) {
-            //文本长度为0，只显示一个直径8dp的小圆点
-            backgroundWidth = backgroundHeight = 8 * mDensityDP;
+            //文本长度为0，只显示一个小圆点
+            backgroundWidth = backgroundHeight = 2 * mDensityDP + (mBadgePaddingTop + mBadgePaddingBottom + mBadgePaddingLeft + mBadgePaddingRight) / 2F;
         } else {
             //根据文本长度计算浮标的宽高
             backgroundHeight = mBadgePaddingTop + mBadgePaddingBottom + mBadgeTextHeight;
