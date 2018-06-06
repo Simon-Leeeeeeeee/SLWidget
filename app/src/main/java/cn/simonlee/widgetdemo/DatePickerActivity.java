@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -105,6 +104,7 @@ public class DatePickerActivity extends AppCompatActivity implements ScrollPicke
                 if (newMaxDay != mDayAdapter.getMaxValue()) {
                     mDayAdapter.resetMax(newMaxDay);
                     mPicker_Day.invalidate();
+                    return;
                 }
                 mSelect_Year = value;
                 break;
@@ -116,6 +116,7 @@ public class DatePickerActivity extends AppCompatActivity implements ScrollPicke
                 if (newMaxDay != mDayAdapter.getMaxValue()) {
                     mDayAdapter.resetMax(newMaxDay);
                     mPicker_Day.invalidate();
+                    return;
                 }
                 mSelect_Month = value;
                 break;

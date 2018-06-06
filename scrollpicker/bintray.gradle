@@ -9,14 +9,15 @@ if (localPropertiesFile.exists()) {
     properties.load(localPropertiesFile.newDataInputStream())
 }
 
-/*读取字段*/
-def key_ProjectVCS = properties.getProperty('project.vcs')
 def key_ProjectName = 'ScrollPicker'//项目名称
 def key_ProjectDesc = 'A simple and beautiful picker.'//项目描述
+def key_ProjectVersion = '1.0.2'//项目版本
+def key_ProjectVersionDesc = ''//版本描述
+
+/*读取字段*/
+def key_ProjectVCS = properties.getProperty('project.vcs')
 def key_ProjectGroupId = properties.getProperty('project.groupId')
 def key_ProjectWebsite = properties.getProperty('project.website')
-def key_ProjectVersion = '1.0.1'//项目版本
-def key_ProjectVersionDesc = ''//版本描述
 
 def key_BintrayKey = properties.getProperty('bintray.key')
 def key_BintrayUser = properties.getProperty('bintray.user')

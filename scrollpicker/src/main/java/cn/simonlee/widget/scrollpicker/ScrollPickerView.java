@@ -93,24 +93,14 @@ public class ScrollPickerView extends View {
     private boolean mLoopEnable;
 
     /**
-     * item0的position
+     * 中部item的position
      */
-    private int mFirstItemPostion;
+    private int mMiddleItemPostion;
 
     /**
-     * item0的偏移量，取值范围 (-mRowHeight , mRowSpacing]
+     * 中部item的偏移量，取值范围( -mItenHeight/2F , mItenHeight/2F ]
      */
-    private float mFirstItemOffset;
-
-    /**
-     * 正常状态下，选中item与item0的position差值
-     */
-    private int mOriginalPositionOffset;
-
-    /**
-     * 正常状态下，item0离上边界的偏移值，取值范围 (-mRowHeight , mRowSpacing]
-     */
-    private float mOriginalFirstItemOffset;
+    private float mMiddleItemOffset;
 
     /**
      * 绘制区域中点的Y坐标
@@ -118,22 +108,7 @@ public class ScrollPickerView extends View {
     private float mCenterY;
 
     /**
-     * 偏移量极小值
-     */
-    private float mMinOffset;
-
-    /**
-     * 偏移量极大值
-     */
-    private float mMaxOffset;
-
-    /**
-     * 所有item累加的总距离
-     */
-    private float mTotalDistance;
-
-    /**
-     * 总的累计偏移量
+     * 总的累计偏移量，指针上移，position增大，偏移量增加
      */
     private float mTotalOffset;
 
@@ -193,7 +168,7 @@ public class ScrollPickerView extends View {
     private boolean isSwitchTouchPointer;
 
     /**
-     * 用于记录指定选中的position
+     * 用于记录指定的position
      */
     private Integer mSpecifyPosition;
 
@@ -354,7 +329,6 @@ public class ScrollPickerView extends View {
         setMeasuredDimension(widthSize, heightSize);
         if (widthSize > 0 && heightSize > 0) {
             measureOriginal();//计算初始状态下显示的行数、首行偏移量
-            measureExtremOffset();//计算偏移量的极值
             setPaintShader();//设置颜色线性渐变
         }
     }
@@ -365,26 +339,7 @@ public class ScrollPickerView extends View {
     private void measureOriginal() {
         //计算绘制区域高度
         int drawHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
-        //减去选中行高度后对折得到的剩余高度
-        float halfSurplusHeight = (drawHeight - mRowHeight) / 2;
-//      TODO measuredHeight不足一行的处理
-        //剩余高度能够填入的行数
-        mOriginalPositionOffset = (int) (halfSurplusHeight / mItemHeight);
-        //对剩余高度取余 注意这里不用取余运算符，因为可能造成严重错误！
-        float halfSurplusRem = halfSurplusHeight - mItemHeight * mOriginalPositionOffset;
-
-        if (mRowSpacing < 0) {
-            halfSurplusRem -= (mRowSpacing + mRowHeight);
-            mOriginalPositionOffset++;
-        }
-        if (halfSurplusRem > mRowSpacing) {//剩余高度取余后大于行距，第一个item压线了
-            //第一行离上边界的偏移值，负值
-            mOriginalFirstItemOffset = halfSurplusRem - mRowSpacing - mRowHeight;
-            mOriginalPositionOffset++;
-        } else {//第一个item未压线
-            //第一行离上边界的偏移值，非负值
-            mOriginalFirstItemOffset = halfSurplusRem;
-        }
+        //计算中心的Y值
         mCenterY = drawHeight / 2F + getPaddingTop();
         //根据对齐方式计算绘制起点
         switch (mGravity) {
@@ -400,19 +355,6 @@ public class ScrollPickerView extends View {
                 mDrawingOriginX = getMeasuredWidth() - getPaddingRight();
                 break;
             }
-        }
-    }
-
-    /**
-     * 计算偏移量的极值
-     */
-    private void measureExtremOffset() {
-        if (isInEditMode() || mAdapter == null) {
-            mMinOffset = mMaxOffset = 0;
-        } else {
-            mMinOffset = mOriginalFirstItemOffset - mCenterY + mRowHeight / 2F;
-            mMaxOffset = (mAdapter.getCount() - 1 - mOriginalPositionOffset) * mItemHeight;
-            mTotalDistance = mAdapter.getCount() * mItemHeight;
         }
     }
 
@@ -505,13 +447,13 @@ public class ScrollPickerView extends View {
                     //累加偏移量
                     mTotalOffset += offset;
                     //根据手势速度开启滑动动画
-                    mOverScroller.startScroll_Velocity(mTotalOffset, mMinOffset, mLoopEnable ? mMinOffset : mMaxOffset, velocityY, mItemHeight);
+                    mOverScroller.startScroll_Velocity(mTotalOffset, 0, mLoopEnable ? 0 : (mAdapter.getCount() - 1) * mItemHeight, velocityY, mItemHeight);
                     super.invalidate();
                 } else if (!isSwitchTouchPointer && Math.abs(offset) < mTouchSlop) {
                     //计算触摸点相对于中心位置的偏移距离
                     float distance = event.getY(actionIndex) - mCenterY;
                     //调用滑动动画方法，移动到目标位置
-                    mOverScroller.startScroll_Value(mTotalOffset, mMinOffset, mLoopEnable ? mMinOffset : mMaxOffset, distance, mItemHeight);
+                    mOverScroller.startScroll_Value(mTotalOffset, 0, mLoopEnable ? 0 : (mAdapter.getCount() - 1) * mItemHeight, distance, mItemHeight);
                     super.invalidate();
                 }
                 if (mVelocityTracker != null) {
@@ -526,12 +468,16 @@ public class ScrollPickerView extends View {
 
     @Override
     public void computeScroll() {
-        //滑动动画未结束
-        if (!isMoveAction && !mOverScroller.isFinished()) {
-            //计算当前偏移量
+        if (mSpecifyPosition != null) {//有指定position
+            //取消惯性事件
+            mOverScroller.finish();
+            //根据指定position计算偏移量
+            mTotalOffset = mSpecifyPosition * mItemHeight;
+            mSpecifyPosition = null;
+        } else if (!isMoveAction && !mOverScroller.isFinished()) {//惯性事件未结束
+            //获取当前偏移量
             mTotalOffset = mOverScroller.getCurValue();
-            //动画不会结束则预请求下一次刷新
-            if (!mOverScroller.isFinished()) {
+            if (!mOverScroller.isFinished()) {//惯性未结束，预请求下一次刷新
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     super.postInvalidateOnAnimation();
                 } else {
@@ -539,16 +485,16 @@ public class ScrollPickerView extends View {
                 }
             }
         }
-        if (mSpecifyPosition != null) {
-            mTotalOffset = (mSpecifyPosition % mAdapter.getCount() - mOriginalPositionOffset) * mItemHeight;
-            mSpecifyPosition = null;
-        }
-        if (mLoopEnable && mAdapter != null) {
-            //循环模式时 对总偏移量进行校正
-            if (mTotalOffset < mMinOffset) {
-                mTotalOffset += mTotalDistance;
-            } else if (mTotalOffset > (mTotalDistance - mMinOffset)) {
-                mTotalOffset -= mTotalDistance;
+        if (mLoopEnable && mAdapter != null) {//对总偏移量进行取模校正
+            //计算所有item累加总距离
+            float totalDistance = mAdapter.getCount() * mItemHeight;
+            //计算倍数
+            int count = (int) (mTotalOffset / totalDistance);
+            //对总偏移量进行取余，注意这里不用取余运算符，因为可能造成严重错误！
+            mTotalOffset = mTotalOffset - count * totalDistance;
+            //对总偏移量进行取模，使之恒不小于0
+            if (mTotalOffset < 0) {
+                mTotalOffset += totalDistance;
             }
         }
     }
@@ -565,61 +511,87 @@ public class ScrollPickerView extends View {
         int paddingTop = getPaddingTop();
         int paddingBottom = getPaddingBottom();
 
-        //计算第一行的position及偏移量
-        calculateFirstItem();
-        int curPosition = mFirstItemPostion;
-        float curOffset = mFirstItemOffset + paddingTop;
         //根据padding限定绘制区域
         canvas.clipRect(paddingLeft, paddingTop, measuredWidth - paddingRight, measuredHeight - paddingBottom);
+
+        //计算中部item的position及偏移量
+        calculateMiddleItem();
+        //绘制上半部分的item
+        int curPosition = mMiddleItemPostion - 1;
+        float curOffset = mCenterY + mMiddleItemOffset - mRowHeight / 2F - mItemHeight;
+        while (curOffset > paddingTop - mRowHeight) {
+            //绘制文本
+            drawText(canvas, curPosition, curOffset);
+            curOffset -= mItemHeight;
+            curPosition--;
+        }
+
+        //绘制中部及下半部分的item
+        curPosition = mMiddleItemPostion;
+        curOffset = mCenterY + mMiddleItemOffset - mRowHeight / 2F;
         while (curOffset < measuredHeight - paddingBottom) {
-            //对position取模
-            curPosition = getRealPosition(curPosition);
-            //position未越界
-            if (isInEditMode() || (curPosition >= 0 && curPosition < mAdapter.getCount())) {
-                //获取文本
-                String text = getDrawingText(curPosition);
-                //绘制文本
-                drawText(canvas, text, curOffset);
-            }
+            //绘制文本
+            drawText(canvas, curPosition, curOffset);
+            //下一个
             curOffset += mItemHeight;
             curPosition++;
         }
+
         //动画即将结束，进行选中回调
         if (!isMoveAction && mOverScroller.isFinished() && mItemSelectedListener != null) {
-            int selectPosition = getRealPosition(mFirstItemPostion + mOriginalPositionOffset);
-            mItemSelectedListener.onItemSelected(this, selectPosition, getDrawingText(selectPosition));
+            mItemSelectedListener.onItemSelected(this, mMiddleItemPostion, getDrawingText(mMiddleItemPostion));
         }
     }
 
     /**
-     * 根据总偏移量计算item0的偏移量及position
+     * 根据总偏移量计算中部item的偏移量及position
+     * 偏移量的取值范围为(-mItenHeight/2F , mItenHeight/2F]
      */
-    private void calculateFirstItem() {
+    private void calculateMiddleItem() {
         //计算偏移了多少个完整item
         int count = (int) (mTotalOffset / mItemHeight);
-        //对偏移量取余 注意这里不用取余运算符，因为可能造成严重错误！
-        float offsetRem = mTotalOffset - mItemHeight * count;
-        //计算item0的上边相对于View上边的偏移量
-        float offset = offsetRem - mOriginalFirstItemOffset;
-
-        if (offset < -mRowSpacing) {//偏移量小于负间距，position减1
-            mFirstItemPostion = count - 1;
-        } else if (offset < mRowHeight) {
-            mFirstItemPostion = count;
-        } else {//偏移量大于等于行高，position加1
-            mFirstItemPostion = count + 1;
-        }
-
-        //对剩余偏移量再次取余 注意这里不用取余运算符，因为可能造成严重错误！
-        offset += 2 * mItemHeight;
-        offsetRem = offset - (int) (offset / mItemHeight) * mItemHeight;
-
-        if (offsetRem < -mRowSpacing) {
-            mFirstItemOffset = -offsetRem - mRowHeight - mRowSpacing;
-        } else if (offsetRem < mRowHeight) {
-            mFirstItemOffset = -offsetRem;
+        //对偏移量取余，注意这里不用取余运算符，因为可能造成严重错误！
+        float offsetRem = mTotalOffset - mItemHeight * count;//取值范围( -mItenHeight , mItenHeight )
+        if (offsetRem >= mItemHeight / 2F) {
+            mMiddleItemPostion = count + 1;
+            mMiddleItemOffset = mItemHeight - offsetRem;
+        } else if (offsetRem >= -mItemHeight / 2F) {
+            mMiddleItemPostion = count;
+            mMiddleItemOffset = -offsetRem;
         } else {
-            mFirstItemOffset = -offsetRem + mItemHeight;
+            mMiddleItemPostion = count - 1;
+            mMiddleItemOffset = -mItemHeight - offsetRem;
+        }
+    }
+
+    /**
+     * 绘制文本
+     */
+    private void drawText(Canvas canvas, int position, float offsetY) {
+        //对position取模
+        position = getRealPosition(position);
+        //position未越界
+        if (isInEditMode() || (position >= 0 && position < mAdapter.getCount())) {
+            //获取文本
+            String text = getDrawingText(position);
+            if (text != null) {
+                canvas.save();
+                //平移画布
+                canvas.translate(0, offsetY);
+                //操作线性颜色渐变
+                mMatrix.setTranslate(0, -offsetY);
+                mLinearShader.setLocalMatrix(mMatrix);
+                //计算缩放比例
+                float scaling = getScaling(offsetY);
+                canvas.scale(scaling, scaling, mDrawingOriginX, mRowHeight / 2F);
+                //获取文本尺寸
+                mTextPaint.getTextBounds(text, 0, text.length(), mTextBounds);
+                //根据文本尺寸计算基线位置
+                float baseLineY = (mRowHeight - mTextBounds.top - mTextBounds.bottom) / 2F;
+                //绘制文本
+                canvas.drawText(text, mDrawingOriginX, baseLineY, mTextPaint);
+                canvas.restore();
+            }
         }
     }
 
@@ -650,28 +622,6 @@ public class ScrollPickerView extends View {
     }
 
     /**
-     * 绘制文本
-     */
-    private void drawText(Canvas canvas, String text, float offsetY) {
-        canvas.save();
-        //平移画布
-        canvas.translate(0, offsetY);
-        //操作线性颜色渐变
-        mMatrix.setTranslate(0, -offsetY);
-        mLinearShader.setLocalMatrix(mMatrix);
-        //根据偏移量计算缩放比例
-        float scaling = getScaling(offsetY);
-        canvas.scale(scaling, scaling, mDrawingOriginX, mRowHeight / 2F);
-        //获取文本尺寸
-        mTextPaint.getTextBounds(text, 0, text.length(), mTextBounds);
-        //根据文本尺寸计算基线位置
-        float baseLineY = (mRowHeight - mTextBounds.top - mTextBounds.bottom) / 2F;
-        //绘制文本
-        canvas.drawText(text, mDrawingOriginX, baseLineY, mTextPaint);
-        canvas.restore();
-    }
-
-    /**
      * 根据偏移量计算缩放比例
      */
     private float getScaling(float offsetY) {
@@ -688,7 +638,7 @@ public class ScrollPickerView extends View {
      */
     public void setAdapter(PickAdapter adapter) {
         this.mAdapter = adapter;
-        measureExtremOffset();
+        super.invalidate();
     }
 
     /**
@@ -702,7 +652,7 @@ public class ScrollPickerView extends View {
         if (!mOverScroller.isFinished()) {
             mOverScroller.finish();
         }
-        //这里不直接计算偏移量是因为，如果在onMeasure完成之前调用setSelectedPosition会有偏差
+        // 如果在onMeasure之前设置选中项，mItemHeight为0，无法得到正确偏移量，因此这里不能直接计算mTotalOffset
         mSpecifyPosition = position;
         super.invalidate();
     }
@@ -714,7 +664,7 @@ public class ScrollPickerView extends View {
         if (isMoveAction || mAdapter == null || !mOverScroller.isFinished()) {
             return -1;
         }
-        return getRealPosition(mFirstItemPostion + mOriginalPositionOffset);
+        return mMiddleItemPostion;
     }
 
     /**
@@ -745,11 +695,17 @@ public class ScrollPickerView extends View {
     }
 
     public void setLoopable(boolean isChecked) {
-        //TODO
-//        if (mLoopEnable != isChecked) {
-//            mLoopEnable = isChecked;
-//            super.invalidate();
-//        }
+        if (mLoopEnable != isChecked) {
+            mLoopEnable = isChecked;
+            //循环将关闭且正在惯性事件
+            if (!mLoopEnable && !mOverScroller.isFinished() && mAdapter != null) {
+                //停止惯性事件，并指定position以确保item对齐
+                mOverScroller.finish();
+                //防止position越界
+                mSpecifyPosition = mMiddleItemPostion < 0 ? 0 : (mMiddleItemPostion >= mAdapter.getCount() ? mAdapter.getCount() - 1 : mMiddleItemPostion);
+            }
+            super.invalidate();
+        }
     }
 
     /**
@@ -767,27 +723,37 @@ public class ScrollPickerView extends View {
     /**
      * 设置文本字体大小，单位sp
      */
-    public void setTextSize(int textSize) {
-        mTextSize = textSize * mDensitySP;
-        mTextPaint.setTextSize(mTextSize);
-        measureTextHeight();
-        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            super.requestLayout();
-        } else {
-            super.invalidate();
+    public void setTextSize(int textSizeSP) {
+        float textSize = textSizeSP * mDensitySP;
+        if (mTextSize != textSize) {
+            mTextSize = textSize;
+            mTextPaint.setTextSize(mTextSize);
+            measureTextHeight();
+            mOverScroller.finish();
+            mSpecifyPosition = mMiddleItemPostion;
+            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                super.requestLayout();
+            } else {
+                super.invalidate();
+            }
         }
     }
 
     /**
      * 设置文本行间距，单位dp
      */
-    public void setRowSpacing(int rowSpacing) {
-        mRowSpacing = rowSpacing * mDensityDP;
-        measureTextHeight();
-        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            super.requestLayout();
-        } else {
-            super.invalidate();
+    public void setRowSpacing(int rowSpacingDP) {
+        float rowSpacing = rowSpacingDP * mDensityDP;
+        if (mRowSpacing != rowSpacing) {
+            mRowSpacing = rowSpacing;
+            measureTextHeight();
+            mOverScroller.finish();
+            mSpecifyPosition = mMiddleItemPostion;
+            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                super.requestLayout();
+            } else {
+                super.invalidate();
+            }
         }
     }
 
@@ -795,12 +761,16 @@ public class ScrollPickerView extends View {
      * 设置放大倍数
      */
     public void setTextRatio(float textRatio) {
-        mTextRatio = textRatio;
-        measureTextHeight();
-        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            super.requestLayout();
-        } else {
-            super.invalidate();
+        if (mTextRatio != textRatio) {
+            mTextRatio = textRatio;
+            measureTextHeight();
+            mOverScroller.finish();
+            mSpecifyPosition = mMiddleItemPostion;
+            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                super.requestLayout();
+            } else {
+                super.invalidate();
+            }
         }
     }
 
