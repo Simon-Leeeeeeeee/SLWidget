@@ -106,14 +106,14 @@
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
                     android:max="30"
-                    android:progress="16" />
+                    android:progress="10" />
 
                 <TextView
                     android:id="@+id/tv_textsize"
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="10"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -140,14 +140,14 @@
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
                     android:max="20"
-                    android:progress="0" />
+                    android:progress="4" />
 
                 <TextView
                     android:id="@+id/tv_paddingleft"
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="4"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -174,14 +174,14 @@
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
                     android:max="20"
-                    android:progress="0" />
+                    android:progress="2" />
 
                 <TextView
                     android:id="@+id/tv_paddingtop"
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="2"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -208,14 +208,14 @@
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
                     android:max="20"
-                    android:progress="0" />
+                    android:progress="4" />
 
                 <TextView
                     android:id="@+id/tv_paddingright"
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="4"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -242,14 +242,14 @@
                     android:layout_marginTop="1dp"
                     android:layout_weight="1"
                     android:max="20"
-                    android:progress="0" />
+                    android:progress="2" />
 
                 <TextView
                     android:id="@+id/tv_paddingbottom"
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="2"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -283,7 +283,7 @@
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="0"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -317,7 +317,7 @@
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="0"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -351,7 +351,7 @@
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="0"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -385,7 +385,7 @@
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="X"
+                    android:text="0"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -416,6 +416,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:checked="true"
                     android:lines="1"
                     android:text="@string/gravity_top" />
 
@@ -424,6 +425,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:checked="true"
                     android:lines="1"
                     android:text="@string/gravity_right" />
 

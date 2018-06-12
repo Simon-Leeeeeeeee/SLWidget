@@ -485,18 +485,6 @@ public class ScrollPickerView extends View {
                 }
             }
         }
-        if (mLoopEnable && mAdapter != null) {//对总偏移量进行取模校正
-            //计算所有item累加总距离
-            float totalDistance = mAdapter.getCount() * mItemHeight;
-            //计算倍数
-            int count = (int) (mTotalOffset / totalDistance);
-            //对总偏移量进行取余，注意这里不用取余运算符，因为可能造成严重错误！
-            mTotalOffset = mTotalOffset - count * totalDistance;
-            //对总偏移量进行取模，使之恒不小于0
-            if (mTotalOffset < 0) {
-                mTotalOffset += totalDistance;
-            }
-        }
     }
 
     @Override
@@ -539,6 +527,9 @@ public class ScrollPickerView extends View {
 
         //动画即将结束，进行选中回调
         if (!isMoveAction && mOverScroller.isFinished() && mItemSelectedListener != null) {
+            //根据当前position对偏移量进行校正
+            mTotalOffset = mMiddleItemPostion * mItemHeight;
+            //回调监听
             mItemSelectedListener.onItemSelected(this, mMiddleItemPostion, getDrawingText(mMiddleItemPostion));
         }
     }
@@ -553,15 +544,15 @@ public class ScrollPickerView extends View {
         //对偏移量取余，注意这里不用取余运算符，因为可能造成严重错误！
         float offsetRem = mTotalOffset - mItemHeight * count;//取值范围( -mItenHeight , mItenHeight )
         if (offsetRem >= mItemHeight / 2F) {
-            mMiddleItemPostion = count + 1;
+            count++;
             mMiddleItemOffset = mItemHeight - offsetRem;
         } else if (offsetRem >= -mItemHeight / 2F) {
-            mMiddleItemPostion = count;
             mMiddleItemOffset = -offsetRem;
         } else {
-            mMiddleItemPostion = count - 1;
+            count--;
             mMiddleItemOffset = -mItemHeight - offsetRem;
         }
+        mMiddleItemPostion = getRealPosition(count);
     }
 
     /**

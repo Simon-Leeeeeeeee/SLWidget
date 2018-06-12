@@ -10,6 +10,8 @@
     <attr name="textSize" format="reference|dimension" />
     <!--字体格式，宽度为wrap_content时用于计算宽度-->
     <attr name="textFormat" format="reference|string" />
+    <!--字体放大倍数-->
+    <attr name="textRatio" format="float" />
 
     <!--选中时字体颜色-->
     <attr name="textColor_selected" format="reference|color" />
@@ -36,7 +38,7 @@
         <!--字体格式，宽度为wrap_content时用于计算宽度-->
         <attr name="textFormat" />
         <!--字体放大倍数-->
-        <attr name="textRatio" format="float" />
+        <attr name="textRatio" />
         <!--选中时字体颜色-->
         <attr name="textColor_selected" />
         <!--未选中时字体颜色-->
@@ -45,34 +47,6 @@
         <attr name="gravity" />
         <!--是否开启循环-->
         <attr name="loop" />
-    </declare-styleable>
-
-    <declare-styleable name="WheelView">
-
-        <!-- View的宽 -->
-        <attr name="android:layout_width" />
-        <!-- View的高 -->
-        <attr name="android:layout_height" />
-
-        <!--字体大小-->
-        <attr name="textSize" />
-
-        <!--选中时字体颜色-->
-        <attr name="textColor_selected" />
-        <!--未选中时字体颜色-->
-        <attr name="textColor_unselected" />
-
-        <!--分割线颜色，默认透明不显示-->
-        <attr name="dividerColor" format="reference|color" />
-
-        <!--是否开启循环-->
-        <attr name="loop" />
-
-        <!--行间距-->
-        <attr name="spacing" />
-
-        <!--文本对齐方式（左、中、右）-->
-        <attr name="gravity" />
     </declare-styleable>
 
 </resources>

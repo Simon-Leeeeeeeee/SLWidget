@@ -237,7 +237,6 @@ public class BadgeProxy {
      */
     public void setBadgeBackground(Drawable drawable) {
         mBadgeBackground = drawable;
-
     }
 
     /**

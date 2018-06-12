@@ -5,34 +5,98 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:clipChildren="false"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <cn.simonlee.widgetdemo.widget.Fake3DView
+            android:id="@+id/fake3dview"
+            android:layout_width="300dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@mipmap/bg_4x2" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="10dp"
-            android:text="@string/catalog"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/angle_rotating"
+                android:textColor="@color/black" />
+
+            <SeekBar
+                android:id="@+id/sb_angle_rotating"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:max="360"
+                android:progress="0" />
+
+            <TextView
+                android:id="@+id/tv_angle_rotating"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="X"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/sight"
+                android:textColor="@color/black" />
+
+            <SeekBar
+                android:id="@+id/sb_sight"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:max="29"
+                android:progress="3" />
+
+            <TextView
+                android:id="@+id/tv_sight"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="X"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btn_badge"
-            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="@string/badge" />
+            android:text="@string/badge"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btn_scrollpicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAllCaps="false"
             android:layout_marginLeft="10dp"
-            android:text="@string/scrollpicker" />
+            android:text="@string/scrollpicker"
+            android:textAllCaps="false" />
 
         <TextView
             android:layout_width="match_parent"

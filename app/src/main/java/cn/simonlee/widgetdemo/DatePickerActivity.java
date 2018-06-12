@@ -98,6 +98,7 @@ public class DatePickerActivity extends AppCompatActivity implements ScrollPicke
     public void onItemSelected(View view, int position, String value) {
         switch (view.getId()) {
             case R.id.datepicker_year: {
+                mSelect_Year = value;
                 int month = mPicker_Month.getSelectedPosition() + mMonthAdapter.getMinValue();
                 int year = mPicker_Year.getSelectedPosition() + mYearAdapter.getMinValue();
                 int newMaxDay = getMaxDay(year, month);
@@ -106,10 +107,10 @@ public class DatePickerActivity extends AppCompatActivity implements ScrollPicke
                     mPicker_Day.invalidate();
                     return;
                 }
-                mSelect_Year = value;
                 break;
             }
             case R.id.datepicker_month: {
+                mSelect_Month = value;
                 int year = mPicker_Year.getSelectedPosition() + mYearAdapter.getMinValue();
                 int month = mPicker_Month.getSelectedPosition() + mMonthAdapter.getMinValue();
                 int newMaxDay = getMaxDay(year, month);
@@ -118,7 +119,6 @@ public class DatePickerActivity extends AppCompatActivity implements ScrollPicke
                     mPicker_Day.invalidate();
                     return;
                 }
-                mSelect_Month = value;
                 break;
             }
             case R.id.datepicker_day: {
@@ -134,9 +134,7 @@ public class DatePickerActivity extends AppCompatActivity implements ScrollPicke
                 break;
             }
         }
-        if (mSelect_Year != null && mSelect_Month != null && mSelect_Day != null && mSelect_Hour != null && mSelect_Min != null) {
-            mTextView_Result.setText(mSelect_Year + "-" + mSelect_Month + "-" + mSelect_Day + " " + mSelect_Hour + ":" + mSelect_Min);
-        }
+        mTextView_Result.setText(mSelect_Year + "-" + mSelect_Month + "-" + mSelect_Day + " " + mSelect_Hour + ":" + mSelect_Min);
     }
 
     private int getMaxDay(int year, int month) {
