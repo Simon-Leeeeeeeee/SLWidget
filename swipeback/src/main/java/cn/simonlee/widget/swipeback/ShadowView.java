@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
+import android.os.Build;
 import android.view.View;
 
 /**
@@ -74,7 +74,11 @@ public class ShadowView extends View {
         if (showBackground) {
             background = new ColorDrawable(mShadowColor & 0X66FFFFFF);
         }
-        setBackgroundDrawable(background);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            setBackground(background);
+        } else {
+            setBackgroundDrawable(background);
+        }
     }
 
     /**
@@ -133,7 +137,6 @@ public class ShadowView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.e("SLWidget", getClass().getName() + ".onDraw()");
         super.onDraw(canvas);
         if (showShadowBar) {
             canvas.drawPaint(mShadowBarPaint);

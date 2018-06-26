@@ -3,7 +3,6 @@ package cn.simonlee.widget.swipeback;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.hardware.SensorManager;
-import android.util.Log;
 import android.view.ViewConfiguration;
 import android.view.animation.LinearInterpolator;
 
@@ -15,7 +14,6 @@ import android.view.animation.LinearInterpolator;
  * 2.指定距离，计算出速度和时间
  * 3.指定速度和距离，计算出时间
  */
-
 public class DecelerateAnimator extends ValueAnimator {
 
     private final DecelerateEvaluator mDecelerateEvaluator;
@@ -42,23 +40,22 @@ public class DecelerateAnimator extends ValueAnimator {
      */
     public void startAnimator(float startValue, float minFinalValue, float maxFinalValue, float velocity) {
         mInitialValue = startValue;
-        //TODO 1.计算预期位移
-        float futureDistance = getDistanceByVelocity(velocity);
-        //TODO 2.进行终点判断
-        if (mInitialValue + futureDistance < (maxFinalValue - minFinalValue) * 0.35F) {
+        //计算预期位移
+        float futureDistance = getDistanceByVelocity(velocity) * 2F;//乘2目的是为了增加灵敏度
+        //进行终点判断
+        if (mInitialValue + futureDistance < (maxFinalValue - minFinalValue) * 0.5F) {
             mFinalValue = minFinalValue;
         } else {
             mFinalValue = maxFinalValue;
         }
-        //TODO 3.计算移动距离
+        //计算移动距离
         mDistance = mFinalValue - mInitialValue;
-        //TODO 4.校正移动速度
+        //校正移动速度
         float minVelocity = getVelocityByDistance(mDistance);
         mVelocity = velocity * minVelocity > 0 ? (velocity + minVelocity) : minVelocity;
-        //TODO 5.计算动画时间
+        //计算动画时间
         mDuration = 3 * Math.round(1000 * Math.abs(mDistance / mVelocity));
-        Log.e("SLWidget", getClass().getName() + ".startAnimator() mDuration = " + mDuration);
-        //TODO 5.启动动画
+        //启动动画
         setFloatValues(mInitialValue, mFinalValue);
         setDuration(mDuration);
         start();
@@ -140,8 +137,6 @@ public class DecelerateAnimator extends ValueAnimator {
 
         @Override
         public Float evaluate(float fraction, Float startValue, Float endValue) {
-//            Log.e("SLWidget", getClass().getName() + ".evaluate() startValue = " + startValue + " , endValue = " + endValue + " , fraction = " + fraction);
-
             final int index = (int) (NB_SAMPLES * fraction);//时间占比乘以100
             float distanceCoef = 1.f;
             float velocityCoef = 0.f;

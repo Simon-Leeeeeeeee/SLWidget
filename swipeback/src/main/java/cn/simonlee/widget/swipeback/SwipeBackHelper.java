@@ -2,13 +2,11 @@ package cn.simonlee.widget.swipeback;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -25,17 +23,17 @@ import android.widget.EditText;
  * @createdTime 2018-06-19
  * <p>
  * 使用说明：
- * 1.Activity的Style设置必须设置以下两条属性
+ * 1. 使用前必须判断SDK，仅支持SDK19(Android4.4)及以上
+ * 2. Activity的Style设置必须设置以下两条属性
  * <item name="android:windowBackground">@color/transparent</item>
  * <item name="android:windowIsTranslucent">true</item>
- * 2.状态栏&ActionBar的高度padding自行设置
- * 3.Android5.0以下兼容性未做测试
+ * 3.ContentView会从屏幕顶端开始绘制，被状态栏&ActionBar覆盖。padding自行按需设置
  * 4.Activity的输入法模式不能设置为adjustPan，原因①无效，②侧滑时布局会下弹。建议为adjustResize
  * 5.入栈的Activity不会调用onStop，因为背景为透明。除非进入后台
  * 6.必须在Activity的dispatchTouchEvent中先调用SwipeBackHelper的dispatchTouchEvent。如若从左侧边滑动返回，会改变TouchEvent的Acition，下放一个ACTION_CANCEL
  * 7.可选：在Activity的onTouchEvent中调用SwipeBackHelper的onTouchEvent，可以在页面任意位置响应侧滑事件
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@android.support.annotation.RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener, View.OnLayoutChangeListener {
 
     /**
@@ -91,7 +89,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     /**
      * 目标Activity
      */
-    private final Activity mSwipeBackActivity;
+    private Activity mSwipeBackActivity;
 
     /**
      * 触摸点的ID
@@ -103,9 +101,34 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      */
     private float mStartX, mStartY;
 
+    /**
+     * 标志侧滑动画是否被取消
+     */
+    private boolean AnimationCancel;
+
+    /**
+     * 标志是否允许侧滑
+     */
+    private boolean mSwipeBackEnabled = true;
+
     public SwipeBackHelper(Activity activity) {
+        this(activity, true);
+    }
+
+    public SwipeBackHelper(Activity activity, boolean swipeBackEnabled) {
+        constructor(activity, swipeBackEnabled, false);
+    }
+
+    @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.M)
+    public SwipeBackHelper(Activity activity, boolean swipeBackEnabled, boolean darkStatusBar) {
+        constructor(activity, swipeBackEnabled, darkStatusBar);
+    }
+
+    private void constructor(Activity activity, boolean swipeBackEnabled, boolean darkStatusBar) {
         //目标Activity
         this.mSwipeBackActivity = activity;
+        //是否开启侧滑返回
+        this.mSwipeBackEnabled = swipeBackEnabled;
         //判断滑动事件的最小距离
         this.mTouchSlop = ViewConfiguration.get(mSwipeBackActivity).getScaledTouchSlop();
         //左侧拦截滑动事件的区域
@@ -122,15 +145,20 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !mSwipeBackActivity.isInMultiWindowMode()) {
             //监听DecorView的布局变化
             mDecorView.addOnLayoutChangeListener(this);
-            //去除状态栏
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            }
-            //设置状态栏透明
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+                if (darkStatusBar && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    //设置状态栏文字&图标暗色
+                    systemUiVisibility |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                }
+                //去除状态栏背景
+                mDecorView.setSystemUiVisibility(systemUiVisibility);
+                //设置状态栏透明
                 activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                mSwipeBackActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             }
         }
     }
@@ -139,19 +167,23 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * 返回侧滑事件操作的View，可被子类重写
      */
     public ViewGroup getSwipeBackView(ViewGroup decorView) {
-        //使用contentView的父View，可包含ActionBar
-        return (ViewGroup) decorView.findViewById(Window.ID_ANDROID_CONTENT).getParent();
+        if (mSwipeBackView == null) {
+            //使用contentView的父View，可包含ActionBar
+            mSwipeBackView = (ViewGroup) decorView.findViewById(Window.ID_ANDROID_CONTENT).getParent();
+        }
+        return mSwipeBackView;
     }
 
     /**
      * 返回侧滑时左侧的阴影View，并添加到decorView，可被子类重写
      */
     public View getShadowView(ViewGroup decorView) {
-        ShadowView shadowView = new ShadowView(mSwipeBackActivity);
-        shadowView.setTranslationX(-decorView.getMeasuredWidth());
-        decorView.addView(shadowView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        //使用contentView的父View，可包含ActionBar
-        return shadowView;
+        if (mShadowView == null) {
+            mShadowView = new ShadowView(mSwipeBackActivity);
+            mShadowView.setTranslationX(-decorView.getMeasuredWidth());
+            decorView.addView(mShadowView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+        return mShadowView;
     }
 
     @Override
@@ -169,7 +201,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                 ViewGroup.LayoutParams childLp = child.getLayoutParams();
                 //调整子ViewGroup的paddingBottom
                 int paddingBottom = bottom - visibleDisplayRect.bottom;
-                Log.e("SLWidget", getClass().getName() + ".onLayoutChange() paddingBottom = " + paddingBottom);
                 if (childLp instanceof ViewGroup.MarginLayoutParams) {
                     //此处减去bottomMargin，是考虑到导航栏的高度
                     paddingBottom -= ((ViewGroup.MarginLayoutParams) childLp).bottomMargin;
@@ -178,7 +209,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                     paddingBottom = 0;
                 }
                 if (paddingBottom != child.getPaddingBottom()) {
-                    Log.e("SLWidget", getClass().getName() + ".onLayoutChange() setPadding = " + paddingBottom);
                     //调整子ViewGroup的paddingBottom，以保证整个ViewGroup可见
                     child.setPadding(child.getPaddingLeft(), child.getPaddingTop(), child.getPaddingRight(), paddingBottom);
                 }
@@ -193,6 +223,9 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * ②当子View未消费时，在onTouchEvent中进行滑动方向判断
      */
     public void dispatchTouchEvent(MotionEvent event) {
+        if (!mSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
+            return;
+        }
         int actionIndex = event.getActionIndex();
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
@@ -200,13 +233,19 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         mVelocityTracker.addMovement(event);
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
-                //记录偏移坐标
-                mStartX = event.getX(actionIndex);
-                mStartY = event.getY(actionIndex);
-                //记录当前控制指针ID
-                mTouchPointerId = event.getPointerId(actionIndex);
-                //重置拖动方向
-                mDragDirection = 0;
+                if (mSwipeAnimator != null && mSwipeAnimator.isStarted()) {
+                    mDragDirection = horizontal;
+                    mSwipeAnimator.cancel();
+                    mStartX = event.getX(actionIndex) - mSwipeBackView.getTranslationX();
+                } else {
+                    //记录偏移坐标
+                    mStartX = event.getX(actionIndex);
+                    mStartY = event.getY(actionIndex);
+                    //记录当前控制指针ID
+                    mTouchPointerId = event.getPointerId(actionIndex);
+                    //重置拖动方向
+                    mDragDirection = 0;
+                }
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
@@ -278,6 +317,8 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                     }
                     startSwipeAnimator(offsetX, 0, mDecorView.getMeasuredWidth(), velocityX);
                 }
+                //重置拖动方向
+                mDragDirection = 0;
                 break;
             }
         }
@@ -288,6 +329,9 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * 当子View未消费时会调用Activity的onTouchEvent，此时进行滑动方向判断
      */
     public void onTouchEvent(MotionEvent event) {
+        if (!mSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
+            return;
+        }
         //还未产生滑动，触点不在拦截区域内
         if (mDragDirection == 0 && mStartX > mInterceptRect) {
             for (int index = 0; index < event.getPointerCount(); index++) {
@@ -306,6 +350,32 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         }
     }
 
+    /**
+     * 设置是否开启侧滑返回
+     */
+    public void setSwipeBackEnabled(boolean enabled) {
+        mSwipeBackEnabled = enabled;
+        if (!enabled) {
+            mSwipeBackView.setTranslationX(0);
+            mShadowView.setTranslationX(-mDecorView.getMeasuredWidth());
+        }
+    }
+
+    /**
+     * 反转状态栏字体&图标颜色
+     */
+    @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.M)
+    public void toggleStatusBarColor(boolean darkStatusBar) {
+        int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        if (darkStatusBar) {
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        }
+        mDecorView.setSystemUiVisibility(systemUiVisibility);
+    }
+
+    /**
+     * 隐藏输入法
+     */
     private void HideInputSoft() {
         View view = mSwipeBackActivity.getCurrentFocus();
         if (view != null) {
@@ -363,22 +433,26 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
 
     @Override
     public void onAnimationEnd(Animator animation) {
-        //最终移动距离位置超过半宽，结束当前Activity
-        if (2 * mSwipeBackView.getTranslationX() >= mDecorView.getMeasuredWidth()) {
-            mSwipeBackActivity.finish();
-            mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
-        } else {
-            mSwipeBackView.setTranslationX(0);
-            mShadowView.setTranslationX(-mDecorView.getMeasuredWidth());
+        if (!AnimationCancel) {
+            //最终移动距离位置超过半宽，结束当前Activity
+            if (2 * mSwipeBackView.getTranslationX() >= mDecorView.getMeasuredWidth()) {
+                mSwipeBackActivity.finish();
+                mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
+            } else {
+                mSwipeBackView.setTranslationX(0);
+                mShadowView.setTranslationX(-mDecorView.getMeasuredWidth());
+            }
         }
     }
 
     @Override
     public void onAnimationStart(Animator animation) {
+        AnimationCancel = false;
     }
 
     @Override
     public void onAnimationCancel(Animator animation) {
+        AnimationCancel = true;
     }
 
     @Override
