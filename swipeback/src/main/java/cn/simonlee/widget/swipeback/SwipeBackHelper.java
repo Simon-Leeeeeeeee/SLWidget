@@ -24,15 +24,26 @@ import android.widget.EditText;
  * <p>
  * 使用说明：
  * 1. 使用前必须判断SDK，仅支持SDK19(Android4.4)及以上
+ * <p>
  * 2. Activity的Style设置必须设置以下两条属性
  * <item name="android:windowBackground">@color/transparent</item>
  * <item name="android:windowIsTranslucent">true</item>
- * 3.ContentView会从屏幕顶端开始绘制，被状态栏&ActionBar覆盖。padding自行按需设置
- * 4.Activity的输入法模式不能设置为adjustPan，原因①无效，②侧滑时布局会下弹。建议为adjustResize
- * 5.入栈的Activity不会调用onStop，因为背景为透明。除非进入后台
- * 6.必须在Activity的dispatchTouchEvent中先调用SwipeBackHelper的dispatchTouchEvent。如若从左侧边滑动返回，会改变TouchEvent的Acition，下放一个ACTION_CANCEL
- * 7.可选：在Activity的onTouchEvent中调用SwipeBackHelper的onTouchEvent，可以在页面任意位置响应侧滑事件
+ * <p>
+ * 3.在android8.0及以上不能固定屏幕方向，因为会与windowIsTranslucent冲突导致程序崩溃。
+ * 解决办法：栈底Activity固定屏幕方向，windowIsTranslucent为false，其他Activity的screenOrientation设置为behind跟随栈底Activity方向
+ * 注意：栈底固定屏幕方向的Activity若被杀死，其他Activity可能会自动旋转
+ * <p>
+ * 4.ContentView会从屏幕顶端开始绘制，被状态栏&ActionBar覆盖。padding自行按需设置
+ * <p>
+ * 5.Activity的输入法模式不能设置为adjustPan，原因①无效，②侧滑时布局会下弹。建议为adjustResize
+ * <p>
+ * 6.入栈的Activity不会调用onStop，因为背景为透明。
+ * <p>
+ * 7.必须在Activity的dispatchTouchEvent中先调用SwipeBackHelper的dispatchTouchEvent。如若从左侧边滑动返回，会改变TouchEvent的Acition，下放一个ACTION_CANCEL
+ * <p>
+ * 8.可选：在Activity的onTouchEvent中调用SwipeBackHelper的onTouchEvent，可以在页面任意位置响应侧滑事件
  */
+@SuppressWarnings("unused")
 @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener, View.OnLayoutChangeListener {
 
@@ -112,23 +123,17 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     private boolean mSwipeBackEnabled = true;
 
     public SwipeBackHelper(Activity activity) {
-        this(activity, true);
-    }
-
-    public SwipeBackHelper(Activity activity, boolean swipeBackEnabled) {
-        constructor(activity, swipeBackEnabled, false);
+        constructor(activity, false);
     }
 
     @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.M)
-    public SwipeBackHelper(Activity activity, boolean swipeBackEnabled, boolean darkStatusBar) {
-        constructor(activity, swipeBackEnabled, darkStatusBar);
+    public SwipeBackHelper(Activity activity, boolean darkStatusBar) {
+        constructor(activity, darkStatusBar);
     }
 
-    private void constructor(Activity activity, boolean swipeBackEnabled, boolean darkStatusBar) {
+    private void constructor(Activity activity, boolean darkStatusBar) {
         //目标Activity
         this.mSwipeBackActivity = activity;
-        //是否开启侧滑返回
-        this.mSwipeBackEnabled = swipeBackEnabled;
         //判断滑动事件的最小距离
         this.mTouchSlop = ViewConfiguration.get(mSwipeBackActivity).getScaledTouchSlop();
         //左侧拦截滑动事件的区域
