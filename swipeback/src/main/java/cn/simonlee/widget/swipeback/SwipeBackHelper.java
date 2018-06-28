@@ -2,6 +2,7 @@ package cn.simonlee.widget.swipeback;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -48,19 +49,29 @@ import android.widget.EditText;
 public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener, View.OnLayoutChangeListener {
 
     /**
+     * 目标Activity
+     */
+    private final Activity mSwipeBackActivity;
+
+    /**
+     * 根视图
+     */
+    private final ViewGroup mDecorView;
+
+    /**
      * 判断滑动事件的最小距离
      */
-    private int mTouchSlop;
+    private final int mTouchSlop;
 
     /**
      * 左侧拦截滑动事件的区域
      */
-    private float mInterceptRect;
+    private final float mInterceptRect;
 
     /**
-     * 滑动事件方向
+     * 标志状态栏是否透明
      */
-    private int mDragDirection;
+    private final boolean isStatusBarTransparent;
 
     /**
      * 纵向滑动
@@ -73,9 +84,9 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     private final int horizontal = 2;
 
     /**
-     * 根视图
+     * 滑动事件方向
      */
-    private ViewGroup mDecorView;
+    private int mDragDirection;
 
     /**
      * 阴影视图
@@ -98,11 +109,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     private DecelerateAnimator mSwipeAnimator;
 
     /**
-     * 目标Activity
-     */
-    private Activity mSwipeBackActivity;
-
-    /**
      * 触摸点的ID
      */
     private int mTouchPointerId;
@@ -115,57 +121,65 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     /**
      * 标志侧滑动画是否被取消
      */
-    private boolean AnimationCancel;
+    private boolean isAnimationCancel;
 
     /**
      * 标志是否允许侧滑
      */
-    private boolean mSwipeBackEnabled = true;
+    private boolean isSwipeBackEnabled = true;
 
+    @SuppressLint("NewApi")
     public SwipeBackHelper(Activity activity) {
-        constructor(activity, false);
+        this(activity, false);
     }
 
     @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.M)
     public SwipeBackHelper(Activity activity, boolean darkStatusBar) {
-        constructor(activity, darkStatusBar);
-    }
-
-    private void constructor(Activity activity, boolean darkStatusBar) {
         //目标Activity
         this.mSwipeBackActivity = activity;
+        //获取根View
+        this.mDecorView = (ViewGroup) activity.getWindow().getDecorView();
+        //设置状态栏透明
+        this.isStatusBarTransparent = setStatusBarTransparent(darkStatusBar);
         //判断滑动事件的最小距离
-        this.mTouchSlop = ViewConfiguration.get(mSwipeBackActivity).getScaledTouchSlop();
+        this.mTouchSlop = ViewConfiguration.get(activity).getScaledTouchSlop();
         //左侧拦截滑动事件的区域
-        this.mInterceptRect = 15 * mSwipeBackActivity.getResources().getDisplayMetrics().density;//15dp
+        this.mInterceptRect = 15 * activity.getResources().getDisplayMetrics().density;//15dp
+    }
 
-        //获取根View及侧滑返回的View
-        this.mDecorView = (ViewGroup) mSwipeBackActivity.getWindow().getDecorView();
-        this.mSwipeBackView = getSwipeBackView(mDecorView);
-
-        //插入左侧阴影
-        this.mShadowView = getShadowView(mDecorView);
-
-        //判断不是窗口模式
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !mSwipeBackActivity.isInMultiWindowMode()) {
-            //监听DecorView的布局变化
-            mDecorView.addOnLayoutChangeListener(this);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-                if (darkStatusBar && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    //设置状态栏文字&图标暗色
-                    systemUiVisibility |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                }
-                //去除状态栏背景
-                mDecorView.setSystemUiVisibility(systemUiVisibility);
-                //设置状态栏透明
-                activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                mSwipeBackActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    /**
+     * 设置状态栏透明，并监听布局变化
+     */
+    private boolean setStatusBarTransparent(boolean darkStatusBar) {
+        boolean isInMultiWindowMode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && mSwipeBackActivity.isInMultiWindowMode();
+        //窗口模式或者SDK小于19，不设置状态栏透明
+        if (isInMultiWindowMode || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return false;
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            mSwipeBackActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        } else {
+            int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            if (darkStatusBar && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                //设置状态栏文字&图标暗色
+                systemUiVisibility |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             }
+            //去除状态栏背景
+            mDecorView.setSystemUiVisibility(systemUiVisibility);
+            //设置状态栏透明
+            mSwipeBackActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            mSwipeBackActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            mSwipeBackActivity.getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
+        //监听DecorView的布局变化
+        mDecorView.addOnLayoutChangeListener(this);
+        return true;
+    }
+
+    /**
+     * 状态栏是否透明
+     */
+    public boolean isStatusBarTransparent() {
+        return isStatusBarTransparent;
     }
 
     /**
@@ -228,9 +242,11 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * ②当子View未消费时，在onTouchEvent中进行滑动方向判断
      */
     public void dispatchTouchEvent(MotionEvent event) {
-        if (!mSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
+        if (!isSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
             return;
         }
+        this.mSwipeBackView = getSwipeBackView(mDecorView);
+        this.mShadowView = getShadowView(mDecorView);
         int actionIndex = event.getActionIndex();
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
@@ -334,7 +350,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * 当子View未消费时会调用Activity的onTouchEvent，此时进行滑动方向判断
      */
     public void onTouchEvent(MotionEvent event) {
-        if (!mSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
+        if (!isSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
             return;
         }
         //还未产生滑动，触点不在拦截区域内
@@ -359,7 +375,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * 设置是否开启侧滑返回
      */
     public void setSwipeBackEnabled(boolean enabled) {
-        mSwipeBackEnabled = enabled;
+        isSwipeBackEnabled = enabled;
         if (!enabled) {
             mSwipeBackView.setTranslationX(0);
             mShadowView.setTranslationX(-mDecorView.getMeasuredWidth());
@@ -438,7 +454,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
 
     @Override
     public void onAnimationEnd(Animator animation) {
-        if (!AnimationCancel) {
+        if (!isAnimationCancel) {
             //最终移动距离位置超过半宽，结束当前Activity
             if (2 * mSwipeBackView.getTranslationX() >= mDecorView.getMeasuredWidth()) {
                 mSwipeBackActivity.finish();
@@ -452,12 +468,12 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
 
     @Override
     public void onAnimationStart(Animator animation) {
-        AnimationCancel = false;
+        isAnimationCancel = false;
     }
 
     @Override
     public void onAnimationCancel(Animator animation) {
-        AnimationCancel = true;
+        isAnimationCancel = true;
     }
 
     @Override
