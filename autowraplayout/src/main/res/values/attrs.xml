@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--网格线宽-->
+    <attr name="gridLineWidth" format="dimension|reference" />
+    <!--网格线颜色-->
+    <attr name="gridLineColor" format="reference|color" />
+    <!--单元格宽-->
+    <attr name="gridCellWidth" format="dimension|reference" />
+    <!--单元格高-->
+    <attr name="gridCellHeight" format="dimension|reference" />
+    <!--单元格内对齐方式-->
+    <attr name="gridCellGravity">
+        <flag name="left" value="1" />
+        <flag name="top" value="2" />
+        <flag name="right" value="4" />
+        <flag name="bottom" value="8" />
+        <flag name="center" value="16" />
+        <flag name="fill" value="32" />
+    </attr>
+    <!--firstChild独占一行-->
+    <attr name="stickFirst" format="boolean" />
+
+    <declare-styleable name="AutoWrapGridLayout">
+        <!--网格线宽-->
+        <attr name="gridLineWidth" />
+        <!--网格线颜色-->
+        <attr name="gridLineColor" />
+        <!--单元格宽-->
+        <attr name="gridCellWidth" />
+        <!--单元格高-->
+        <attr name="gridCellHeight" />
+        <!--单元格内对齐方式-->
+        <attr name="gridCellGravity" />
+        <!--firstChild独占一行-->
+        <attr name="stickFirst" />
+    </declare-styleable>
+
+</resources>
