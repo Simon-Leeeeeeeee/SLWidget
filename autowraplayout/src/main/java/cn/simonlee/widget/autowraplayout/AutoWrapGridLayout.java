@@ -146,6 +146,7 @@ public class AutoWrapGridLayout extends ViewGroup {
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int childState = 0;
         //单元格个数
         int gridCellCount = 0;
         mStickFirstWidth = mStickFirstHeight = 0;
@@ -155,6 +156,7 @@ public class AutoWrapGridLayout extends ViewGroup {
                 continue;
             }
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+            childState = combineMeasuredStates(childState, child.getMeasuredState());//TODO ？此处作用
             if (isStickFirst && index == 0) {
                 //记录置顶的firstChild宽高
                 MarginLayoutParams childLP = (MarginLayoutParams) child.getLayoutParams();
@@ -176,14 +178,20 @@ public class AutoWrapGridLayout extends ViewGroup {
         if (mLayoutWidth == LayoutParams.WRAP_CONTENT && widthMode != MeasureSpec.EXACTLY) {
             //计算需要的宽度
             int maxGridWidth = Math.max(mStickFirstWidth, gridCellCount * (mGridCellWidth + mGridLineWidth) - mGridLineWidth);
-            //不能操作最大值
-            widthSize = Math.min(widthSize, paddingWidth + maxGridWidth);
+            if (widthSize <= 0) {
+                widthSize = paddingWidth + maxGridWidth;
+            } else {
+                //不能超过最大宽，否则不会换行了
+                widthSize = Math.min(widthSize, paddingWidth + maxGridWidth);
+            }
             View firstChild = getChildAt(0);
             //重新测量置顶的firstChild
             if (isStickFirst && firstChild != null && firstChild.getVisibility() != View.GONE) {
-                //改变宽度模式重新测量置顶的firstChild，使其match_parent生效
-                widthMeasureSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
-                measureChildWithMargins(firstChild, widthMeasureSpec, 0, heightMeasureSpec, 0);
+                MarginLayoutParams firstChildLP = (MarginLayoutParams) firstChild.getLayoutParams();
+                if (firstChildLP.width == LayoutParams.MATCH_PARENT) {
+                    //改变宽度模式重新测量置顶的firstChild，使其match_parent生效
+                    measureChildWithMargins(firstChild, MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), 0, heightMeasureSpec, 0);
+                }
             }
         }
         //计算单元格的列数
@@ -202,10 +210,10 @@ public class AutoWrapGridLayout extends ViewGroup {
             if (mStickFirstHeight <= 0 && rowCount > 0) {
                 maxChildHeight -= mGridLineWidth;
             }
-            //不能操作最大值
-            heightSize = Math.min(heightSize, paddingHeight + maxChildHeight);
+            //高度不需要限制最大值，因为如果在ScrollView中，会丢失超出ScrollView高度的部分
+            heightSize = paddingHeight + maxChildHeight;
         }
-        setMeasuredDimension(widthSize, heightSize);
+        setMeasuredDimension(resolveSizeAndState(widthSize, widthMeasureSpec, childState), resolveSizeAndState(heightSize, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT));
     }
 
     @Override
@@ -390,6 +398,42 @@ public class AutoWrapGridLayout extends ViewGroup {
      */
     public boolean getStickFirst() {
         return isStickFirst;
+    }
+
+    @Override
+    public void addView(View child, int index, LayoutParams params) {
+        //除置顶的FirstChildView的宽允许使用MATCH_PARENT，其余情况下的宽高一律不支持WRAP_CONTENT
+        if (isStickFirst && (index == 0 || getChildCount() == 0)) {
+            if (params.height == LayoutParams.MATCH_PARENT) {
+                params.height = LayoutParams.WRAP_CONTENT;
+            }
+        } else {
+            if (params.width == LayoutParams.MATCH_PARENT) {
+                params.width = LayoutParams.WRAP_CONTENT;
+            }
+            if (params.height == LayoutParams.MATCH_PARENT) {
+                params.height = LayoutParams.WRAP_CONTENT;
+            }
+        }
+        super.addView(child, index, params);
+    }
+
+    @Override
+    protected boolean addViewInLayout(View child, int index, LayoutParams params, boolean preventRequestLayout) {
+        //除置顶的FirstChildView的宽允许使用MATCH_PARENT，其余情况下的宽高一律不支持WRAP_CONTENT
+        if (isStickFirst && (index == 0 || getChildCount() == 0)) {
+            if (params.height == LayoutParams.MATCH_PARENT) {
+                params.height = LayoutParams.WRAP_CONTENT;
+            }
+        } else {
+            if (params.width == LayoutParams.MATCH_PARENT) {
+                params.width = LayoutParams.WRAP_CONTENT;
+            }
+            if (params.height == LayoutParams.MATCH_PARENT) {
+                params.height = LayoutParams.WRAP_CONTENT;
+            }
+        }
+        return super.addViewInLayout(child, index, params, preventRequestLayout);
     }
 
     @Override
