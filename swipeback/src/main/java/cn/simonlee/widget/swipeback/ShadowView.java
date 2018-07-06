@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 
@@ -14,6 +15,7 @@ import android.view.View;
  * @e-mail jmlixiaomeng@163.com
  * @createdTime 2018-06-19
  */
+@SuppressWarnings("unused")
 public class ShadowView extends View {
 
     private final float density;
@@ -21,7 +23,7 @@ public class ShadowView extends View {
     private int mLinearShaderWidth;
     private int mShadowColor;
 
-    private boolean showShadowBar;
+    private boolean isShowShadowBar;
     private int colors[] = new int[11];
     private float positions[] = new float[11];
 
@@ -57,9 +59,9 @@ public class ShadowView extends View {
      * @param showBackground 是否显示背景
      */
     public void setShowColor(int shadowColor, boolean showShadowBar, boolean showBackground) {
-        mShadowColor = shadowColor | 0XFF000000;
-        this.showShadowBar = showShadowBar;
-        if (showShadowBar) {
+        this.mShadowColor = shadowColor | 0XFF000000;
+        this.isShowShadowBar = showShadowBar;
+        if (isShowShadowBar) {
             for (int i = 0; i < colors.length; i++) {
                 //根据位置计算透明度
                 int alpha = getShadowAlpha(i * 0.1F);
@@ -70,14 +72,11 @@ public class ShadowView extends View {
                 positions[i] = position;
             }
         }
-        ColorDrawable background = null;
-        if (showBackground) {
-            background = new ColorDrawable(mShadowColor & 0X66FFFFFF);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            setBackground(background);
-        } else {
+        Drawable background = showBackground ? new ColorDrawable(mShadowColor & 0X66FFFFFF) : null;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             setBackgroundDrawable(background);
+        } else {
+            setBackground(background);
         }
     }
 
@@ -125,10 +124,10 @@ public class ShadowView extends View {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (getMeasuredWidth() != mLinearShaderWidth) {
-            mLinearShaderWidth = getMeasuredWidth();
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (getWidth() != mLinearShaderWidth) {
+            mLinearShaderWidth = getWidth();
             LinearGradient linearShader = new LinearGradient(mLinearShaderWidth - density * 22, 0F, mLinearShaderWidth, 0F,
                     colors, positions, LinearGradient.TileMode.CLAMP);
             mShadowBarPaint.setShader(linearShader);
@@ -138,8 +137,12 @@ public class ShadowView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (showShadowBar) {
+        if (isShowShadowBar) {
+            canvas.save();
+            canvas.clipRect(getRight() - density * 22, getTop(), getRight(), getBottom());
             canvas.drawPaint(mShadowBarPaint);
+            canvas.restore();
         }
     }
+
 }
