@@ -237,7 +237,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      */
     public View getWindowBackGroundView(ViewGroup decorView) {
         if (mWindowBackGroundView == null) {
-            mWindowBackGroundView = new ShadowView(mSwipeBackActivity);
+            mWindowBackGroundView = new View(mSwipeBackActivity);
             mWindowBackGroundView.setTranslationY(decorView.getHeight());
             mWindowBackGroundView.setBackgroundColor(mWindowBackgroundColor);
             decorView.addView(mWindowBackGroundView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
