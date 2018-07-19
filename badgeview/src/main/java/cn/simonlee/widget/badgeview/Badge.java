@@ -1,102 +1,600 @@
 package cn.simonlee.widget.badgeview;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.DrawableRes;
+import android.support.v4.content.res.ResourcesCompat;
+import android.text.TextPaint;
+import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
- * @createdTime 2018-05-25
+ * @createdTime 2018-05-29
  */
-public interface Badge {
+@SuppressWarnings("unused")
+public class Badge {
 
     /**
      * 浮标相对目标View左对齐
      */
-    int GRAVITY_LEFT = 1;
+    public static final int GRAVITY_LEFT = 1;
     /**
      * 浮标相对目标View顶对齐
      */
-    int GRAVITY_TOP = 2;
+    public static final int GRAVITY_TOP = 2;
     /**
      * 浮标相对目标View右对齐
      */
-    int GRAVITY_RIGHT = 4;
+    public static final int GRAVITY_RIGHT = 4;
     /**
      * 浮标相对目标View底对齐
      */
-    int GRAVITY_BOTTOM = 8;
+    public static final int GRAVITY_BOTTOM = 8;
     /**
      * 浮标相对目标View居中
      */
-    int GRAVITY_CENTER = 16;
+    public static final int GRAVITY_CENTER = 16;
 
     /**
-     * 设置目标View宽高
+     * 目标View
      */
-    void onSizeChanged(int w, int h, int oldw, int oldh);
+    private final View mTargetView;
 
     /**
-     * 绘制浮标
+     * 浮标文本，为null时不显示，长度0时显示小圆点
      */
-    void dispatchDraw(Canvas canvas);
+    private String mBadgeText;
+
+    /**
+     * 浮标字体颜色
+     */
+    private int mBadgeTextColor;
+
+    /**
+     * 浮标字体大小
+     */
+    private float mBadgeTextSize;
+
+    /**
+     * 字体是否加粗
+     */
+    private boolean mBoldTextEnable;
+
+    /**
+     * 浮标背景
+     */
+    private Drawable mBadgeBackground;
+
+    /**
+     * 浮标内边距
+     */
+    private float mBadgePaddingLeft, mBadgePaddingTop, mBadgePaddingRight, mBadgePaddingBottom;
+
+    /**
+     * 浮标外边距
+     */
+    private float mBadgeMarginLeft, mBadgeMarginTop, mBadgeMarginRight, mBadgeMarginBottom;
+
+    /**
+     * 浮标对齐方式
+     */
+    private int mBadgeGravity;
+
+    /**
+     * dp&sp转px的系数
+     */
+    private float mDensityDP, mDensitySP;
+
+    /**
+     * 文本画笔工具
+     */
+    private TextPaint mBadgeTextPaint;
+
+    /**
+     * 文本画笔工具的度量
+     */
+    private Paint.FontMetrics mBadgeTextFontMetrics;
+
+    /**
+     * 浮标背景边界值
+     */
+    private RectF mBadgeBackgroundBounds;
+
+    /**
+     * 文本高度
+     */
+    private float mBadgeTextHeight;
+
+    /**
+     * 目标View的宽高值
+     */
+    private int mViewWidth, mViewHeight;
+
+    /**
+     * 目标View的布局宽高
+     */
+    private int mLayoutWidth, mLayoutHeight;
+
+    public Badge(View targetView, AttributeSet attributeSet) {
+        this.mTargetView = targetView;
+        mTargetView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                mViewWidth = right - left;
+                mViewHeight = bottom - top;
+                measureBackgroundBounds();
+            }
+        });
+        //IDE编辑模式下，显示预览效果
+        if (mTargetView.isInEditMode()) {
+            mBadgeText = "99+";
+        }
+        //初始化变量
+        initBadge(mTargetView.getContext(), attributeSet);
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initBadge(Context context, AttributeSet attributeSet) {
+        mDensityDP = context.getResources().getDisplayMetrics().density;//DP密度
+        mDensitySP = context.getResources().getDisplayMetrics().scaledDensity;//SP密度
+
+        TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.Badge);
+        //浮标对齐方式
+        this.mBadgeGravity = typedArray.getInt(R.styleable.Badge_gravity_badge, GRAVITY_TOP | GRAVITY_RIGHT);
+        //浮标背景
+        this.mBadgeBackground = typedArray.getDrawable(R.styleable.Badge_background_badge);
+        //无背景则设置默认红色圆角背景
+        if (mBadgeBackground == null) {
+            GradientDrawable gradientDrawable = new GradientDrawable();
+            gradientDrawable.setColor(Color.RED);
+            gradientDrawable.setCornerRadius(9999);
+            mBadgeBackground = gradientDrawable;
+        }
+        //浮标内边距
+        float badgePadding = typedArray.getDimension(R.styleable.Badge_padding_badge, -1);
+        //浮标内左边距，默认值4dp
+        this.mBadgePaddingLeft = typedArray.getDimension(R.styleable.Badge_paddingLeft_badge, badgePadding < 0 ? 4 * mDensityDP : badgePadding);
+        //浮标内上边距，默认值2dp
+        this.mBadgePaddingTop = typedArray.getDimension(R.styleable.Badge_paddingTop_badge, badgePadding < 0 ? 2 * mDensityDP : badgePadding);
+        //浮标内右边距，默认值4dp
+        this.mBadgePaddingRight = typedArray.getDimension(R.styleable.Badge_paddingRight_badge, badgePadding < 0 ? 4 * mDensityDP : badgePadding);
+        //浮标内下边距，默认值2dp
+        this.mBadgePaddingBottom = typedArray.getDimension(R.styleable.Badge_paddingBottom_badge, badgePadding < 0 ? 2 * mDensityDP : badgePadding);
+
+        //浮标外边距
+        float badgeMargin = typedArray.getDimension(R.styleable.Badge_margin_badge, 0);
+        //浮标外左边距，默认值0dp
+        this.mBadgeMarginLeft = typedArray.getDimension(R.styleable.Badge_marginLeft_badge, badgeMargin);
+        //浮标外上边距，默认值0dp
+        this.mBadgeMarginTop = typedArray.getDimension(R.styleable.Badge_marginTop_badge, badgeMargin);
+        //浮标外右边距，默认值0dp
+        this.mBadgeMarginRight = typedArray.getDimension(R.styleable.Badge_marginRight_badge, badgeMargin);
+        //浮标外下边距，默认值0dp
+        this.mBadgeMarginBottom = typedArray.getDimension(R.styleable.Badge_marginBottom_badge, badgeMargin);
+
+        //字体大小
+        this.mBadgeTextSize = typedArray.getDimension(R.styleable.Badge_textSize_badge, 10 * mDensitySP);
+        //字体颜色
+        this.mBadgeTextColor = typedArray.getColor(R.styleable.Badge_textColor_badge, 0xFFFFFFFF);
+        //字体加粗
+        this.mBoldTextEnable = typedArray.getBoolean(R.styleable.Badge_boldText_badge, true);
+
+        typedArray.recycle();
+
+        //初始化画笔工具
+        initTextPaint();
+        //计算行高
+        measureTextHeight();
+        mBadgeBackgroundBounds = new RectF();
+    }
+
+    /**
+     * 初始化画笔工具
+     */
+    private void initTextPaint() {
+        mBadgeTextPaint = new TextPaint();
+        mBadgeTextPaint.setDither(true);//防抖动
+        mBadgeTextPaint.setAntiAlias(true);//抗锯齿
+        mBadgeTextPaint.setLinearText(true);//不要文本缓存
+        mBadgeTextPaint.setSubpixelText(true);//设置亚像素
+        mBadgeTextPaint.setColor(mBadgeTextColor);//设置字体颜色
+        mBadgeTextPaint.setTextSize(mBadgeTextSize);//设置字体大小
+        mBadgeTextPaint.setTextAlign(Paint.Align.CENTER);//文本居中
+        mBadgeTextPaint.setFakeBoldText(mBoldTextEnable);//字体加粗
+    }
+
+    /**
+     * 计算行高
+     */
+    private void measureTextHeight() {
+        mBadgeTextFontMetrics = mBadgeTextPaint.getFontMetrics();
+        mBadgeTextHeight = Math.abs(mBadgeTextFontMetrics.descent - mBadgeTextFontMetrics.ascent);
+    }
 
     /**
      * 获取浮标文本
      */
-    String getBadgeText();
+    public String getBadgeText() {
+        return mBadgeText;
+    }
 
     /**
      * 设置浮标文本
      *
      * @param badgeText 为null时不显示，长度为0时显示小圆点
      */
-    void setBadgeText(String badgeText);
+    public void setBadgeText(String badgeText) {
+        if ((mBadgeText == null && badgeText != null) || (mBadgeText != null && !mBadgeText.equals(badgeText))) {
+            mBadgeText = badgeText;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
 
     /**
      * 设置浮标字体颜色
      */
-    void setBadgeTextColor(int color);
+    public void setBadgeTextColor(int color) {
+        mBadgeTextColor = color;
+        mBadgeTextPaint.setColor(mBadgeTextColor);
+        mTargetView.invalidate();
+    }
 
     /**
-     * 设置浮标字体大小，单位SP
+     * 设置浮标字体大小，单位px
+     *
+     * @param size 小于1时显示小圆点
      */
-    void setBadgeTextSize(float size);
+    public void setBadgeTextSize(float size) {
+        if (mBadgeTextSize != size) {
+            mBadgeTextSize = size;
+            mBadgeTextPaint.setTextSize(mBadgeTextSize);
+            measureTextHeight();
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
 
     /**
      * 设置是否字体加粗
      */
-    void setBadgeBoldText(boolean boldEnable);
+    public void setBadgeBoldText(boolean boldEnable) {
+        if (mBoldTextEnable != boldEnable) {
+            mBoldTextEnable = boldEnable;
+            mBadgeTextPaint.setFakeBoldText(mBoldTextEnable);
+            measureTextHeight();
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
 
     /**
      * 设置浮标背景
      */
-    void setBadgeBackground(Drawable drawable);
+    public void setBadgeBackground(Drawable drawable) {
+        mBadgeBackground = drawable;
+        mTargetView.invalidate();
+    }
 
     /**
-     * 设置浮标内边距，单位DP
+     * 设置浮标背景
      */
-    void setBadgePadding(float padding);
+    public void setBadgeBackgroundResource(@DrawableRes int resid) {
+        try {
+            setBadgeBackground(ResourcesCompat.getDrawable(mTargetView.getResources(), resid, null));
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
-     * 设置浮标内边距，单位DP
+     * 设置浮标内边距，单位px
      */
-    void setBadgePadding(Float paddingLeft, Float paddingTop, Float paddingRight, Float paddingBottom);
+    public void setBadgePadding(float padding) {
+        if (mBadgePaddingLeft != padding || mBadgePaddingTop != padding || mBadgePaddingRight != padding || mBadgePaddingBottom != padding) {
+            mBadgePaddingLeft = mBadgePaddingTop = mBadgePaddingRight = mBadgePaddingBottom = padding;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
 
     /**
-     * 设置浮标外边距，单位DP
+     * 设置浮标内边距，单位px
      */
-    void setBadgeMargin(float margin);
+    public void setBadgePadding(float paddingLeft, float paddingTop, float paddingRight, float paddingBottom) {
+        if (mBadgePaddingLeft != paddingLeft || mBadgePaddingTop != paddingTop || mBadgePaddingRight != paddingRight || mBadgePaddingBottom != paddingBottom) {
+            mBadgePaddingLeft = paddingLeft;
+            mBadgePaddingTop = paddingTop;
+            mBadgePaddingRight = paddingRight;
+            mBadgePaddingBottom = paddingBottom;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
 
     /**
-     * 设置浮标外边距，单位DP
+     * 设置浮标内边距-左，单位px
      */
-    void setBadgeMargin(Float marginLeft, Float marginTop, Float marginRight, Float marginBottom);
+    public void setBadgePaddingLeft(float paddingLeft) {
+        if (mBadgePaddingLeft != paddingLeft) {
+            mBadgePaddingLeft = paddingLeft;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标内边距-上，单位px
+     */
+    public void setBadgePaddingTop(float paddingTop) {
+        if (mBadgePaddingTop != paddingTop) {
+            mBadgePaddingTop = paddingTop;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标内边距-右，单位px
+     */
+    public void setBadgePaddingRight(float paddingRight) {
+        if (mBadgePaddingRight != paddingRight) {
+            mBadgePaddingRight = paddingRight;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标内边距-下，单位px
+     */
+    public void setBadgePaddingBottom(float paddingBottom) {
+        if (mBadgePaddingBottom != paddingBottom) {
+            mBadgePaddingBottom = paddingBottom;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标外边距，单位px
+     */
+    public void setBadgeMargin(float marginLeft, float marginTop, float marginRight, float marginBottom) {
+        if (mBadgeMarginLeft != marginLeft || mBadgeMarginTop != marginTop || mBadgeMarginRight != marginRight || mBadgeMarginBottom != marginBottom) {
+            mBadgeMarginLeft = marginLeft;
+            mBadgeMarginTop = marginTop;
+            mBadgeMarginRight = marginRight;
+            mBadgeMarginBottom = marginBottom;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标外边距-左，单位px
+     */
+    public void setBadgeMarginLeft(float marginLeft) {
+        if (mBadgeMarginLeft != marginLeft) {
+            mBadgeMarginLeft = marginLeft;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标外边距-上，单位px
+     */
+    public void setBadgeMarginTop(float marginTop) {
+        if (mBadgeMarginTop != marginTop) {
+            mBadgeMarginTop = marginTop;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标外边距-右，单位px
+     */
+    public void setBadgeMarginRight(float marginRight) {
+        if (mBadgeMarginRight != marginRight) {
+            mBadgeMarginRight = marginRight;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
+
+    /**
+     * 设置浮标外边距-下，单位px
+     */
+    public void setBadgeMarginBottom(float marginBottom) {
+        if (mBadgeMarginBottom != marginBottom) {
+            mBadgeMarginBottom = marginBottom;
+            measureBackgroundBounds();
+            if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                mTargetView.requestLayout();
+            } else {
+                mTargetView.invalidate();
+            }
+        }
+    }
 
     /**
      * 设置浮标对齐方式
      */
-    void setBadgeGravity(int gravity);
+    public void setBadgeGravity(int gravity) {
+        if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            gravity |= GRAVITY_LEFT;//宽度自适应时，强制左对齐
+        }
+        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            gravity |= GRAVITY_TOP;//高度自适应时，强制上对齐
+        }
+        if (mBadgeGravity != gravity) {
+            mBadgeGravity = gravity;
+            measureBackgroundBounds();
+            mTargetView.invalidate();
+        }
+    }
+
+    /**
+     * 返回浮标对齐方式
+     */
+    public int getBadgeGravity() {
+        return mBadgeGravity;
+    }
+
+    /**
+     * 在目标View的dispatchDraw方法中最后调用，绘制浮标
+     * 不建议在onDraw中调用，因为可能会被目标View的前景遮挡，且ViewGroup在透明背景时不会调用onDraw
+     */
+    public void dispatchDraw(Canvas canvas) {
+        if (mBadgeText == null) {
+            return;
+        }
+        //绘制背景
+        if (mBadgeBackground != null) {
+            int left = (int) mBadgeBackgroundBounds.left;
+            int top = (int) mBadgeBackgroundBounds.top;
+            int right = (int) mBadgeBackgroundBounds.right;
+            int bottom = (int) mBadgeBackgroundBounds.bottom;
+            mBadgeBackground.setBounds(left, top, right, bottom);
+            mBadgeBackground.draw(canvas);
+        }
+        //绘制文本
+        if (mBadgeText.length() > 0) {
+            //计算文本对齐坐标
+            float baseX = mBadgeBackgroundBounds.left + (mBadgeBackgroundBounds.width() + mBadgePaddingLeft - mBadgePaddingRight) / 2F;
+            float baseY = mBadgeBackgroundBounds.top + (mBadgeBackgroundBounds.height() + mBadgePaddingTop - mBadgePaddingBottom - mBadgeTextFontMetrics.bottom - mBadgeTextFontMetrics.top) / 2F;
+            canvas.drawText(mBadgeText, baseX, baseY, mBadgeTextPaint);
+        }
+    }
+
+    /**
+     * 计算浮标背景尺寸
+     */
+    private void measureBackgroundBounds() {
+        if (mBadgeText == null) {
+            return;
+        }
+        float offsetX = mBadgeMarginLeft, offsetY = mBadgeMarginTop;
+        float backgroundWidth, backgroundHeight;
+        //先计算浮标的宽高
+        if (mBadgeText.length() < 1 || mBadgeTextSize < 1) {
+            //文本长度为0，只显示一个小圆点
+            backgroundWidth = backgroundHeight = 2 * mDensityDP + (mBadgePaddingTop + mBadgePaddingBottom + mBadgePaddingLeft + mBadgePaddingRight) / 2F;
+        } else {
+            //根据文本长度计算浮标的宽高
+            backgroundHeight = mBadgePaddingTop + mBadgePaddingBottom + mBadgeTextHeight;
+            float badgeTextWidth = mBadgeTextPaint.measureText(mBadgeText);
+            //浮标的宽不能小于高
+            backgroundWidth = Math.max(backgroundHeight, mBadgePaddingLeft + mBadgePaddingRight + badgeTextWidth);
+        }
+
+        //计算水平方向的偏移量
+        if ((mBadgeGravity & GRAVITY_LEFT) == GRAVITY_LEFT) {//水平居左
+//            offsetX = mBadgeMarginLeft;
+        } else if ((mBadgeGravity & GRAVITY_RIGHT) == GRAVITY_RIGHT) {//水平居右
+            offsetX = mViewWidth - backgroundWidth - mBadgeMarginRight;
+        } else if ((mBadgeGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//水平居中
+            offsetX = (mViewWidth - backgroundWidth) / 2 + mBadgeMarginLeft - mBadgeMarginRight;
+        }
+        //计算垂直方向的偏移量
+        if ((mBadgeGravity & GRAVITY_TOP) == GRAVITY_TOP) {//垂直居上
+//            offsetY = mBadgeMarginTop;
+        } else if ((mBadgeGravity & GRAVITY_BOTTOM) == GRAVITY_BOTTOM) {//垂直居下
+            offsetY = mViewHeight - backgroundHeight - mBadgeMarginBottom;
+        } else if ((mBadgeGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//垂直居中
+            offsetY = (mViewHeight - backgroundHeight) / 2 + mBadgeMarginTop - mBadgeMarginBottom;
+        }
+        //设置浮标的边界值
+        mBadgeBackgroundBounds.set(offsetX, offsetY, backgroundWidth + offsetX, backgroundHeight + offsetY);
+    }
+
+    /**
+     * 设置宽高属性
+     */
+    void setLayoutParams(int layoutWidth, int layoutHeight) {
+        mLayoutWidth = layoutWidth;
+        mLayoutHeight = layoutHeight;
+        setBadgeGravity(mBadgeGravity);
+    }
+
+    /**
+     * 返回浮标总宽
+     */
+    int getBadgeWidth() {
+        return (int) Math.ceil(mBadgeMarginLeft + mBadgeMarginRight + mBadgeBackgroundBounds.width());
+    }
+
+    /**
+     * 返回浮标总高
+     */
+    int getBadgeHeight() {
+        return (int) Math.ceil(mBadgeMarginTop + mBadgeMarginBottom + mBadgeBackgroundBounds.height());
+    }
 
 }
