@@ -87,7 +87,7 @@ public class BadgeProxy {
     /**
      * 目标View的宽高
      */
-    private int mMeasuredWidth, mMeasuredHeight;
+    private int mViewWidth, mViewHeight;
 
     public BadgeProxy(View view, Context context, AttributeSet attributeSet) {
         //IDE编辑模式下，显示预览效果
@@ -179,11 +179,11 @@ public class BadgeProxy {
     }
 
     /**
-     * 在目标View的onMeasure方法中调用，记录目标View的宽高属性
+     * 在目标View的onSizeChanged方法中调用，记录目标View的宽高属性
      */
-    public void onMeasure(int measuredWidth, int measuredHeight) {
-        mMeasuredWidth = measuredWidth;
-        mMeasuredHeight = measuredHeight;
+    public void onSizeChanged(int width, int height) {
+        mViewWidth = width;
+        mViewHeight = height;
         measureBackgroundBounds();
     }
 
@@ -343,17 +343,17 @@ public class BadgeProxy {
         if ((mBadgeGravity & Badge.GRAVITY_LEFT) == Badge.GRAVITY_LEFT) {//水平居左
 //            offsetX = mBadgeMarginLeft;
         } else if ((mBadgeGravity & Badge.GRAVITY_RIGHT) == Badge.GRAVITY_RIGHT) {//水平居右
-            offsetX = mMeasuredWidth - backgroundWidth - mBadgeMarginRight;
+            offsetX = mViewWidth - backgroundWidth - mBadgeMarginRight;
         } else if ((mBadgeGravity & Badge.GRAVITY_CENTER) == Badge.GRAVITY_CENTER) {//水平居中
-            offsetX = (mMeasuredWidth - backgroundWidth) / 2 + mBadgeMarginLeft - mBadgeMarginRight;
+            offsetX = (mViewWidth - backgroundWidth) / 2 + mBadgeMarginLeft - mBadgeMarginRight;
         }
         //计算垂直方向的偏移量
         if ((mBadgeGravity & Badge.GRAVITY_TOP) == Badge.GRAVITY_TOP) {//垂直居上
 //            offsetY = mBadgeMarginTop;
         } else if ((mBadgeGravity & Badge.GRAVITY_BOTTOM) == Badge.GRAVITY_BOTTOM) {//垂直居下
-            offsetY = mMeasuredHeight - backgroundHeight - mBadgeMarginBottom;
+            offsetY = mViewHeight - backgroundHeight - mBadgeMarginBottom;
         } else if ((mBadgeGravity & Badge.GRAVITY_CENTER) == Badge.GRAVITY_CENTER) {//垂直居中
-            offsetY = (mMeasuredHeight - backgroundHeight) / 2 + mBadgeMarginTop - mBadgeMarginBottom;
+            offsetY = (mViewHeight - backgroundHeight) / 2 + mBadgeMarginTop - mBadgeMarginBottom;
         }
         //设置浮标的边界值
         mBadgeBackgroundBounds.set(offsetX, offsetY, backgroundWidth + offsetX, backgroundHeight + offsetY);
@@ -372,6 +372,5 @@ public class BadgeProxy {
     public int getBadgeHeight() {
         return (int) Math.ceil(mBadgeMarginTop + mBadgeMarginBottom + mBadgeBackgroundBounds.height());
     }
-
 
 }

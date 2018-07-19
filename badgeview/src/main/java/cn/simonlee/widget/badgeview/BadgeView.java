@@ -73,12 +73,17 @@ public class BadgeView extends View implements Badge {
             heightSize = mBadgeProxy.getBadgeHeight();
         }
         super.setMeasuredDimension(widthSize, heightSize);
-        mBadgeProxy.onMeasure(getMeasuredWidth(), getMeasuredHeight());
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mBadgeProxy.onSizeChanged(w, h);
+    }
+
+    @Override
+    public void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
         mBadgeProxy.dispatchDraw(canvas);
     }
 

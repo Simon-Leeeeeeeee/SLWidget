@@ -1,5 +1,6 @@
 package cn.simonlee.widget.badgeview;
 
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
 /**
@@ -30,6 +31,16 @@ public interface Badge {
      * 浮标相对目标View居中
      */
     int GRAVITY_CENTER = 16;
+
+    /**
+     * 设置目标View宽高
+     */
+    void onSizeChanged(int w, int h, int oldw, int oldh);
+
+    /**
+     * 绘制浮标
+     */
+    void dispatchDraw(Canvas canvas);
 
     /**
      * 获取浮标文本
