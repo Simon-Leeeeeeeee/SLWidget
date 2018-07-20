@@ -203,10 +203,12 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * 判断窗口是否透明
      */
     public boolean isWindowTranslucent() {
-        TypedArray typedArray = mSwipeBackActivity.obtainStyledAttributes(R.styleable.WindowTranslucent);
-        boolean isWindowTranslucent = typedArray.getBoolean(R.styleable.WindowTranslucent_android_windowIsTranslucent, false);
-        typedArray.recycle();
-        return isWindowTranslucent;
+        TypedArray typedArray = mSwipeBackActivity.obtainStyledAttributes(new int[]{android.R.attr.windowIsTranslucent});
+        try {
+            return typedArray.getBoolean(0, false);
+        } finally {
+            typedArray.recycle();
+        }
     }
 
     /**
@@ -512,6 +514,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         if (!isAnimationCancel) {
             //最终移动距离位置超过半宽，结束当前Activity
             if (2 * mSwipeBackView.getTranslationX() >= mDecorView.getWidth()) {
+                mShadowView.setVisibility(View.GONE);
                 mSwipeBackActivity.finish();
                 mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
             } else {
