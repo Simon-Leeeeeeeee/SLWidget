@@ -1,82 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 浮标对齐方式 -->
-    <attr name="gravity_badge">
+    <!-- 角标对齐方式 -->
+    <attr name="badge_gravity">
         <flag name="left" value="1" />
         <flag name="top" value="2" />
         <flag name="right" value="4" />
         <flag name="bottom" value="8" />
         <flag name="center" value="16" />
     </attr>
-    <!--浮标背景-->
-    <attr name="background_badge" format="reference|color" />
+    <!--角标背景-->
+    <attr name="badge_background" format="reference|color" />
 
-    <!--浮标内边距-->
-    <attr name="padding_badge" format="reference|dimension" />
-    <!--浮标内左边距-->
-    <attr name="paddingLeft_badge" format="reference|dimension" />
-    <!--浮标内上边距-->
-    <attr name="paddingTop_badge" format="reference|dimension" />
-    <!--浮标内右边距-->
-    <attr name="paddingRight_badge" format="reference|dimension" />
-    <!--浮标内下边距-->
-    <attr name="paddingBottom_badge" format="reference|dimension" />
+    <!--角标内边距-->
+    <attr name="badge_padding" format="reference|dimension" />
+    <!--角标内左边距-->
+    <attr name="badge_paddingLeft" format="reference|dimension" />
+    <!--角标内上边距-->
+    <attr name="badge_paddingTop" format="reference|dimension" />
+    <!--角标内右边距-->
+    <attr name="badge_paddingRight" format="reference|dimension" />
+    <!--角标内下边距-->
+    <attr name="badge_paddingBottom" format="reference|dimension" />
 
-    <!--浮标外边距-->
-    <attr name="margin_badge" format="reference|dimension" />
-    <!--浮标外左边距-->
-    <attr name="marginLeft_badge" format="reference|dimension" />
-    <!--浮标外上边距-->
-    <attr name="marginTop_badge" format="reference|dimension" />
-    <!--浮标外右边距-->
-    <attr name="marginRight_badge" format="reference|dimension" />
-    <!--浮标外下边距-->
-    <attr name="marginBottom_badge" format="reference|dimension" />
+    <!--角标外边距-->
+    <attr name="badge_margin" format="reference|dimension" />
+    <!--角标外左边距-->
+    <attr name="badge_marginLeft" format="reference|dimension" />
+    <!--角标外上边距-->
+    <attr name="badge_marginTop" format="reference|dimension" />
+    <!--角标外右边距-->
+    <attr name="badge_marginRight" format="reference|dimension" />
+    <!--角标外下边距-->
+    <attr name="badge_marginBottom" format="reference|dimension" />
 
-    <!--浮标字体大小-->
-    <attr name="textSize_badge" format="reference|dimension" />
-    <!--浮标字体颜色-->
-    <attr name="textColor_badge" format="reference|color" />
+    <!--角标字体大小-->
+    <attr name="badge_textSize" format="reference|dimension" />
+    <!--角标字体颜色-->
+    <attr name="badge_textColor" format="reference|color" />
     <!--文本加粗-->
-    <attr name="boldText_badge" format="boolean" />
+    <attr name="badge_boldText" format="boolean" />
+
+    <!--小圆点半径-->
+    <attr name="badge_dotRadius" format="reference|dimension" />
 
     <declare-styleable name="Badge">
 
-        <!--浮标对齐方式-->
-        <attr name="gravity_badge" />
-        <!--浮标背景-->
-        <attr name="background_badge" />
+        <!--角标对齐方式-->
+        <attr name="badge_gravity" />
+        <!--角标背景-->
+        <attr name="badge_background" />
 
-        <!--浮标内边距-->
-        <attr name="padding_badge" />
-        <!--浮标内左边距-->
-        <attr name="paddingLeft_badge" />
-        <!--浮标内上边距-->
-        <attr name="paddingTop_badge" />
-        <!--浮标内右边距-->
-        <attr name="paddingRight_badge" />
-        <!--浮标内下边距-->
-        <attr name="paddingBottom_badge" />
+        <!--角标内边距-->
+        <attr name="badge_padding" />
+        <!--角标内左边距-->
+        <attr name="badge_paddingLeft" />
+        <!--角标内上边距-->
+        <attr name="badge_paddingTop" />
+        <!--角标内右边距-->
+        <attr name="badge_paddingRight" />
+        <!--角标内下边距-->
+        <attr name="badge_paddingBottom" />
 
-        <!--浮标外边距-->
-        <attr name="margin_badge" />
-        <!--浮标外左边距-->
-        <attr name="marginLeft_badge" />
-        <!--浮标外上边距-->
-        <attr name="marginTop_badge" />
-        <!--浮标外右边距-->
-        <attr name="marginRight_badge" />
-        <!--浮标外下边距-->
-        <attr name="marginBottom_badge" />
+        <!--角标外边距-->
+        <attr name="badge_margin" />
+        <!--角标外左边距-->
+        <attr name="badge_marginLeft" />
+        <!--角标外上边距-->
+        <attr name="badge_marginTop" />
+        <!--角标外右边距-->
+        <attr name="badge_marginRight" />
+        <!--角标外下边距-->
+        <attr name="badge_marginBottom" />
 
         <!--字体大小-->
-        <attr name="textSize_badge" />
+        <attr name="badge_textSize" />
         <!--字体颜色-->
-        <attr name="textColor_badge" />
+        <attr name="badge_textColor" />
         <!--文本加粗-->
-        <attr name="boldText_badge" />
+        <attr name="badge_boldText" />
 
+        <!--小圆点半径-->
+        <attr name="badge_dotRadius" />
     </declare-styleable>
 
 </resources>

@@ -26,23 +26,23 @@ import android.view.ViewGroup;
 public class Badge {
 
     /**
-     * 浮标相对目标View左对齐
+     * 角标相对目标View左对齐
      */
     public static final int GRAVITY_LEFT = 1;
     /**
-     * 浮标相对目标View顶对齐
+     * 角标相对目标View顶对齐
      */
     public static final int GRAVITY_TOP = 2;
     /**
-     * 浮标相对目标View右对齐
+     * 角标相对目标View右对齐
      */
     public static final int GRAVITY_RIGHT = 4;
     /**
-     * 浮标相对目标View底对齐
+     * 角标相对目标View底对齐
      */
     public static final int GRAVITY_BOTTOM = 8;
     /**
-     * 浮标相对目标View居中
+     * 角标相对目标View居中
      */
     public static final int GRAVITY_CENTER = 16;
 
@@ -52,17 +52,17 @@ public class Badge {
     private final View mTargetView;
 
     /**
-     * 浮标文本，为null时不显示，长度0时显示小圆点
+     * 角标文本，为null时不显示，长度0时显示小圆点
      */
     private String mBadgeText;
 
     /**
-     * 浮标字体颜色
+     * 角标字体颜色
      */
     private int mBadgeTextColor;
 
     /**
-     * 浮标字体大小
+     * 角标字体大小，默认值12dp
      */
     private float mBadgeTextSize;
 
@@ -72,22 +72,27 @@ public class Badge {
     private boolean mBoldTextEnable;
 
     /**
-     * 浮标背景
+     * 角标背景
      */
     private Drawable mBadgeBackground;
 
     /**
-     * 浮标内边距
+     * 角标内边距
      */
     private float mBadgePaddingLeft, mBadgePaddingTop, mBadgePaddingRight, mBadgePaddingBottom;
 
     /**
-     * 浮标外边距
+     * 角标外边距
      */
     private float mBadgeMarginLeft, mBadgeMarginTop, mBadgeMarginRight, mBadgeMarginBottom;
 
     /**
-     * 浮标对齐方式
+     * 角标小圆点半径，默认值10dp
+     */
+    private float mBadgeDotRadius;
+
+    /**
+     * 角标对齐方式
      */
     private int mBadgeGravity;
 
@@ -107,7 +112,7 @@ public class Badge {
     private Paint.FontMetrics mBadgeTextFontMetrics;
 
     /**
-     * 浮标背景边界值
+     * 角标背景边界值
      */
     private RectF mBadgeBackgroundBounds;
 
@@ -152,10 +157,10 @@ public class Badge {
         mDensitySP = context.getResources().getDisplayMetrics().scaledDensity;//SP密度
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.Badge);
-        //浮标对齐方式
-        this.mBadgeGravity = typedArray.getInt(R.styleable.Badge_gravity_badge, GRAVITY_TOP | GRAVITY_RIGHT);
-        //浮标背景
-        this.mBadgeBackground = typedArray.getDrawable(R.styleable.Badge_background_badge);
+        //角标对齐方式
+        this.mBadgeGravity = typedArray.getInt(R.styleable.Badge_badge_gravity, GRAVITY_TOP | GRAVITY_RIGHT);
+        //角标背景
+        this.mBadgeBackground = typedArray.getDrawable(R.styleable.Badge_badge_background);
         //无背景则设置默认红色圆角背景
         if (mBadgeBackground == null) {
             GradientDrawable gradientDrawable = new GradientDrawable();
@@ -163,35 +168,37 @@ public class Badge {
             gradientDrawable.setCornerRadius(9999);
             mBadgeBackground = gradientDrawable;
         }
-        //浮标内边距
-        float badgePadding = typedArray.getDimension(R.styleable.Badge_padding_badge, -1);
-        //浮标内左边距，默认值4dp
-        this.mBadgePaddingLeft = typedArray.getDimension(R.styleable.Badge_paddingLeft_badge, badgePadding < 0 ? 4 * mDensityDP : badgePadding);
-        //浮标内上边距，默认值2dp
-        this.mBadgePaddingTop = typedArray.getDimension(R.styleable.Badge_paddingTop_badge, badgePadding < 0 ? 2 * mDensityDP : badgePadding);
-        //浮标内右边距，默认值4dp
-        this.mBadgePaddingRight = typedArray.getDimension(R.styleable.Badge_paddingRight_badge, badgePadding < 0 ? 4 * mDensityDP : badgePadding);
-        //浮标内下边距，默认值2dp
-        this.mBadgePaddingBottom = typedArray.getDimension(R.styleable.Badge_paddingBottom_badge, badgePadding < 0 ? 2 * mDensityDP : badgePadding);
+        //角标内边距
+        float badgePadding = typedArray.getDimension(R.styleable.Badge_badge_padding, -1);
+        //角标内左边距，默认值4dp
+        this.mBadgePaddingLeft = typedArray.getDimension(R.styleable.Badge_badge_paddingLeft, badgePadding < 0 ? 4 * mDensityDP : badgePadding);
+        //角标内上边距，默认值2dp
+        this.mBadgePaddingTop = typedArray.getDimension(R.styleable.Badge_badge_paddingTop, badgePadding < 0 ? 2 * mDensityDP : badgePadding);
+        //角标内右边距，默认值4dp
+        this.mBadgePaddingRight = typedArray.getDimension(R.styleable.Badge_badge_paddingRight, badgePadding < 0 ? 4 * mDensityDP : badgePadding);
+        //角标内下边距，默认值2dp
+        this.mBadgePaddingBottom = typedArray.getDimension(R.styleable.Badge_badge_paddingBottom, badgePadding < 0 ? 2 * mDensityDP : badgePadding);
 
-        //浮标外边距
-        float badgeMargin = typedArray.getDimension(R.styleable.Badge_margin_badge, 0);
-        //浮标外左边距，默认值0dp
-        this.mBadgeMarginLeft = typedArray.getDimension(R.styleable.Badge_marginLeft_badge, badgeMargin);
-        //浮标外上边距，默认值0dp
-        this.mBadgeMarginTop = typedArray.getDimension(R.styleable.Badge_marginTop_badge, badgeMargin);
-        //浮标外右边距，默认值0dp
-        this.mBadgeMarginRight = typedArray.getDimension(R.styleable.Badge_marginRight_badge, badgeMargin);
-        //浮标外下边距，默认值0dp
-        this.mBadgeMarginBottom = typedArray.getDimension(R.styleable.Badge_marginBottom_badge, badgeMargin);
+        //角标外边距
+        float badgeMargin = typedArray.getDimension(R.styleable.Badge_badge_margin, 0);
+        //角标外左边距，默认值0dp
+        this.mBadgeMarginLeft = typedArray.getDimension(R.styleable.Badge_badge_marginLeft, badgeMargin);
+        //角标外上边距，默认值0dp
+        this.mBadgeMarginTop = typedArray.getDimension(R.styleable.Badge_badge_marginTop, badgeMargin);
+        //角标外右边距，默认值0dp
+        this.mBadgeMarginRight = typedArray.getDimension(R.styleable.Badge_badge_marginRight, badgeMargin);
+        //角标外下边距，默认值0dp
+        this.mBadgeMarginBottom = typedArray.getDimension(R.styleable.Badge_badge_marginBottom, badgeMargin);
 
         //字体大小
-        this.mBadgeTextSize = typedArray.getDimension(R.styleable.Badge_textSize_badge, 10 * mDensitySP);
+        this.mBadgeTextSize = typedArray.getDimension(R.styleable.Badge_badge_textSize, 12 * mDensitySP);
         //字体颜色
-        this.mBadgeTextColor = typedArray.getColor(R.styleable.Badge_textColor_badge, 0xFFFFFFFF);
+        this.mBadgeTextColor = typedArray.getColor(R.styleable.Badge_badge_textColor, 0xFFFFFFFF);
         //字体加粗
-        this.mBoldTextEnable = typedArray.getBoolean(R.styleable.Badge_boldText_badge, true);
+        this.mBoldTextEnable = typedArray.getBoolean(R.styleable.Badge_badge_boldText, true);
 
+        //角标小圆点半径
+        this.mBadgeDotRadius = typedArray.getDimension(R.styleable.Badge_badge_dotRadius, 10 * mDensityDP);
         typedArray.recycle();
 
         //初始化画笔工具
@@ -225,14 +232,14 @@ public class Badge {
     }
 
     /**
-     * 获取浮标文本
+     * 获取角标文本
      */
     public String getBadgeText() {
         return mBadgeText;
     }
 
     /**
-     * 设置浮标文本
+     * 设置角标文本
      *
      * @param badgeText 为null时不显示，长度为0时显示小圆点
      */
@@ -249,7 +256,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标字体颜色
+     * 设置角标字体颜色
      */
     public void setBadgeTextColor(int color) {
         mBadgeTextColor = color;
@@ -258,12 +265,12 @@ public class Badge {
     }
 
     /**
-     * 设置浮标字体大小，单位px
+     * 设置角标字体大小，单位px
      *
-     * @param size 小于1时显示小圆点
+     * @param size 必须大于0
      */
     public void setBadgeTextSize(float size) {
-        if (mBadgeTextSize != size) {
+        if (size > 0 && mBadgeTextSize != size) {
             mBadgeTextSize = size;
             mBadgeTextPaint.setTextSize(mBadgeTextSize);
             measureTextHeight();
@@ -294,7 +301,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标背景
+     * 设置角标背景
      */
     public void setBadgeBackground(Drawable drawable) {
         mBadgeBackground = drawable;
@@ -302,7 +309,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标背景
+     * 设置角标背景
      */
     public void setBadgeBackgroundResource(@DrawableRes int resid) {
         try {
@@ -313,7 +320,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标内边距，单位px
+     * 设置角标内边距，单位px
      */
     public void setBadgePadding(float padding) {
         if (mBadgePaddingLeft != padding || mBadgePaddingTop != padding || mBadgePaddingRight != padding || mBadgePaddingBottom != padding) {
@@ -328,7 +335,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标内边距，单位px
+     * 设置角标内边距，单位px
      */
     public void setBadgePadding(float paddingLeft, float paddingTop, float paddingRight, float paddingBottom) {
         if (mBadgePaddingLeft != paddingLeft || mBadgePaddingTop != paddingTop || mBadgePaddingRight != paddingRight || mBadgePaddingBottom != paddingBottom) {
@@ -346,7 +353,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标内边距-左，单位px
+     * 设置角标内边距-左，单位px
      */
     public void setBadgePaddingLeft(float paddingLeft) {
         if (mBadgePaddingLeft != paddingLeft) {
@@ -361,7 +368,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标内边距-上，单位px
+     * 设置角标内边距-上，单位px
      */
     public void setBadgePaddingTop(float paddingTop) {
         if (mBadgePaddingTop != paddingTop) {
@@ -376,7 +383,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标内边距-右，单位px
+     * 设置角标内边距-右，单位px
      */
     public void setBadgePaddingRight(float paddingRight) {
         if (mBadgePaddingRight != paddingRight) {
@@ -391,7 +398,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标内边距-下，单位px
+     * 设置角标内边距-下，单位px
      */
     public void setBadgePaddingBottom(float paddingBottom) {
         if (mBadgePaddingBottom != paddingBottom) {
@@ -406,7 +413,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标外边距，单位px
+     * 设置角标外边距，单位px
      */
     public void setBadgeMargin(float marginLeft, float marginTop, float marginRight, float marginBottom) {
         if (mBadgeMarginLeft != marginLeft || mBadgeMarginTop != marginTop || mBadgeMarginRight != marginRight || mBadgeMarginBottom != marginBottom) {
@@ -424,7 +431,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标外边距-左，单位px
+     * 设置角标外边距-左，单位px
      */
     public void setBadgeMarginLeft(float marginLeft) {
         if (mBadgeMarginLeft != marginLeft) {
@@ -439,7 +446,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标外边距-上，单位px
+     * 设置角标外边距-上，单位px
      */
     public void setBadgeMarginTop(float marginTop) {
         if (mBadgeMarginTop != marginTop) {
@@ -454,7 +461,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标外边距-右，单位px
+     * 设置角标外边距-右，单位px
      */
     public void setBadgeMarginRight(float marginRight) {
         if (mBadgeMarginRight != marginRight) {
@@ -469,7 +476,7 @@ public class Badge {
     }
 
     /**
-     * 设置浮标外边距-下，单位px
+     * 设置角标外边距-下，单位px
      */
     public void setBadgeMarginBottom(float marginBottom) {
         if (mBadgeMarginBottom != marginBottom) {
@@ -484,7 +491,25 @@ public class Badge {
     }
 
     /**
-     * 设置浮标对齐方式
+     * 设置小圆点半径，单位px
+     *
+     * @param dotRadius 必须大于0
+     */
+    public void setBadgeDotRadius(float dotRadius) {
+        if (dotRadius > 0 && mBadgeDotRadius != dotRadius) {
+            mBadgeDotRadius = dotRadius;
+            if (mBadgeText != null && mBadgeText.length() < 1) {
+                if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                    mTargetView.requestLayout();
+                } else {
+                    mTargetView.invalidate();
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置角标对齐方式
      */
     public void setBadgeGravity(int gravity) {
         if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT) {
@@ -501,14 +526,14 @@ public class Badge {
     }
 
     /**
-     * 返回浮标对齐方式
+     * 返回角标对齐方式
      */
     public int getBadgeGravity() {
         return mBadgeGravity;
     }
 
     /**
-     * 在目标View的dispatchDraw方法中最后调用，绘制浮标
+     * 在目标View的dispatchDraw方法中最后调用，绘制角标
      * 不建议在onDraw中调用，因为可能会被目标View的前景遮挡，且ViewGroup在透明背景时不会调用onDraw
      */
     public void dispatchDraw(Canvas canvas) {
@@ -534,7 +559,7 @@ public class Badge {
     }
 
     /**
-     * 计算浮标背景尺寸
+     * 计算角标背景尺寸
      */
     private void measureBackgroundBounds() {
         if (mBadgeText == null) {
@@ -542,15 +567,15 @@ public class Badge {
         }
         float offsetX = mBadgeMarginLeft, offsetY = mBadgeMarginTop;
         float backgroundWidth, backgroundHeight;
-        //先计算浮标的宽高
-        if (mBadgeText.length() < 1 || mBadgeTextSize < 1) {
+        //先计算角标的宽高
+        if (mBadgeText.length() < 1) {
             //文本长度为0，只显示一个小圆点
-            backgroundWidth = backgroundHeight = 2 * mDensityDP + (mBadgePaddingTop + mBadgePaddingBottom + mBadgePaddingLeft + mBadgePaddingRight) / 2F;
+            backgroundWidth = backgroundHeight = mBadgeDotRadius;
         } else {
-            //根据文本长度计算浮标的宽高
+            //根据文本长度计算角标的宽高
             backgroundHeight = mBadgePaddingTop + mBadgePaddingBottom + mBadgeTextHeight;
             float badgeTextWidth = mBadgeTextPaint.measureText(mBadgeText);
-            //浮标的宽不能小于高
+            //角标的宽不能小于高
             backgroundWidth = Math.max(backgroundHeight, mBadgePaddingLeft + mBadgePaddingRight + badgeTextWidth);
         }
 
@@ -570,7 +595,7 @@ public class Badge {
         } else if ((mBadgeGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//垂直居中
             offsetY = (mViewHeight - backgroundHeight) / 2 + mBadgeMarginTop - mBadgeMarginBottom;
         }
-        //设置浮标的边界值
+        //设置角标的边界值
         mBadgeBackgroundBounds.set(offsetX, offsetY, backgroundWidth + offsetX, backgroundHeight + offsetY);
     }
 
@@ -584,14 +609,14 @@ public class Badge {
     }
 
     /**
-     * 返回浮标总宽
+     * 返回角标总宽
      */
     int getBadgeWidth() {
         return (int) Math.ceil(mBadgeMarginLeft + mBadgeMarginRight + mBadgeBackgroundBounds.width());
     }
 
     /**
-     * 返回浮标总高
+     * 返回角标总高
      */
     int getBadgeHeight() {
         return (int) Math.ceil(mBadgeMarginTop + mBadgeMarginBottom + mBadgeBackgroundBounds.height());
