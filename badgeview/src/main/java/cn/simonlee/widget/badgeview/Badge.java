@@ -21,6 +21,11 @@ import android.view.ViewGroup;
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-05-29
+ * <p>
+ * 用法：
+ * 1.自定义View，在构造方法中创建Badge实例;
+ * 2.重写dispatchDraw(Canvas canvas)方法，在里面调用Badge.dispatchDraw(canvas);
+ * 3.添加一个getBadge()方法，返回Badge实例。
  */
 @SuppressWarnings("unused")
 public class Badge {
