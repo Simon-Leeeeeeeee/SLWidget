@@ -482,8 +482,8 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
             }
             mShadowView.getBackground().setAlpha(alpha);
         }
-        mSwipeBackView.setTranslationX(translation);
         mShadowView.setTranslationX(translation - mDecorView.getWidth());
+        mSwipeBackView.setTranslationX(translation);
     }
 
     /**
@@ -496,17 +496,18 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      */
     private void startSwipeAnimator(float startValue, float minFinalValue, float maxFinalValue, float velocity) {
         if (mSwipeAnimator == null) {
-            mSwipeAnimator = new DecelerateAnimator();
+            mSwipeAnimator = new DecelerateAnimator(mSwipeBackActivity, false);
+            mSwipeAnimator.growFlingFriction(9F);
             mSwipeAnimator.addListener(this);
             mSwipeAnimator.addUpdateListener(this);
         }
-        mSwipeAnimator.startAnimator(startValue, minFinalValue, maxFinalValue, velocity);
+        mSwipeAnimator.startAnimator(startValue, minFinalValue, maxFinalValue, velocity * 3F);
     }
 
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
-        float animatedValue = (Float) animation.getAnimatedValue();
-        swipeBackEvent((int) animatedValue);
+        float translation = (Float) animation.getAnimatedValue();
+        swipeBackEvent((int) translation);
     }
 
     @Override
@@ -518,8 +519,8 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                 mSwipeBackActivity.finish();
                 mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
             } else {
-                mSwipeBackView.setTranslationX(0);
                 mShadowView.setTranslationX(-mDecorView.getWidth());
+                mSwipeBackView.setTranslationX(0);
             }
         }
     }
