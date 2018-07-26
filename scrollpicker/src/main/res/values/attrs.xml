@@ -2,51 +2,51 @@
 <resources>
 
     <!--显示行数-->
-    <attr name="rows" format="integer" />
+    <attr name="scrollpicker_rows" format="integer" />
     <!--行间距-->
-    <attr name="spacing" format="reference|dimension" />
+    <attr name="scrollpicker_spacing" format="reference|dimension" />
 
     <!--字体大小-->
-    <attr name="textSize" format="reference|dimension" />
+    <attr name="scrollpicker_textSize" format="reference|dimension" />
     <!--字体格式，宽度为wrap_content时用于计算宽度-->
-    <attr name="textFormat" format="reference|string" />
+    <attr name="scrollpicker_textFormat" format="reference|string" />
     <!--字体放大倍数-->
-    <attr name="textRatio" format="float" />
+    <attr name="scrollpicker_textRatio" format="float" />
 
     <!--选中时字体颜色-->
-    <attr name="textColor_selected" format="reference|color" />
+    <attr name="scrollpicker_textColor_center" format="reference|color" />
     <!--未选中时字体颜色-->
-    <attr name="textColor_unselected" format="reference|color" />
+    <attr name="scrollpicker_textColor_outside" format="reference|color" />
 
     <!--文本对齐方式（左、中、右）-->
-    <attr name="gravity">
+    <attr name="scrollpicker_gravity">
         <enum name="center" value="17" />
         <enum name="left" value="3" />
         <enum name="right" value="5" />
     </attr>
 
     <!--是否开启循环-->
-    <attr name="loop" format="boolean" />
+    <attr name="scrollpicker_loop" format="boolean" />
 
     <declare-styleable name="ScrollPickerView">
         <!--显示行数-->
-        <attr name="rows" />
+        <attr name="scrollpicker_rows" />
         <!--行间距-->
-        <attr name="spacing" />
+        <attr name="scrollpicker_spacing" />
         <!--字体大小-->
-        <attr name="textSize" />
+        <attr name="scrollpicker_textSize" />
         <!--字体格式，宽度为wrap_content时用于计算宽度-->
-        <attr name="textFormat" />
+        <attr name="scrollpicker_textFormat" />
         <!--字体放大倍数-->
-        <attr name="textRatio" />
+        <attr name="scrollpicker_textRatio" />
         <!--选中时字体颜色-->
-        <attr name="textColor_selected" />
+        <attr name="scrollpicker_textColor_center" />
         <!--未选中时字体颜色-->
-        <attr name="textColor_unselected" />
+        <attr name="scrollpicker_textColor_outside" />
         <!--文本对齐方式（左、中、右）-->
-        <attr name="gravity" />
+        <attr name="scrollpicker_gravity" />
         <!--是否开启循环-->
-        <attr name="loop" />
+        <attr name="scrollpicker_loop" />
     </declare-styleable>
 
 </resources>

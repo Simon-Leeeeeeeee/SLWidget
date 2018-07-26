@@ -218,18 +218,18 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ScrollPickerView);
 
-        this.mTextRows = typedArray.getInteger(R.styleable.ScrollPickerView_rows, 5);
-        this.mTextSize = typedArray.getDimension(R.styleable.ScrollPickerView_textSize, 16 * mDensityDP);
-        this.mTextRatio = typedArray.getFloat(R.styleable.ScrollPickerView_textRatio, 2F);
-        this.mRowSpacing = typedArray.getDimension(R.styleable.ScrollPickerView_spacing, 0);
-        this.mTextFormat = typedArray.getString(R.styleable.ScrollPickerView_textFormat);
+        this.mTextRows = typedArray.getInteger(R.styleable.ScrollPickerView_scrollpicker_rows, 5);
+        this.mTextSize = typedArray.getDimension(R.styleable.ScrollPickerView_scrollpicker_textSize, 16 * mDensityDP);
+        this.mTextRatio = typedArray.getFloat(R.styleable.ScrollPickerView_scrollpicker_textRatio, 2F);
+        this.mRowSpacing = typedArray.getDimension(R.styleable.ScrollPickerView_scrollpicker_spacing, 0);
+        this.mTextFormat = typedArray.getString(R.styleable.ScrollPickerView_scrollpicker_textFormat);
 
-        this.mTextColor_Selected = typedArray.getColor(R.styleable.ScrollPickerView_textColor_selected, 0xFFDD8822);
-        this.mTextColor_Unselected = typedArray.getColor(R.styleable.ScrollPickerView_textColor_unselected, 0xFFFFDD99);
+        this.mTextColor_Selected = typedArray.getColor(R.styleable.ScrollPickerView_scrollpicker_textColor_center, 0xFFDD8822);
+        this.mTextColor_Unselected = typedArray.getColor(R.styleable.ScrollPickerView_scrollpicker_textColor_outside, 0xFFFFDD99);
 
-        this.mLoopEnable = typedArray.getBoolean(R.styleable.ScrollPickerView_loop, true);
+        this.mLoopEnable = typedArray.getBoolean(R.styleable.ScrollPickerView_scrollpicker_loop, true);
 
-        this.mGravity = typedArray.getInt(R.styleable.ScrollPickerView_gravity, GRAVITY_LEFT);
+        this.mGravity = typedArray.getInt(R.styleable.ScrollPickerView_scrollpicker_gravity, GRAVITY_LEFT);
         this.mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         typedArray.recycle();
 
@@ -731,7 +731,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
      *
      * @param textSize 必须大于0
      */
-    public void setTextSize(int textSize) {
+    public void setTextSize(float textSize) {
         if (textSize > 0 && mTextSize != textSize) {
             mTextSize = textSize;
             mTextPaint.setTextSize(mTextSize);
@@ -743,7 +743,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
     /**
      * 设置文本行间距，单位px
      */
-    public void setRowSpacing(int rowSpacing) {
+    public void setRowSpacing(float rowSpacing) {
         if (mRowSpacing != rowSpacing) {
             mRowSpacing = rowSpacing;
             measureTextHeight();
