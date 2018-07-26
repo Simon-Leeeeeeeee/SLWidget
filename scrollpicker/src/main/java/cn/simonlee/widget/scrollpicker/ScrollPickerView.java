@@ -1,5 +1,6 @@
 package cn.simonlee.widget.scrollpicker;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,7 +10,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -25,7 +25,7 @@ import android.view.ViewGroup;
  * @createdTime 2018-05-11
  */
 @SuppressWarnings("unused")
-public class ScrollPickerView extends View {
+public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpdateListener {
 
     /**
      * dp&sp转px的系数
@@ -175,9 +175,9 @@ public class ScrollPickerView extends View {
     private Matrix mMatrix;
 
     /**
-     * 滑动辅助器
+     * 减速动画
      */
-    private OverScroller mOverScroller;
+    private DecelerateAnimator mDecelerateAnimator;
 
     /**
      * 线性颜色选择器
@@ -185,7 +185,7 @@ public class ScrollPickerView extends View {
     private LinearGradient mLinearShader;
 
     /**
-     * 速度追踪器，结束触摸事件时计算手势速度，用于滑动动画
+     * 速度追踪器，结束触摸事件时计算手势速度，用于减速动画
      */
     private VelocityTracker mVelocityTracker;
 
@@ -199,7 +199,7 @@ public class ScrollPickerView extends View {
         /**
          * 选中时的回调
          */
-        void onItemSelected(View view, int position, String value);
+        void onItemSelected(View view, int position);
     }
 
     public ScrollPickerView(Context context, AttributeSet attrs) {
@@ -240,8 +240,9 @@ public class ScrollPickerView extends View {
 
         mMatrix = new Matrix();//用户记录偏移量并设置给颜色渐变工具
         mTextBounds = new Rect();//用于计算每行文本边界区域
-        //滑动辅助器
-        mOverScroller = new OverScroller(mDensityDP);
+        //减速动画
+        mDecelerateAnimator = new DecelerateAnimator(this.getContext());
+        mDecelerateAnimator.addUpdateListener(this);
     }
 
     /**
@@ -382,10 +383,11 @@ public class ScrollPickerView extends View {
         int actionIndex = event.getActionIndex();
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
-                //当前有滑动动画未结束，则取消该动画，并直接进入滑动状态
-                if (!mOverScroller.isFinished()) {
-                    mOverScroller.finish();
+                isSwitchTouchPointer = false;
+                //当前有减速动画未结束，则取消该动画，并直接进入滑动状态
+                if (mDecelerateAnimator.isStarted()) {
                     isMoveAction = true;
+                    mDecelerateAnimator.cancel();
                 } else {
                     isMoveAction = false;
                 }
@@ -446,15 +448,13 @@ public class ScrollPickerView extends View {
                     float velocityY = -mVelocityTracker.getYVelocity(mTouchPointerId);
                     //累加偏移量
                     mTotalOffset += offset;
-                    //根据手势速度开启滑动动画
-                    mOverScroller.startScroll_Velocity(mTotalOffset, 0, mLoopEnable ? 0 : (mAdapter.getCount() - 1) * mItemHeight, velocityY, mItemHeight);
-                    super.invalidate();
+                    //开启减速动画
+                    startDecelerateAnimator(mTotalOffset, velocityY, 0, mItemHeight);
                 } else if (!isSwitchTouchPointer && Math.abs(offset) < mTouchSlop) {
                     //计算触摸点相对于中心位置的偏移距离
                     float distance = event.getY(actionIndex) - mCenterY;
-                    //调用滑动动画方法，移动到目标位置
-                    mOverScroller.startScroll_Value(mTotalOffset, 0, mLoopEnable ? 0 : (mAdapter.getCount() - 1) * mItemHeight, distance, mItemHeight);
-                    super.invalidate();
+                    //开启减速动画
+                    startDecelerateAnimator(mTotalOffset, 0, distance, mItemHeight);
                 }
                 if (mVelocityTracker != null) {
                     mVelocityTracker.recycle();
@@ -466,25 +466,28 @@ public class ScrollPickerView extends View {
         return true;
     }
 
-    @Override
-    public void computeScroll() {
-        if (mSpecifyPosition != null) {//有指定position
-            //取消惯性事件
-            mOverScroller.finish();
-            //根据指定position计算偏移量
-            mTotalOffset = mSpecifyPosition * mItemHeight;
-            mSpecifyPosition = null;
-        } else if (!isMoveAction && !mOverScroller.isFinished()) {//惯性事件未结束
-            //获取当前偏移量
-            mTotalOffset = mOverScroller.getCurValue();
-            if (!mOverScroller.isFinished()) {//惯性未结束，预请求下一次刷新
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    super.postInvalidateOnAnimation();
-                } else {
-                    super.postInvalidate();
-                }
-            }
+    /**
+     * 开始减速动画
+     *
+     * @param startValue 初始位移值
+     * @param velocity   初始速度
+     * @param distance   移动距离
+     * @param modulus    距离的模
+     */
+    private void startDecelerateAnimator(float startValue, float velocity, float distance, float modulus) {
+        float minValue = -1;
+        float maxValue = mLoopEnable ? -1 : (mAdapter.getCount() - 1) * mItemHeight + 1;
+        if (distance != 0) {
+            mDecelerateAnimator.startAnimator_Distance(startValue, minValue, maxValue, distance, modulus);
+        } else {
+            mDecelerateAnimator.startAnimator_Velocity(startValue, minValue, maxValue, velocity, modulus);
         }
+    }
+
+    @Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+        mTotalOffset = (Float) animation.getAnimatedValue();
+        super.invalidate();
     }
 
     @Override
@@ -524,13 +527,12 @@ public class ScrollPickerView extends View {
             curOffset += mItemHeight;
             curPosition++;
         }
-
-        //动画即将结束，进行选中回调
-        if (!isMoveAction && mOverScroller.isFinished() && mItemSelectedListener != null) {
+        //动画结束，进行选中回调
+        if (!isMoveAction && !mDecelerateAnimator.isStarted() && mItemSelectedListener != null) {
             //根据当前position对偏移量进行校正
             mTotalOffset = mMiddleItemPostion * mItemHeight;
             //回调监听
-            mItemSelectedListener.onItemSelected(this, mMiddleItemPostion, getDrawingText(mMiddleItemPostion));
+            mItemSelectedListener.onItemSelected(this, mMiddleItemPostion);
         }
     }
 
@@ -540,17 +542,26 @@ public class ScrollPickerView extends View {
      */
     private void calculateMiddleItem() {
         //计算偏移了多少个完整item
-        int count = (int) (mTotalOffset / mItemHeight);
-        //对偏移量取余，注意这里不用取余运算符，因为可能造成严重错误！
-        float offsetRem = mTotalOffset - mItemHeight * count;//取值范围( -mItenHeight , mItenHeight )
-        if (offsetRem >= mItemHeight / 2F) {
-            count++;
-            mMiddleItemOffset = mItemHeight - offsetRem;
-        } else if (offsetRem >= -mItemHeight / 2F) {
-            mMiddleItemOffset = -offsetRem;
+        int count = mSpecifyPosition != null ? mSpecifyPosition : (int) (mTotalOffset / mItemHeight);
+        if (mSpecifyPosition != null) {
+            if (mDecelerateAnimator.isStarted()) {
+                mDecelerateAnimator.cancel();
+            }
+            mTotalOffset = mSpecifyPosition * mItemHeight;
+            mMiddleItemOffset = 0;
+            mSpecifyPosition = null;
         } else {
-            count--;
-            mMiddleItemOffset = -mItemHeight - offsetRem;
+            //对偏移量取余，注意这里不用取余运算符，因为可能造成严重错误！
+            float offsetRem = mTotalOffset - mItemHeight * count;//取值范围( -mItenHeight , mItenHeight )
+            if (offsetRem >= mItemHeight / 2F) {
+                count++;
+                mMiddleItemOffset = mItemHeight - offsetRem;
+            } else if (offsetRem >= -mItemHeight / 2F) {
+                mMiddleItemOffset = -offsetRem;
+            } else {
+                count--;
+                mMiddleItemOffset = -mItemHeight - offsetRem;
+            }
         }
         mMiddleItemPostion = getRealPosition(count);
     }
@@ -640,8 +651,8 @@ public class ScrollPickerView extends View {
         if (position < 0 || position >= mAdapter.getCount()) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        if (!mOverScroller.isFinished()) {
-            mOverScroller.finish();
+        if (mDecelerateAnimator.isStarted()) {
+            mDecelerateAnimator.cancel();
         }
         // 如果在onMeasure之前设置选中项，mItemHeight为0，无法得到正确偏移量，因此这里不能直接计算mTotalOffset
         mSpecifyPosition = position;
@@ -652,7 +663,7 @@ public class ScrollPickerView extends View {
      * 获取当前选中项
      */
     public int getSelectedPosition() {
-        if (isMoveAction || mAdapter == null || !mOverScroller.isFinished()) {
+        if (isMoveAction || mAdapter == null || mDecelerateAnimator.isStarted()) {
             return -1;
         }
         return mMiddleItemPostion;
@@ -685,13 +696,17 @@ public class ScrollPickerView extends View {
         super.invalidate();
     }
 
-    public void setLoopable(boolean isChecked) {
-        if (mLoopEnable != isChecked) {
-            mLoopEnable = isChecked;
-            //循环将关闭且正在惯性事件
-            if (!mLoopEnable && !mOverScroller.isFinished() && mAdapter != null) {
-                //停止惯性事件，并指定position以确保item对齐
-                mOverScroller.finish();
+    public boolean isLoopEnable() {
+        return mLoopEnable;
+    }
+
+    public void setLoopEnable(boolean enable) {
+        if (mLoopEnable != enable) {
+            mLoopEnable = enable;
+            //循环将关闭且正在减速动画
+            if (!mLoopEnable && mDecelerateAnimator.isStarted() && mAdapter != null) {
+                //停止减速动画，并指定position以确保item对齐
+                mDecelerateAnimator.cancel();
                 //防止position越界
                 mSpecifyPosition = mMiddleItemPostion < 0 ? 0 : (mMiddleItemPostion >= mAdapter.getCount() ? mAdapter.getCount() - 1 : mMiddleItemPostion);
             }
@@ -712,39 +727,27 @@ public class ScrollPickerView extends View {
     }
 
     /**
-     * 设置文本字体大小，单位sp
+     * 设置文本字体大小，单位px
+     *
+     * @param textSize 必须大于0
      */
-    public void setTextSize(int textSizeSP) {
-        float textSize = textSizeSP * mDensitySP;
-        if (mTextSize != textSize) {
+    public void setTextSize(int textSize) {
+        if (textSize > 0 && mTextSize != textSize) {
             mTextSize = textSize;
             mTextPaint.setTextSize(mTextSize);
             measureTextHeight();
-            mOverScroller.finish();
-            mSpecifyPosition = mMiddleItemPostion;
-            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
-                super.requestLayout();
-            } else {
-                super.invalidate();
-            }
+            reInvalidate();
         }
     }
 
     /**
-     * 设置文本行间距，单位dp
+     * 设置文本行间距，单位px
      */
-    public void setRowSpacing(int rowSpacingDP) {
-        float rowSpacing = rowSpacingDP * mDensityDP;
+    public void setRowSpacing(int rowSpacing) {
         if (mRowSpacing != rowSpacing) {
             mRowSpacing = rowSpacing;
             measureTextHeight();
-            mOverScroller.finish();
-            mSpecifyPosition = mMiddleItemPostion;
-            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
-                super.requestLayout();
-            } else {
-                super.invalidate();
-            }
+            reInvalidate();
         }
     }
 
@@ -755,13 +758,19 @@ public class ScrollPickerView extends View {
         if (mTextRatio != textRatio) {
             mTextRatio = textRatio;
             measureTextHeight();
-            mOverScroller.finish();
-            mSpecifyPosition = mMiddleItemPostion;
-            if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
-                super.requestLayout();
-            } else {
-                super.invalidate();
-            }
+            reInvalidate();
+        }
+    }
+
+    private void reInvalidate() {
+        if (mDecelerateAnimator.isStarted()) {
+            mDecelerateAnimator.cancel();
+        }
+        mSpecifyPosition = mMiddleItemPostion;
+        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            super.requestLayout();
+        } else {
+            super.invalidate();
         }
     }
 
