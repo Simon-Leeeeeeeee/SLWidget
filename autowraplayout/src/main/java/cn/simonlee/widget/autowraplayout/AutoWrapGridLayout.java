@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 /**
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
+ * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-04
  */
 public class AutoWrapGridLayout extends ViewGroup {
@@ -18,27 +19,27 @@ public class AutoWrapGridLayout extends ViewGroup {
     /**
      * 单元格内对齐方式：左对齐
      */
-    public final int GRAVITY_LEFT = 1;
+    public static final int GRAVITY_LEFT = 1;
     /**
      * 单元格内对齐方式：顶对齐
      */
-    public final int GRAVITY_TOP = 2;
+    public static final int GRAVITY_TOP = 2;
     /**
      * 单元格内对齐方式：右对齐
      */
-    public final int GRAVITY_RIGHT = 4;
+    public static final int GRAVITY_RIGHT = 4;
     /**
      * 单元格内对齐方式：底对齐
      */
-    public final int GRAVITY_BOTTOM = 8;
+    public static final int GRAVITY_BOTTOM = 8;
     /**
      * 单元格内对齐方式：居中
      */
-    public final int GRAVITY_CENTER = 16;
+    public static final int GRAVITY_CENTER = 16;
     /**
      * 单元格内对齐方式：填满
      */
-    public final int GRAVITY_FILL = 32;
+    public static final int GRAVITY_FILL = 32;
 
     /**
      * 单元格内对齐方式
@@ -46,23 +47,18 @@ public class AutoWrapGridLayout extends ViewGroup {
     private int mGridCellGravity;
 
     /**
-     * 单元格宽度
+     * 单元格实际宽高
      */
-    private int mGridCellWidth;
+    private int mGridCellWidth, mGridCellHeight;
 
     /**
-     * 单元格高度
+     * 单元格指定宽高
      */
-    private int mGridCellHeight;
-
-    /**
-     * 未指定单元格的宽高
-     */
-    private boolean noGridCellSize;
+    private int mAppointGridCellWidth, mAppointGridCellHeight;
 
     /**
      * AutoWrapGridLayout的宽被单元格平分后的余数。
-     * 在每行从左至右每个单元格从余数中取1，尽可能使每个单元格看起来一样宽
+     * 每行从左至右每个单元格从余数中取1，尽可能使每个单元格看起来一样宽
      */
     private int mRowSurplusWidth;
 
@@ -118,13 +114,12 @@ public class AutoWrapGridLayout extends ViewGroup {
     private void initView(Context context, AttributeSet attributeSet) {
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.AutoWrapGridLayout);
 
-        this.mGridCellGravity = typedArray.getInt(R.styleable.AutoWrapGridLayout_gridCellGravity, GRAVITY_FILL);
-        this.mGridCellWidth = typedArray.getDimensionPixelSize(R.styleable.AutoWrapGridLayout_gridCellWidth, 0);
-        this.mGridCellHeight = typedArray.getDimensionPixelSize(R.styleable.AutoWrapGridLayout_gridCellHeight, 0);
-        this.noGridCellSize = mGridCellWidth <= 0 || mGridCellWidth <= 0;
-        this.mGridLineWidth = typedArray.getDimensionPixelSize(R.styleable.AutoWrapGridLayout_gridLineWidth, 1);
-        this.mGridLineColor = typedArray.getColor(R.styleable.AutoWrapGridLayout_gridLineColor, 0);
-        this.isStickFirst = typedArray.getBoolean(R.styleable.AutoWrapGridLayout_stickFirst, false);
+        this.mGridCellGravity = typedArray.getInt(R.styleable.AutoWrapGridLayout_autowrap_gridCellGravity, GRAVITY_FILL);
+        this.mAppointGridCellWidth = typedArray.getDimensionPixelSize(R.styleable.AutoWrapGridLayout_autowrap_gridCellWidth, 0);
+        this.mAppointGridCellHeight = typedArray.getDimensionPixelSize(R.styleable.AutoWrapGridLayout_autowrap_gridCellHeight, 0);
+        this.mGridLineWidth = typedArray.getDimensionPixelSize(R.styleable.AutoWrapGridLayout_autowrap_gridLineWidth, 1);
+        this.mGridLineColor = typedArray.getColor(R.styleable.AutoWrapGridLayout_autowrap_gridLineColor, 0);
+        this.isStickFirst = typedArray.getBoolean(R.styleable.AutoWrapGridLayout_autowrap_stickFirst, false);
 
         typedArray.recycle();
         mGridLinePaint = new Paint();
@@ -149,6 +144,8 @@ public class AutoWrapGridLayout extends ViewGroup {
         int childState = 0;
         //单元格个数
         int gridCellCount = 0;
+        mGridCellWidth = mAppointGridCellWidth;
+        mGridCellHeight = mAppointGridCellHeight;
         mStickFirstWidth = mStickFirstHeight = 0;
         for (int index = 0; index < getChildCount(); index++) {//测量每个子View，并记录宽高等数据
             View child = getChildAt(index);
@@ -165,12 +162,16 @@ public class AutoWrapGridLayout extends ViewGroup {
             } else {
                 gridCellCount++;
                 //未指定单元格的尺寸，以childView的宽高最大值为准
-                if (noGridCellSize) {
+                if (mAppointGridCellWidth <= 0 || mAppointGridCellHeight <= 0) {
                     MarginLayoutParams childLP = (MarginLayoutParams) child.getLayoutParams();
-                    int childMarginWidth = childLP.leftMargin + childLP.rightMargin;
-                    int childMarginHeight = childLP.topMargin + childLP.bottomMargin;
-                    mGridCellWidth = Math.max(mGridCellWidth, childMarginWidth + child.getMeasuredWidth());
-                    mGridCellHeight = Math.max(mGridCellHeight, childMarginHeight + child.getMeasuredHeight());
+                    if (childLP.width != LayoutParams.MATCH_PARENT) {
+                        int childMarginWidth = childLP.leftMargin + childLP.rightMargin;
+                        mGridCellWidth = Math.max(mGridCellWidth, childMarginWidth + child.getMeasuredWidth());
+                    }
+                    if (childLP.height != LayoutParams.MATCH_PARENT) {
+                        int childMarginHeight = childLP.topMargin + childLP.bottomMargin;
+                        mGridCellHeight = Math.max(mGridCellHeight, childMarginHeight + child.getMeasuredHeight());
+                    }
                 }
             }
         }
@@ -195,7 +196,7 @@ public class AutoWrapGridLayout extends ViewGroup {
             }
         }
         //计算单元格的列数
-        int columnCount = (widthSize - paddingWidth + mGridLineWidth) / (mGridCellWidth + mGridLineWidth);
+        int columnCount = Math.max(1, (widthSize - paddingWidth + mGridLineWidth) / (mGridCellWidth + mGridLineWidth));
         //校正单元格的宽度，使之填满整个View
         mGridCellWidth = (widthSize - paddingWidth + mGridLineWidth) / columnCount - mGridLineWidth;
         //宽被单元格平分后的余数
@@ -293,9 +294,11 @@ public class AutoWrapGridLayout extends ViewGroup {
             canvas.drawRect(0, gridLineY, getWidth(), gridLineY + mGridLineWidth, mGridLinePaint);
         } else {
             //计算当前child所在的行
-            int childRow = (int) Math.ceil(1F * (child.getBottom() - getPaddingTop() - mStickFirstHeight) / (mGridCellHeight + mGridLineWidth));
+            int childRow = (int) (1F * (child.getBottom() - getPaddingTop() - mStickFirstHeight) / (mGridCellHeight + mGridLineWidth) + 0.5F);
             //计算当前child所在的列
-            int childColumn = (int) Math.ceil(1F * (child.getRight() - getPaddingLeft()) / (mGridCellWidth + mGridLineWidth));
+            int childColumn = (int) (1F * (child.getRight() - getPaddingLeft()) / (mGridCellWidth + mGridLineWidth) + 0.5F);
+//            Log.e("SLWidget", getClass().getSimpleName() + ".drawChild() 第 "+childColumn+" 个单元格, getPaddingLeft = "+getPaddingLeft()+" , 右边 = "+child.getRight()
+//                    +" , 单元格宽 = "+mGridCellWidth+" , 线宽 = "+mGridLineWidth);
             //计算当前child所在单元格的底边
             int gridCellBottom = getPaddingTop() + mStickFirstHeight + childRow * (mGridCellHeight + mGridLineWidth);
             //firstChild未置顶，需要减去一个网格线宽
@@ -322,14 +325,12 @@ public class AutoWrapGridLayout extends ViewGroup {
      * 设置单元格尺寸宽度，单位px
      */
     public void setGridCellSize(int width, int height) {
-        this.mGridCellWidth = width;
-        this.mGridCellHeight = height;
-        this.noGridCellSize = mGridCellWidth <= 0 || mGridCellWidth <= 0;
-        if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (mAppointGridCellWidth != width || mAppointGridCellHeight != height) {
+            mAppointGridCellWidth = width;
+            mAppointGridCellHeight = height;
             super.requestLayout();
-        } else {
-            super.invalidate();
         }
+
     }
 
     /**
@@ -350,11 +351,9 @@ public class AutoWrapGridLayout extends ViewGroup {
      * 设置网格线宽度，单位px
      */
     public void setGridLineWidth(int width) {
-        this.mGridLineWidth = width;
-        if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (mGridLineWidth != width) {
+            mGridLineWidth = width;
             super.requestLayout();
-        } else {
-            super.invalidate();
         }
     }
 
@@ -369,9 +368,11 @@ public class AutoWrapGridLayout extends ViewGroup {
      * 设置网格线颜色
      */
     public void setGridLineColor(int color) {
-        this.mGridLineColor = color;
-        mGridLinePaint.setColor(mGridLineColor);
-        super.invalidate();
+        if (mGridLineColor != color) {
+            mGridLineColor = color;
+            mGridLinePaint.setColor(mGridLineColor);
+            super.invalidate();
+        }
     }
 
     /**
@@ -385,19 +386,34 @@ public class AutoWrapGridLayout extends ViewGroup {
      * 设置第一个子View是否置顶
      */
     public void setStickFirst(boolean stick) {
-        this.isStickFirst = stick;
-        if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        if (isStickFirst != stick) {
+            isStickFirst = stick;
             super.requestLayout();
-        } else {
-            super.invalidate();
         }
     }
 
     /**
      * 获取第一个子View是否置顶
      */
-    public boolean getStickFirst() {
+    public boolean isStickFirst() {
         return isStickFirst;
+    }
+
+    /**
+     * 设置单元格对齐方式
+     */
+    public void setGridCellGravity(int gravity) {
+        if (mGridCellGravity != gravity) {
+            mGridCellGravity = gravity;
+            super.requestLayout();
+        }
+    }
+
+    /**
+     * 获取单元格对齐方式
+     */
+    public int getGridCellGravity() {
+        return mGridCellGravity;
     }
 
     @Override

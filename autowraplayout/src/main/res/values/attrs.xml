@@ -2,15 +2,15 @@
 <resources>
 
     <!--网格线宽-->
-    <attr name="gridLineWidth" format="dimension|reference" />
+    <attr name="autowrap_gridLineWidth" format="dimension|reference" />
     <!--网格线颜色-->
-    <attr name="gridLineColor" format="reference|color" />
+    <attr name="autowrap_gridLineColor" format="reference|color" />
     <!--单元格宽-->
-    <attr name="gridCellWidth" format="dimension|reference" />
+    <attr name="autowrap_gridCellWidth" format="dimension|reference" />
     <!--单元格高-->
-    <attr name="gridCellHeight" format="dimension|reference" />
+    <attr name="autowrap_gridCellHeight" format="dimension|reference" />
     <!--单元格内对齐方式-->
-    <attr name="gridCellGravity">
+    <attr name="autowrap_gridCellGravity">
         <flag name="left" value="1" />
         <flag name="top" value="2" />
         <flag name="right" value="4" />
@@ -19,21 +19,21 @@
         <flag name="fill" value="32" />
     </attr>
     <!--firstChild独占一行-->
-    <attr name="stickFirst" format="boolean" />
+    <attr name="autowrap_stickFirst" format="boolean" />
 
     <declare-styleable name="AutoWrapGridLayout">
         <!--网格线宽-->
-        <attr name="gridLineWidth" />
+        <attr name="autowrap_gridLineWidth" />
         <!--网格线颜色-->
-        <attr name="gridLineColor" />
+        <attr name="autowrap_gridLineColor" />
         <!--单元格宽-->
-        <attr name="gridCellWidth" />
+        <attr name="autowrap_gridCellWidth" />
         <!--单元格高-->
-        <attr name="gridCellHeight" />
+        <attr name="autowrap_gridCellHeight" />
         <!--单元格内对齐方式-->
-        <attr name="gridCellGravity" />
+        <attr name="autowrap_gridCellGravity" />
         <!--firstChild独占一行-->
-        <attr name="stickFirst" />
+        <attr name="autowrap_stickFirst" />
     </declare-styleable>
 
 </resources>
