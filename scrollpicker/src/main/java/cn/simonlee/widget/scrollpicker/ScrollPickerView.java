@@ -333,12 +333,12 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        measureOriginal();//计算初始状态下显示的行数、首行偏移量
+        measureOriginal();//计算中心位置、绘制起点
         setPaintShader();//设置颜色线性渐变
     }
 
     /**
-     * 计算初始状态
+     * 计算中心位置、绘制起点
      */
     private void measureOriginal() {
         //计算绘制区域高度

@@ -14,7 +14,7 @@ def key_ProjectDesc = 'A simple and beautiful picker.'//项目描述
 def key_ProjectVersion = '1.0.7'//项目版本
 def key_ProjectVersionDesc = ''//版本描述
 
-/*读取字段*/
+//从本地文件读取字段
 def key_ProjectVCS = properties.getProperty('project.vcs')
 def key_ProjectGroupId = properties.getProperty('project.groupId')
 def key_ProjectWebsite = properties.getProperty('project.website')
