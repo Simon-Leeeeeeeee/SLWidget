@@ -78,14 +78,14 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
     private String mTextFormat;
 
     /**
-     * 选中项的字体颜色
+     * 中部字体颜色
      */
-    private int mTextColor_Selected;
+    private int mTextColor_Center;
 
     /**
-     * 未选中项的字体颜色
+     * 外部字体颜色
      */
-    private int mTextColor_Unselected;
+    private int mTextColor_Outside;
 
     /**
      * 是否开启循环
@@ -224,8 +224,8 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         this.mRowSpacing = typedArray.getDimension(R.styleable.ScrollPickerView_scrollpicker_spacing, 0);
         this.mTextFormat = typedArray.getString(R.styleable.ScrollPickerView_scrollpicker_textFormat);
 
-        this.mTextColor_Selected = typedArray.getColor(R.styleable.ScrollPickerView_scrollpicker_textColor_center, 0xFFDD8822);
-        this.mTextColor_Unselected = typedArray.getColor(R.styleable.ScrollPickerView_scrollpicker_textColor_outside, 0xFFFFDD99);
+        this.mTextColor_Center = typedArray.getColor(R.styleable.ScrollPickerView_scrollpicker_textColor_center, 0xFFDD8822);
+        this.mTextColor_Outside = typedArray.getColor(R.styleable.ScrollPickerView_scrollpicker_textColor_outside, 0xFFFFDD99);
 
         this.mLoopEnable = typedArray.getBoolean(R.styleable.ScrollPickerView_scrollpicker_loop, true);
 
@@ -364,7 +364,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
      */
     private void setPaintShader() {
         mLinearShader = new LinearGradient(0F, mCenterY - (0.5F * mRowHeight + mItemHeight), 0F, mCenterY + (0.5F * mRowHeight + mItemHeight),
-                new int[]{mTextColor_Unselected, mTextColor_Selected, mTextColor_Unselected}
+                new int[]{mTextColor_Outside, mTextColor_Center, mTextColor_Outside}
                 , new float[]{0F, 0.5F, 1F}, LinearGradient.TileMode.CLAMP);
         mTextPaint.setShader(mLinearShader);
     }
@@ -759,6 +759,28 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
             mTextRatio = textRatio;
             measureTextHeight();
             reInvalidate();
+        }
+    }
+
+    /**
+     * 设置中部字体颜色
+     */
+    public void setCenterTextColor(int color) {
+        if (mTextColor_Center != color) {
+            mTextColor_Center = color;
+            setPaintShader();//设置颜色线性渐变
+            invalidate();
+        }
+    }
+
+    /**
+     * 设置外部字体颜色
+     */
+    public void setOutsideTextColor(int color) {
+        if (mTextColor_Outside != color) {
+            mTextColor_Outside = color;
+            setPaintShader();//设置颜色线性渐变
+            invalidate();
         }
     }
 
