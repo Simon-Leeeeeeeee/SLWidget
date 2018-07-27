@@ -327,11 +327,14 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT && heightMode != MeasureSpec.EXACTLY) {//高为WRAP
             heightSize = (int) (mRowHeight * mTextRows + mRowSpacing * (mTextRows - mTextRows % 2));
         }
-        setMeasuredDimension(widthSize, heightSize);
-        if (widthSize > 0 && heightSize > 0) {
-            measureOriginal();//计算初始状态下显示的行数、首行偏移量
-            setPaintShader();//设置颜色线性渐变
-        }
+        setMeasuredDimension(resolveSize(widthSize, widthMeasureSpec), resolveSize(heightSize, heightMeasureSpec));
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        measureOriginal();//计算初始状态下显示的行数、首行偏移量
+        setPaintShader();//设置颜色线性渐变
     }
 
     /**
@@ -339,7 +342,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
      */
     private void measureOriginal() {
         //计算绘制区域高度
-        int drawHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+        int drawHeight = getHeight() - getPaddingTop() - getPaddingBottom();
         //计算中心的Y值
         mCenterY = drawHeight / 2F + getPaddingTop();
         //根据对齐方式计算绘制起点
@@ -349,11 +352,11 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
                 break;
             }
             case GRAVITY_CENTER: {
-                mDrawingOriginX = (getMeasuredWidth() + getPaddingLeft() - getPaddingRight()) / 2F;
+                mDrawingOriginX = (getWidth() + getPaddingLeft() - getPaddingRight()) / 2F;
                 break;
             }
             case GRAVITY_RIGHT: {
-                mDrawingOriginX = getMeasuredWidth() - getPaddingRight();
+                mDrawingOriginX = getWidth() - getPaddingRight();
                 break;
             }
         }
@@ -495,8 +498,8 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         if (!isInEditMode() && mAdapter == null) {
             return;
         }
-        int measuredWidth = getMeasuredWidth();
-        int measuredHeight = getMeasuredHeight();
+        int measuredWidth = getWidth();
+        int measuredHeight = getHeight();
         int paddingLeft = getPaddingLeft();
         int paddingRight = getPaddingRight();
         int paddingTop = getPaddingTop();
@@ -681,12 +684,12 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
             }
             case GRAVITY_CENTER: {
                 mTextPaint.setTextAlign(Paint.Align.CENTER);
-                mDrawingOriginX = (getMeasuredWidth() + getPaddingLeft() - getPaddingRight()) / 2F;
+                mDrawingOriginX = (getWidth() + getPaddingLeft() - getPaddingRight()) / 2F;
                 break;
             }
             case GRAVITY_RIGHT: {
                 mTextPaint.setTextAlign(Paint.Align.RIGHT);
-                mDrawingOriginX = getMeasuredWidth() - getPaddingRight();
+                mDrawingOriginX = getWidth() - getPaddingRight();
                 break;
             }
             default:
