@@ -1,48 +1,73 @@
 <resources>
     <string name="app_name">SLWidget</string>
-    <string name="catalog">目录</string>
-    <string name="badge">Badge</string>
-    <string name="wheelpicker">WheelPicker</string>
+    <string name="author">Simon Lee</string>
+    <string name="hello_world">Hello World!</string>
+    <string name="about">关于&#8201;&#8201;</string>
+
+    <string name="badgeview">BadgeView</string>
+    <string name="badgeview_introduction">角标控件，可实现任意View的角标指示。支持字体、边距、背景、对齐方式等属性。</string>
+    <string name="badgeview_version">v1.0.4</string>
+
     <string name="scrollpicker">ScrollPicker</string>
+    <string name="scrollpicker_version">v1.0.7</string>
+    <string name="scrollpicker_introduction">滚动选择控件。仅支持文本显示，可设置行数、间距、颜色渐变、字体大小渐变等。</string>
 
-    <string name="feedback">反馈</string>
-    <string name="feedback_instructions">有问题记得提issue哦~</string>
+    <string name="autowraplayout">AutoWrapLayout</string>
+    <string name="autowraplayout_version">v1.0.3</string>
+    <string name="autowraplayout_introduction">自动换行布局，ChildView横向排列并自动换行。可设置首行独占，指定网格尺寸、颜色、对齐方式等。</string>
 
-    <string name="juejin">掘金</string>
-    <string name="jianshu">简书</string>
-    <string name="github">GitHub</string>
+    <string name="swipeback">SwipeBack</string>
+    <string name="swipeback_version">v1.0.7</string>
+    <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
+    <string name="swipeback_introduction">Activity侧滑辅助，支持Activity的侧滑返回操作。详细使用说明详见GitHub。</string>
 
-    <string name="year">年</string>
-    <string name="month">月</string>
-    <string name="day">日</string>
-    <string name="hour">时</string>
-    <string name="minute">分</string>
+    <string name="guidelines">使用指南</string>
+    <string name="guide_swipeback_1">1. 仅支持SDK19(Android4.4)及以上</string>
+    <string name="guide_swipeback_2">2. 侧滑Activity背景需设置为透明</string>
+    <string name="guide_swipeback_3">3. 侧滑Activity屏幕方向需设置为behind，避免在SDK26(Android8.0)及以上与透明背景冲突崩溃</string>
+    <string name="guide_swipeback_4">4. 侧滑Activity输入法模式adjustPan无效，建议设置为adjustResize</string>
+    <string name="guide_swipeback_5">5. 入栈的Activity只会onPause，不会onStop，栈中Activity较多会影响性能，建议在onPause中释放资源</string>
+    <string name="guide_swipeback_6">6. 使用示例参考demo中BaseActivity，详细使用请阅读源码</string>
+
+    <string name="next">下一页</string>
+    <string name="random">随机</string>
+    <string name="hide">隐藏</string>
+
+    <string name="loop">循环:</string>
     <string name="rows">行数:</string>
     <string name="spacing">行间距:</string>
+    <string name="dot_radius">圆点半径:</string>
     <string name="text_size">字体大小:</string>
     <string name="text_ratio">放大倍数:</string>
-    <string name="gravity">对齐方式:</string>
-    <string name="loop">循环:</string>
-
     <string name="bold">加粗:</string>
-    <string name="paddingLeft">内边距-左:</string>
-    <string name="paddingTop">内边距-上:</string>
-    <string name="paddingRight">内边距-右:</string>
-    <string name="paddingBottom">内边距-下:</string>
-
-    <string name="marginLeft">外边距-左:</string>
-    <string name="marginTop">外边距-上:</string>
-    <string name="marginRight">外边距-右:</string>
-    <string name="marginBottom">外边距-下:</string>
+    <string name="margin">外边距:</string>
+    <string name="padding">内边距:</string>
+    <string name="left">左:</string>
+    <string name="top">上:</string>
+    <string name="right">右:</string>
+    <string name="bottom">下:</string>
+    <string name="width">宽:</string>
+    <string name="height">高:</string>
+    <string name="gridline">网格线:</string>
+    <string name="color">颜色:</string>
+    <string name="color_center">中部颜色:</string>
+    <string name="color_outside">外部颜色:</string>
+    <string name="gridcell">单元格:</string>
+    <string name="stickfirst">首行独占:</string>
+    <string name="parentwidth">容器宽:</string>
+    <string name="gravity">对齐方式:</string>
 
     <string name="gravity_left">左</string>
     <string name="gravity_top">上</string>
     <string name="gravity_right">右</string>
     <string name="gravity_bottom">下</string>
     <string name="gravity_center">中</string>
-    <string name="hide">隐藏</string>
+    <string name="gravity_fill">填满</string>
 
-    <string name="angle_rotating">旋转:</string>
-    <string name="sight">视距:</string>
-    <string name="angle_visual">视角:</string>
+    <string name="adobe_app_1">Adobe&#8201;&#8201;I</string>
+    <string name="adobe_app_2">Adobe&#8201;&#8201;II</string>
+    <string name="adobe_app_3">Adobe&#8201;&#8201;III</string>
+    <string name="adobe_app_4">Adobe&#8201;&#8201;IV</string>
+    <string name="support_landscape">支持横屏</string>
+
 </resources>

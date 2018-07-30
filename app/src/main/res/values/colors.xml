@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#225596</color>
+    <color name="colorPrimaryDark">#225596</color>
+    <color name="colorPrimaryLight">#4E77AB</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorPrimaryDarkTrans">#CCf57257</color>
+
+    <color name="colorTransparent">#00000000</color>
+    <color name="colorWindowBackground">#F4F4F4</color>
 
     <color name="transparent">#00000000</color>
-    <color name="shade">#44000000</color>
 
-    <color name="white_translucent">#EEFFFFFF</color>
     <color name="white">#FFFFFF</color>
-    <color name="white_gray">#FAFAFA</color>
-    <color name="white_gray_lv2">#F4F7F8</color>
 
-    <color name="green">#43D95D</color>
-    <color name="green_light_lv1">#B3ECBC</color>
+    <color name="black">#000000</color>
+    <color name="black_light_lv1">#242424</color>
+    <color name="black_light_lv2">#353535</color>
+    <color name="black_light_lv3">#4A4A4A</color>
+    <color name="black_light_lv4">#4D4D4D</color>
+    <color name="black_light_lv6">#888888</color>
+    <color name="black_light_lv9">#BBBBBB</color>
 
-    <color name="green_dark_lv1">#195362</color>
+    <color name="red">#FF0000</color>
 
     <color name="purple">#A020F0</color>
 
@@ -28,17 +32,9 @@
     <color name="blue_light_lv9">#C5DFFF</color>
     <color name="blue_light_lv10">#ECF9FF</color>
 
-    <color name="black">#000000</color>
-    <color name="black_light_lv1">#242424</color>
-    <color name="black_light_lv2">#4A4A4A</color>
-    <color name="black_light_lv3">#4D4D4D</color>
-    <color name="black_light_lv6">#888888</color>
-    <color name="black_light_lv9">#BBBBBB</color>
-
-    <color name="gray_translucent">#80888888</color>
     <color name="gray">#888888</color>
     <color name="gray_light_lv0">#8F8E94</color>
-    <color name="gray_light_lv1">#9B9B9B</color>
+    <color name="gray_light_lv1">#999999</color>
     <color name="gray_light_lv2">#BABABA</color>
     <color name="gray_light_lv3">#C6C6C6</color>
     <color name="gray_light_lv4">#D3D3D3</color>
@@ -48,30 +44,7 @@
     <color name="gray_light_lv8">#EBEBEB</color>
     <color name="gray_light_lv9">#F3F3F3</color>
 
-    <color name="gray_dark">#686868</color>
-    <color name="gray_light">#B2B2B2</color>
-    <color name="gray_light2">#D3D3D3</color>
-    <color name="gray_light22">#DDDDDD</color>
-    <color name="gray_light3">#EEEEEE</color>
-    <color name="gray_light3_translucent">#EEEEEEEE</color>
     <color name="yellow">#FFFF00</color>
-    <color name="orange">#DD8822</color>
-    <color name="orange2">#F5A623</color>
-    <color name="orange_light">#F7B941</color>
-    <color name="orange_light1">#FFDD99</color>
-    <color name="orange_light2">#FFEEBB</color>
 
-    <color name="label_normal">#9B9B9B</color>
-    <color name="label_press">#40C4FC</color>
-
-    <color name="btn_submit_unenabled">#D4D4D4</color>
-    <color name="btn_submit_press">#23B2EF</color>
-    <color name="btn_submit_normal">#41C6FE</color>
-
-    <color name="theme_gray_whit2">#d9d9d9</color>
-    <color name="theme_gray_white">#F4F4F4</color>
-    <color name="theme_blue_light">#41C6FE</color>
-    <color name="theme_blue">#4772A3</color>
-    <color name="theme_orange">#F5A623</color>
-    <color name="theme_orange_light">#F4B750</color>
+    <color name="green">#43D95D</color>
 </resources>

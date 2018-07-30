@@ -5,63 +5,84 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <cn.simonlee.widgetdemo.widget.BadgeLinearLayout
-        android:id="@+id/linearlayout_badgelayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/gray"
-        android:orientation="horizontal"
-        android:padding="20dp"
-        app:background_badge="@drawable/shape_badge_purple">
+    <include layout="@layout/layout_toolbar" />
 
-        <cn.simonlee.widgetdemo.widget.BadgeImageView
-            android:id="@+id/imageview_badgeimage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_launcher_background"
-            app:background_badge="@drawable/shape_badge_yellow"
-            app:boldText_badge="true"
-            app:textColor_badge="@color/black"
-            app:textSize_badge="10sp" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <cn.simonlee.widgetdemo.badge.BadgeImageView
+            android:id="@+id/badge_avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_avatar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/badge_author"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/badge_author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:text="@string/author"
+            android:textColor="@color/black_light_lv2"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/badge_msg"
+            app:layout_constraintLeft_toRightOf="@id/badge_avatar"
+            app:layout_constraintRight_toLeftOf="@id/badge_badgeview"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/badge_msg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:text="@string/hello_world"
+            android:textColor="@color/gray_light_lv1"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/badge_author"
+            app:layout_constraintRight_toRightOf="@id/badge_author"
+            app:layout_constraintTop_toBottomOf="@id/badge_author" />
 
         <cn.simonlee.widget.badgeview.BadgeView
-            android:id="@+id/badgeview"
+            android:id="@+id/badge_badgeview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:background_badge="@drawable/shape_badge_blue"
-            app:boldText_badge="true"
-            app:textColor_badge="@color/white"
-            app:textSize_badge="10sp" />
+            android:layout_margin="15dp"
+            app:badge_background="@drawable/bg_badge_stroke_purple_black"
+            app:badge_textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/badge_author"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <cn.simonlee.widgetdemo.widget.BadgeTextView
-            android:id="@+id/textview_badgetext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/green"
-            android:gravity="center_vertical"
-            android:padding="5dp"
-            android:text="BadgeTextView" />
+    </android.support.constraint.ConstraintLayout>
 
-        <cn.simonlee.widgetdemo.widget.BadgeButton
-            android:id="@+id/button_badgebutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:text="BadgeButton"
-            android:textAllCaps="false"
-            app:textColor_badge="@color/white"
-            app:textSize_badge="10sp" />
-
-    </cn.simonlee.widgetdemo.widget.BadgeLinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="@color/colorWindowBackground">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -82,14 +103,11 @@
                     android:layout_height="wrap_content"
                     android:checked="true" />
 
-            </LinearLayout>
-
-            <!--字体大小-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -102,26 +120,33 @@
                     android:id="@+id/sb_textsize"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="30"
-                    android:progress="10" />
+                    android:max="19"
+                    android:progress="11" />
 
                 <TextView
                     android:id="@+id/tv_textsize"
-                    android:layout_width="30dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="10"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="12SP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
-            <!--内边距-左-->
+            <!--内边距-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:text="@string/padding"
+                android:textColor="@color/black" />
+
+            <!--内边距：左&上-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -129,67 +154,62 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/paddingLeft"
+                    android:text="@string/left"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_paddingleft"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="20"
+                    android:max="10"
                     android:progress="4" />
 
                 <TextView
                     android:id="@+id/tv_paddingleft"
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="4"
+                    android:gravity="end"
+                    android:minWidth="40dp"
+                    android:text="4DP"
                     android:textColor="@color/black" />
 
-            </LinearLayout>
-
-            <!--内边距-上-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/paddingTop"
+                    android:text="@string/top"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_paddingtop"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="20"
+                    android:max="10"
                     android:progress="2" />
 
                 <TextView
                     android:id="@+id/tv_paddingtop"
-                    android:layout_width="30dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="2"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="2DP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
-            <!--内边距-右-->
+            <!--内边距：右&下-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -197,67 +217,70 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/paddingRight"
+                    android:text="@string/right"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_paddingright"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="20"
+                    android:max="10"
                     android:progress="4" />
 
                 <TextView
                     android:id="@+id/tv_paddingright"
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="4"
+                    android:gravity="end"
+                    android:minWidth="40dp"
+                    android:text="4DP"
                     android:textColor="@color/black" />
 
-            </LinearLayout>
-
-            <!--内边距-下-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/paddingBottom"
+                    android:text="@string/bottom"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_paddingbottom"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="20"
+                    android:max="10"
                     android:progress="2" />
 
                 <TextView
                     android:id="@+id/tv_paddingbottom"
-                    android:layout_width="30dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="2"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="2DP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
-            <!--外边距-左-->
+            <!--外边距-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:text="@string/margin"
+                android:textColor="@color/black" />
+
+            <!--外边距：左&上-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -265,67 +288,62 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/marginLeft"
+                    android:text="@string/left"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_marginleft"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="10"
                     android:progress="0" />
 
                 <TextView
                     android:id="@+id/tv_marginleft"
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="0"
+                    android:gravity="end"
+                    android:minWidth="40dp"
+                    android:text="0DP"
                     android:textColor="@color/black" />
 
-            </LinearLayout>
-
-            <!--外边距-上-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/marginTop"
+                    android:text="@string/top"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_margintop"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="10"
                     android:progress="0" />
 
                 <TextView
                     android:id="@+id/tv_margintop"
-                    android:layout_width="30dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="0"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="0DP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
-            <!--外边距-右-->
+            <!--外边距：右&下-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -333,62 +351,64 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/marginRight"
+                    android:text="@string/right"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_marginright"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="10"
                     android:progress="0" />
 
                 <TextView
                     android:id="@+id/tv_marginright"
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="0"
+                    android:gravity="end"
+                    android:minWidth="40dp"
+                    android:text="0DP"
                     android:textColor="@color/black" />
 
-            </LinearLayout>
-
-            <!--外边距-下-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/marginBottom"
+                    android:text="@string/bottom"
                     android:textColor="@color/black" />
 
                 <SeekBar
                     android:id="@+id/sb_marginbottom"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginTop="1dp"
                     android:layout_weight="1"
-                    android:max="40"
+                    android:max="10"
                     android:progress="0" />
 
                 <TextView
                     android:id="@+id/tv_marginbottom"
-                    android:layout_width="30dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="0"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="0DP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:text="@string/gravity"
+                android:textColor="@color/black" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -396,14 +416,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/gravity"
-                    android:textColor="@color/black" />
-
-                <cn.simonlee.widgetdemo.widget.RadioButton
+                <cn.simonlee.widgetdemo.RadioButton
                     android:id="@+id/radio_gravityleft"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -411,7 +424,7 @@
                     android:lines="1"
                     android:text="@string/gravity_left" />
 
-                <cn.simonlee.widgetdemo.widget.RadioButton
+                <cn.simonlee.widgetdemo.RadioButton
                     android:id="@+id/radio_gravitytop"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -420,7 +433,7 @@
                     android:lines="1"
                     android:text="@string/gravity_top" />
 
-                <cn.simonlee.widgetdemo.widget.RadioButton
+                <cn.simonlee.widgetdemo.RadioButton
                     android:id="@+id/radio_gravityright"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -429,7 +442,7 @@
                     android:lines="1"
                     android:text="@string/gravity_right" />
 
-                <cn.simonlee.widgetdemo.widget.RadioButton
+                <cn.simonlee.widgetdemo.RadioButton
                     android:id="@+id/radio_gravitybottom"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -438,7 +451,7 @@
                     android:lines="1"
                     android:text="@string/gravity_bottom" />
 
-                <cn.simonlee.widgetdemo.widget.RadioButton
+                <cn.simonlee.widgetdemo.RadioButton
                     android:id="@+id/radio_gravitycenter"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -452,14 +465,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Text : "
+                    android:paddingLeft="4dp"
+                    android:text="Text："
                     android:textColor="@color/black" />
 
                 <EditText
@@ -468,9 +481,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:maxLines="1"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:textColor="@color/gray" />
+                    android:text="99+"
+                    android:textColor="@color/black_light_lv2" />
 
                 <Button
                     android:id="@+id/button_hide"

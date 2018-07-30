@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_toolbar" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <cn.simonlee.widget.scrollpicker.ScrollPickerView
+            android:id="@+id/datepicker_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:scrollpicker_gravity="center"
+            app:scrollpicker_spacing="-5dp"
+            app:scrollpicker_textColor_center="@color/black_light_lv3"
+            app:scrollpicker_textColor_outside="@color/gray_light_lv4"
+            app:scrollpicker_textFormat="2018"
+            app:scrollpicker_textRatio="1.8"
+            app:scrollpicker_textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="-"
+            android:textSize="18sp" />
+
+        <cn.simonlee.widget.scrollpicker.ScrollPickerView
+            android:id="@+id/datepicker_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:scrollpicker_gravity="center"
+            app:scrollpicker_spacing="-5dp"
+            app:scrollpicker_textColor_center="@color/black_light_lv3"
+            app:scrollpicker_textColor_outside="@color/gray_light_lv4"
+            app:scrollpicker_textFormat="12"
+            app:scrollpicker_textRatio="1.8"
+            app:scrollpicker_textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="-"
+            android:textSize="18sp" />
+
+        <cn.simonlee.widget.scrollpicker.ScrollPickerView
+            android:id="@+id/datepicker_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:scrollpicker_gravity="center"
+            app:scrollpicker_spacing="-5dp"
+            app:scrollpicker_textColor_center="@color/black_light_lv3"
+            app:scrollpicker_textColor_outside="@color/gray_light_lv4"
+            app:scrollpicker_textFormat="31"
+            app:scrollpicker_textRatio="1.8"
+            app:scrollpicker_textSize="18sp" />
+
+        <cn.simonlee.widget.scrollpicker.ScrollPickerView
+            android:id="@+id/datepicker_hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            app:scrollpicker_gravity="center"
+            app:scrollpicker_spacing="-5dp"
+            app:scrollpicker_textColor_center="@color/black_light_lv3"
+            app:scrollpicker_textColor_outside="@color/gray_light_lv4"
+            app:scrollpicker_textFormat="24"
+            app:scrollpicker_textRatio="1.8"
+            app:scrollpicker_textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text=":"
+            android:textSize="18sp" />
+
+        <cn.simonlee.widget.scrollpicker.ScrollPickerView
+            android:id="@+id/datepicker_minute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:scrollpicker_gravity="center"
+            app:scrollpicker_spacing="-5dp"
+            app:scrollpicker_textColor_center="@color/black_light_lv3"
+            app:scrollpicker_textColor_outside="@color/gray_light_lv4"
+            app:scrollpicker_textFormat="59"
+            app:scrollpicker_textRatio="1.8"
+            app:scrollpicker_textSize="18sp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray" />
+
+    <TextView
+        android:id="@+id/tv_result"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:gravity="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWindowBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--字体颜色-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/color_center"
+                    android:textColor="@color/black" />
+
+                <Button
+                    android:id="@+id/btn_color_center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/random"
+                    android:textColor="@color/black" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/color_outside"
+                    android:textColor="@color/black" />
+
+                <Button
+                    android:id="@+id/btn_color_outside"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/random"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/loop"
+                    android:textColor="@color/black" />
+
+                <Switch
+                    android:id="@+id/swicth_loop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@color/gray" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/rows"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_rows"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:max="7"
+                    android:progress="2" />
+
+                <TextView
+                    android:id="@+id/tv_rows"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="5行"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/spacing"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_spacing"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:max="80"
+                    android:progress="35" />
+
+                <TextView
+                    android:id="@+id/tv_spacing"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="-5DP"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/text_size"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_textsize"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:max="30"
+                    android:progress="17" />
+
+                <TextView
+                    android:id="@+id/tv_textsize"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="18SP"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/text_ratio"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_textratio"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:max="30"
+                    android:progress="18" />
+
+                <TextView
+                    android:id="@+id/tv_textratio"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:paddingRight="4dp"
+                    android:text="1.8倍"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/gravity"
+                    android:textColor="@color/black" />
+
+                <RadioGroup
+                    android:id="@+id/radiogroup_gravity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checkedButton="@id/radio_gravitycenter"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radio_gravityleft"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:lines="1"
+                        android:text="@string/gravity_left" />
+
+                    <RadioButton
+                        android:id="@+id/radio_gravitycenter"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:lines="1"
+                        android:text="@string/gravity_center" />
+
+                    <RadioButton
+                        android:id="@+id/radio_gravityright"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:lines="1"
+                        android:text="@string/gravity_right" />
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
