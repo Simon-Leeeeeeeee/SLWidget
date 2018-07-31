@@ -38,9 +38,9 @@ import android.widget.EditText;
  * <p>
  * 4.ContentView会从屏幕顶端开始绘制，被状态栏&ActionBar覆盖。padding自行调整
  * <p>
- * 5.Activity的输入法模式不能设置为adjustPan，原因①无效，②侧滑时布局会下弹。建议为adjustResize
+ * 5.Activity的输入法模式不能设置为adjustPan，原因1.无效，2.侧滑时布局会下弹。建议为adjustResize
  * <p>
- * 6.因为背景为透明，入栈的Activity不会调用onStop，需要注意在onPause中停止不必要的动作。
+ * 6.因为背景为透明，入栈的Activity不会调用onStop，如果栈中Activity过多会带来性能问题，解决方案：1.在onPause中释放资源，2.结合ActivityStackManager的使用。
  * <p>
  * 7.必须在Activity的dispatchTouchEvent中优先调用SwipeBackHelper的dispatchTouchEvent。因为若从左侧边滑动返回，会改变触摸事件的动作，下放一个ACTION_CANCEL
  * <p>
@@ -201,7 +201,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     }
 
     /**
-     * 判断窗口是否透明
+     * 判断窗口属性是否透明（无法获取通过反射改变的值）
      */
     public boolean isWindowTranslucent() {
         TypedArray typedArray = mSwipeBackActivity.obtainStyledAttributes(new int[]{android.R.attr.windowIsTranslucent});
@@ -345,8 +345,8 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                             if (offsetX < 0) {
                                 offsetX = 0;
                                 mStartX = event.getX(index);
-                            } else if (offsetX > mDecorView.getWidth()) {
-                                offsetX = mDecorView.getWidth();
+                            } else if (offsetX > mSwipeBackView.getWidth()) {
+                                offsetX = mSwipeBackView.getWidth();
                                 mStartX = event.getX(index) - offsetX;
                             }
                             //滑动返回事件
@@ -381,10 +381,10 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                     //处理偏移量越界的情况
                     if (offsetX < 0) {
                         offsetX = 0;
-                    } else if (offsetX > mDecorView.getWidth()) {
-                        offsetX = mDecorView.getWidth();
+                    } else if (offsetX > mSwipeBackView.getWidth()) {
+                        offsetX = mSwipeBackView.getWidth();
                     }
-                    startSwipeAnimator(offsetX, 0, mDecorView.getWidth(), velocityX);
+                    startSwipeAnimator(offsetX, 0, mSwipeBackView.getWidth(), velocityX);
                 }
                 //重置拖动方向
                 mDragDirection = 0;
@@ -426,7 +426,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         isSwipeBackEnabled = enabled;
         if (!enabled) {
             mSwipeBackView.setTranslationX(0);
-            mShadowView.setTranslationX(-mDecorView.getWidth());
+            mShadowView.setTranslationX(-mSwipeBackView.getWidth());
         }
     }
 
@@ -475,7 +475,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      */
     public void swipeBackEvent(int translation) {
         if (mShadowView.getBackground() != null) {
-            int alpha = (int) ((1F - 1F * translation / mDecorView.getWidth()) * 255);
+            int alpha = (int) ((1F - 1F * translation / mSwipeBackView.getWidth()) * 255);
             if (alpha < 0) {
                 alpha = 0;
             } else if (alpha > 255) {
@@ -483,7 +483,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
             }
             mShadowView.getBackground().setAlpha(alpha);
         }
-        mShadowView.setTranslationX(translation - mDecorView.getWidth());
+        mShadowView.setTranslationX(translation - mSwipeBackView.getWidth());
         mSwipeBackView.setTranslationX(translation);
     }
 
@@ -515,12 +515,12 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     public void onAnimationEnd(Animator animation) {
         if (!isAnimationCancel) {
             //最终移动距离位置超过半宽，结束当前Activity
-            if (2 * mSwipeBackView.getTranslationX() >= mDecorView.getWidth()) {
+            if (2 * mSwipeBackView.getTranslationX() >= mSwipeBackView.getWidth()) {
                 mShadowView.setVisibility(View.GONE);
                 mSwipeBackActivity.finish();
                 mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
             } else {
-                mShadowView.setTranslationX(-mDecorView.getWidth());
+                mShadowView.setTranslationX(-mSwipeBackView.getWidth());
                 mSwipeBackView.setTranslationX(0);
             }
         }

@@ -96,34 +96,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
 
-        <LinearLayout
-            android:id="@+id/swipeback_layout_support_landscape"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:text="@string/support_landscape"
+            android:textColor="@color/black" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/support_landscape"
-                android:textColor="@color/black" />
+        <Switch
+            android:id="@+id/swipeback_swicth_support_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true" />
 
-            <Switch
-                android:id="@+id/swipeback_swicth_support_landscape"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                android:background="@color/gray" />
-
-        </LinearLayout>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:background="@color/gray" />
 
         <EditText
             android:layout_width="match_parent"

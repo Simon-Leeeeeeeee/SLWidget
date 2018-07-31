@@ -26,8 +26,8 @@
     <string name="guide_swipeback_2">2. 侧滑Activity背景需设置为透明</string>
     <string name="guide_swipeback_3">3. 侧滑Activity屏幕方向需设置为behind，避免在SDK26(Android8.0)及以上与透明背景冲突崩溃</string>
     <string name="guide_swipeback_4">4. 侧滑Activity输入法模式adjustPan无效，建议设置为adjustResize</string>
-    <string name="guide_swipeback_5">5. 入栈的Activity只会onPause，不会onStop，栈中Activity较多会影响性能，建议在onPause中释放资源</string>
-    <string name="guide_swipeback_6">6. 使用示例参考demo中BaseActivity，详细使用请阅读源码</string>
+    <string name="guide_swipeback_5">5. 因为背景透明，入栈的Activity只会onPause，不会onStop。需结合ActivityStackManager，利用反射将次层Activity转为不透明</string>
+    <string name="guide_swipeback_6">6. 使用示例请参考demo，更多细节请阅读源码</string>
 
     <string name="next">下一页</string>
     <string name="random">随机</string>

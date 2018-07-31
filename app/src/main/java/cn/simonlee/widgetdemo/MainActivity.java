@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -45,6 +46,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.main_layout_scrollpicker).setOnClickListener(this);
         findViewById(R.id.main_layout_autowraplayout).setOnClickListener(this);
         findViewById(R.id.main_layout_swipeback).setOnClickListener(this);
+        registerReceiver(getBroadcastReceiver(), new IntentFilter("cn.simonlee.widgetdemo.SCREEN_ORIENTATION_SUPPORT_LANDSCAPE"));
     }
 
     @Override
@@ -83,12 +85,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver(getBroadcastReceiver(), new IntentFilter("cn.simonlee.widgetdemo.SCREEN_ORIENTATION_SUPPORT_LANDSCAPE"));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         if (mBroadcastReceiver != null) {
             unregisterReceiver(mBroadcastReceiver);
             mBroadcastReceiver = null;
@@ -97,6 +103,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private void supportLandscape() {
         boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
+        Log.e("SLWidget",getClass().getName()+".supportLandscape() supportLandscape = "+supportLandscape);
         if (supportLandscape) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }

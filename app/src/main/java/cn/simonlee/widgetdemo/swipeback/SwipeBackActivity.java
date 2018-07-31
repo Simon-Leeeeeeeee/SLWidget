@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -25,7 +24,7 @@ import cn.simonlee.widgetdemo.R;
  */
 public class SwipeBackActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    private int mIndex;
+    public int mIndex;
     private int mRandomColor;
 
     @Override
@@ -43,17 +42,14 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
             toolbar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
             toolbar.setNavigationOnClickListener(this);
         }
-        if (mIndex > 1) {
-            findViewById(R.id.swipeback_layout_support_landscape).setVisibility(View.GONE);
-        } else {
-            Switch switch_SupportLandscape = findViewById(R.id.swipeback_swicth_support_landscape);
-            boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
+        Switch switch_SupportLandscape = findViewById(R.id.swipeback_swicth_support_landscape);
+        boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
+        if (switch_SupportLandscape != null) {
             switch_SupportLandscape.setChecked(supportLandscape);
             switch_SupportLandscape.setOnCheckedChangeListener(this);
         }
         findViewById(R.id.swipeback_rootlayout).setBackgroundColor(mRandomColor);
         findViewById(R.id.swipeback_btn_next).setOnClickListener(this);
-
     }
 
     @Override
@@ -66,7 +62,6 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void supportSwipeBack(int color) {
-        Log.e("SLWidget", "mRandomColor = " + mRandomColor);
         if (mRandomColor == 0) {
             Random random = new Random();
             mRandomColor = Color.argb(255, random.nextInt(255), random.nextInt(255), random.nextInt(255));
@@ -92,9 +87,9 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("landscape_support", isChecked).apply();
         Intent intent = new Intent("cn.simonlee.widgetdemo.SCREEN_ORIENTATION_SUPPORT_LANDSCAPE");
         intent.putExtra("landscape_support", isChecked);
         sendBroadcast(intent);
     }
+
 }
