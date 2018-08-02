@@ -7,7 +7,7 @@
         android:toXDelta="0" />
 
     <alpha
-        android:fromAlpha="0.5"
+        android:fromAlpha="0.4"
         android:toAlpha="1.0" />
 
 </set>
