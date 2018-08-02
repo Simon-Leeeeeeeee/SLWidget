@@ -1,15 +1,18 @@
 package cn.simonlee.widgetdemo;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,9 +38,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     @CallSuper
     public void onCreate(Bundle savedInstanceState) {
+        Log.e("SLWidget", getClass().getName() + ".onCreate()");
+        supportLandscape();
         super.onCreate(savedInstanceState);
         supportSwipeBack(0);//开启侧滑返回
         fixToolbarPadding();//校正Toolbar的paddingTop
+    }
+
+    private void supportLandscape() {
+        boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
+        if (!supportLandscape) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     }
 
     @Override
@@ -137,7 +149,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (color >>> 24 <= 0) {
                 color = getResources().getColor(R.color.colorWindowBackground);
             }
-            //设置窗口不可见区域背景颜色，不设置默认为白色。Tips：防止输入法及导航栏可能造成的透视
+//            //设置窗口背景颜色，覆盖不可见区域出现的黑色（不可见区域常见为当输入法及导航栏变化时的背景）
             mSwipeBackHelper.setWindowBackgroundColor(color | 0XFF000000);
         }
     }

@@ -84,6 +84,24 @@
                 android:text="@string/guide_swipeback_6"
                 android:textColor="@color/black" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/guide_swipeback_7"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/guide_swipeback_8"
+                android:textColor="@color/black" />
+
         </LinearLayout>
     </ScrollView>
 

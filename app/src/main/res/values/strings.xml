@@ -17,17 +17,19 @@
     <string name="autowraplayout_introduction">自动换行布局，ChildView横向排列并自动换行。可设置首行独占，指定网格尺寸、颜色、对齐方式等。</string>
 
     <string name="swipeback">SwipeBack</string>
-    <string name="swipeback_version">v1.0.7</string>
+    <string name="swipeback_version">v1.0.9</string>
     <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
     <string name="swipeback_introduction">Activity侧滑辅助，支持Activity的侧滑返回操作。详细使用说明详见GitHub。</string>
 
     <string name="guidelines">使用指南</string>
     <string name="guide_swipeback_1">1. 仅支持SDK19(Android4.4)及以上</string>
-    <string name="guide_swipeback_2">2. 侧滑Activity背景需设置为透明</string>
-    <string name="guide_swipeback_3">3. 侧滑Activity屏幕方向需设置为behind，避免在SDK26(Android8.0)及以上与透明背景冲突崩溃</string>
-    <string name="guide_swipeback_4">4. 侧滑Activity输入法模式adjustPan无效，建议设置为adjustResize</string>
-    <string name="guide_swipeback_5">5. 因为背景透明，入栈的Activity只会onPause，不会onStop。需结合ActivityStackManager，利用反射将次层Activity转为不透明</string>
-    <string name="guide_swipeback_6">6. 使用示例请参考demo，更多细节请阅读源码</string>
+    <string name="guide_swipeback_2">2. 因状态栏透明，布局从屏幕顶端开始绘制，Toolbar高度需自行调整</string>
+    <string name="guide_swipeback_3">3. 状态栏透明会导致输入法的adjustPan模式失效，建议设置为adjustResize</string>
+    <string name="guide_swipeback_4">4. 必须指定android:windowBackground属性为透明色</string>
+    <string name="guide_swipeback_5">5. 侧滑时会利用反射将窗口转为透明，此时会引起下层Activity生命周期变化，留意可能因此导致的严重问题</string>
+    <string name="guide_swipeback_6">6. 与下层Activity方向不一致时务必禁用侧滑（下层方向未锁定除外）</string>
+    <string name="guide_swipeback_7">7. 如需动态支持横竖屏切换，屏幕方向需指定为"behind"跟随栈底Activity方向，同时在onCreate中判断若不支持横竖屏切换，则锁定屏幕方向</string>
+    <string name="guide_swipeback_8">8. 使用示例请参考demo，更多细节请阅读源码</string>
 
     <string name="next">下一页</string>
     <string name="random">随机</string>

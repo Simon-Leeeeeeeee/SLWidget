@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import java.util.Random;
 
 import cn.simonlee.widgetdemo.BaseActivity;
+import cn.simonlee.widgetdemo.MainActivity;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -22,10 +22,11 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-27
  */
-public class SwipeBackActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class SwipeBackActivity extends BaseActivity implements View.OnClickListener {
 
     public int mIndex;
     private int mRandomColor;
+    private Switch mSwitch_SupportLandscape;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,12 +43,10 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
             toolbar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
             toolbar.setNavigationOnClickListener(this);
         }
-        Switch switch_SupportLandscape = findViewById(R.id.swipeback_swicth_support_landscape);
+        mSwitch_SupportLandscape = findViewById(R.id.swipeback_swicth_support_landscape);
         boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
-        if (switch_SupportLandscape != null) {
-            switch_SupportLandscape.setChecked(supportLandscape);
-            switch_SupportLandscape.setOnCheckedChangeListener(this);
-        }
+        mSwitch_SupportLandscape.setChecked(supportLandscape);
+        mSwitch_SupportLandscape.setOnClickListener(this);
         findViewById(R.id.swipeback_rootlayout).setBackgroundColor(mRandomColor);
         findViewById(R.id.swipeback_btn_next).setOnClickListener(this);
     }
@@ -82,14 +81,13 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
                 startActivity(intent);
                 break;
             }
+            case R.id.swipeback_swicth_support_landscape: {
+                boolean isChecked = mSwitch_SupportLandscape.isChecked();
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("landscape_support", isChecked).apply();
+                startActivity(new Intent(this, MainActivity.class));
+                break;
+            }
         }
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-        Intent intent = new Intent("cn.simonlee.widgetdemo.SCREEN_ORIENTATION_SUPPORT_LANDSCAPE");
-        intent.putExtra("landscape_support", isChecked);
-        sendBroadcast(intent);
     }
 
 }

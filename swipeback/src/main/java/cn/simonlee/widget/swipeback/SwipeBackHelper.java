@@ -4,8 +4,9 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.res.TypedArray;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
@@ -19,36 +20,58 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
 /**
+ * Activity侧滑返回支持，状态栏透明
+ * <p>
+ * 原理：
+ * <p>
+ * 1. 在构造方法中设置透明状态栏，利用反射将窗口转为不透明，同时监听布局变化以解决adjustResize失效问题
+ * <p>
+ * 2. 在Activity的dispatchTouchEvent方法中拦截触摸事件，满足条件则进行侧滑
+ * <p>
+ * 3. 侧滑事件前，利用反射将窗口转为透明；侧滑取消后，利用反射将窗口转为不透明
+ * <p>
+ * <p>
+ * 使用说明：
+ * <p>
+ * 1. 仅支持SDK19(Android4.4)及以上
+ * <p>
+ * 2. 因状态栏透明，布局会从屏幕顶端开始绘制，Toolbar高度需自行调整
+ * <p>
+ * 3. 状态栏透明会导致输入法的adjustPan模式失效，建议设置为adjustResize
+ * <p>
+ * 4. 必须设置以下属性，否则侧滑时无法透视下层Activity
+ * <p>
+ * <item name="android:windowBackground">@android:color/transparent</item>
+ * <p>
+ * 5. SDK21(Android5.0)以下必须设置以下属性，否则无法通过反射将窗口转为透明
+ * <p>
+ * <item name="android:windowIsTranslucent">true</item>
+ * <p>
+ * 6. 侧滑时会利用反射将窗口转为透明，此时会引起下层Activity生命周期变化，留意可能因此导致的严重问题
+ * <p>
+ * (a) onDestory -> onCreat -> onStart -> (onResume -> onPause) -> onStop
+ * <p>
+ * (b) onRestart -> onStart -> (onResume -> onPause) -> onStop
+ * <p>
+ * 7. 当顶层Activity方向与下层Activity方向不一致时侧滑会失效（下层方向未锁定除外），建议关闭该层Activity侧滑功能。
+ * <p>
+ * 示例场景：视频APP的播放页面和下层页面。
+ * <p>
+ * 8. 如需动态支持横竖屏切换，屏幕方向需指定为"behind"跟随栈底Activity方向，同时在onCreate中判断若不支持横竖屏切换，则锁定屏幕方向（避免behind失效）。
+ *
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-06-19
- * <p>
- * 使用说明：
- * 1. 使用前必须判断SDK，仅支持SDK19(Android4.4)及以上
- * <p>
- * 2. Activity的Style设置必须设置以下两条属性
- * <item name="android:windowBackground">@color/transparent</item>
- * <item name="android:windowIsTranslucent">true</item>
- * <p>
- * 3.在android8.0及以上不能固定屏幕方向，因为会与windowIsTranslucent冲突导致程序崩溃。
- * 解决办法：栈底Activity固定屏幕方向，windowIsTranslucent为false，其他Activity的screenOrientation设置为behind跟随栈底Activity方向
- * 注意：栈底固定屏幕方向的Activity若被杀死，其他Activity可能会自动旋转
- * <p>
- * 4.ContentView会从屏幕顶端开始绘制，被状态栏&ActionBar覆盖。padding自行调整
- * <p>
- * 5.Activity的输入法模式不能设置为adjustPan，原因1.无效，2.侧滑时布局会下弹。建议为adjustResize
- * <p>
- * 6.因为背景为透明，入栈的Activity不会调用onStop，如果栈中Activity过多会带来性能问题，解决方案：1.在onPause中释放资源，2.结合ActivityStackManager的使用。
- * <p>
- * 7.必须在Activity的dispatchTouchEvent中优先调用SwipeBackHelper的dispatchTouchEvent。因为若从左侧边滑动返回，会改变触摸事件的动作，下放一个ACTION_CANCEL
- * <p>
- * 8.可选：在Activity的onTouchEvent中调用SwipeBackHelper的onTouchEvent，可以在页面任意位置响应侧滑事件
  */
 @SuppressWarnings("unused")
 @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener, View.OnLayoutChangeListener {
+public class SwipeBackHelper {
 
     /**
      * 目标Activity
@@ -86,6 +109,11 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     private final int horizontal = 2;
 
     /**
+     * 当前屏幕方向
+     */
+    private final int mOrientation;
+
+    /**
      * 滑动事件方向
      */
     private int mDragDirection;
@@ -99,11 +127,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      * 侧滑操作的视图
      */
     private ViewGroup mSwipeBackView;
-
-    /**
-     * 窗口背景视图，用于解决当窗口透明时，输入法&导航栏可能造成的透视
-     */
-    private View mWindowBackGroundView;
 
     /**
      * 滑动速度追踪
@@ -136,9 +159,38 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     private boolean isSwipeBackEnabled = true;
 
     /**
-     * 窗口背景颜色，当设置窗口透明时，输入法及导航栏的弹出会透视到前一个Activity
+     * 窗口背景颜色，用于覆盖当输入法及导航栏变化时底部的黑色，默认不处理
+     * <p>
+     * 因{android:windowBackground}透明，输入法及导航栏变化时底部为黑色
      */
-    private int mWindowBackgroundColor = 0xFFFFFFFF;//Color.WHITE
+    private int mWindowBackgroundColor;
+
+    /**
+     * 窗口背景视图，用于覆盖当输入法及导航栏变化时底部的黑色，默认不处理
+     * <p>
+     * 因{android:windowBackground}透明，输入法及导航栏变化时底部为黑色
+     */
+    private View mWindowBackGroundView;
+
+    /**
+     * Activity转为透明的回调
+     */
+    private Object mTranslucentConversionListener;
+
+    /**
+     * Activity转为透明的回调类
+     */
+    private Class mTranslucentConversionListenerClass;
+
+    /**
+     * 标志Activity转为透明完成
+     */
+    private boolean isTranslucentComplete;
+
+    /**
+     * 布局和动画的监听，使用内部类的方式避免暴露回调接口
+     */
+    private PrivateListener mPrivateListener = new PrivateListener();
 
     @SuppressLint("NewApi")
     public SwipeBackHelper(Activity activity) {
@@ -149,6 +201,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     public SwipeBackHelper(Activity activity, boolean darkStatusBar) {
         //目标Activity
         this.mSwipeBackActivity = activity;
+        this.mOrientation = activity.getResources().getConfiguration().orientation;
         //获取根View
         this.mDecorView = (ViewGroup) activity.getWindow().getDecorView();
         //设置状态栏透明
@@ -156,13 +209,9 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         //判断滑动事件的最小距离
         this.mTouchSlop = ViewConfiguration.get(activity).getScaledTouchSlop();
         //左侧拦截滑动事件的区域
-        this.mInterceptRect = 15 * activity.getResources().getDisplayMetrics().density;//15dp
-        //窗口如果是透明的，需要新增背景View，防止输入法&导航栏透视
-        if (isWindowTranslucent()) {
-            this.mWindowBackGroundView = getWindowBackGroundView(mDecorView);
-            //监听DecorView的布局变化
-            mDecorView.addOnLayoutChangeListener(this);
-        }
+        this.mInterceptRect = 18 * activity.getResources().getDisplayMetrics().density;//18dp
+        //设置Activity不透明
+        convertFromTranslucent(mSwipeBackActivity);
     }
 
     /**
@@ -189,7 +238,7 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
             mSwipeBackActivity.getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         //监听DecorView的布局变化
-        mDecorView.addOnLayoutChangeListener(this);
+        mDecorView.addOnLayoutChangeListener(mPrivateListener);
         return true;
     }
 
@@ -198,18 +247,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
      */
     public boolean isStatusBarTransparent() {
         return isStatusBarTransparent;
-    }
-
-    /**
-     * 判断窗口属性是否透明（无法获取通过反射改变的值）
-     */
-    public boolean isWindowTranslucent() {
-        TypedArray typedArray = mSwipeBackActivity.obtainStyledAttributes(new int[]{android.R.attr.windowIsTranslucent});
-        try {
-            return typedArray.getBoolean(0, false);
-        } finally {
-            typedArray.recycle();
-        }
     }
 
     /**
@@ -224,7 +261,9 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     }
 
     /**
-     * 返回侧滑时左侧的阴影视图，并添加到decorView
+     * 返回侧滑时左侧的阴影视图
+     * <p>
+     * 被子类重写时，注意要添加到decorView
      */
     public View getShadowView(ViewGroup decorView) {
         if (mShadowView == null) {
@@ -236,10 +275,12 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     }
 
     /**
-     * 返回窗口背景视图，用于防止输入法&导航栏的透视
+     * 返回窗口背景视图，用于覆盖当输入法及导航栏变化时底部的黑色
+     * <p>
+     * 因{android:windowBackground}透明，输入法及导航栏变化时底部为黑色
      */
     public View getWindowBackGroundView(ViewGroup decorView) {
-        if (mWindowBackGroundView == null) {
+        if (mWindowBackGroundView == null && mWindowBackgroundColor >>> 24 > 0) {
             mWindowBackGroundView = new View(mSwipeBackActivity);
             mWindowBackGroundView.setTranslationY(decorView.getHeight());
             mWindowBackGroundView.setBackgroundColor(mWindowBackgroundColor);
@@ -248,46 +289,20 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         return mWindowBackGroundView;
     }
 
-    @Override
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        //获取DecorView的可见区域
-        Rect visibleDisplayRect = new Rect();
-        mDecorView.getWindowVisibleDisplayFrame(visibleDisplayRect);
-        //窗口透明则调整mWindowBackGroundView的Y轴偏移量，遮蔽不可见区域（不可见区域常见为输入法&导航栏，可能会造成透视）
-        if (isWindowTranslucent()) {
-            mWindowBackGroundView = getWindowBackGroundView(mDecorView);
-            mWindowBackGroundView.setTranslationY(visibleDisplayRect.bottom);
-        }
-        //状态栏透明情况下，输入法的adjustResize不会生效，这里手动调整View的高度以适配
-        if (isStatusBarTransparent()) {
-            for (int i = 0; i < mDecorView.getChildCount(); i++) {
-                View child = mDecorView.getChildAt(i);
-                if (child instanceof ViewGroup) {
-                    //获取DecorView的子ViewGroup
-                    ViewGroup.LayoutParams childLp = child.getLayoutParams();
-                    //调整子ViewGroup的paddingBottom
-                    int paddingBottom = bottom - visibleDisplayRect.bottom;
-                    if (childLp instanceof ViewGroup.MarginLayoutParams) {
-                        //此处减去bottomMargin，是考虑到导航栏的高度
-                        paddingBottom -= ((ViewGroup.MarginLayoutParams) childLp).bottomMargin;
-                    }
-                    if (paddingBottom < 0) {
-                        paddingBottom = 0;
-                    }
-                    if (paddingBottom != child.getPaddingBottom()) {
-                        //调整子ViewGroup的paddingBottom，以保证整个ViewGroup可见
-                        child.setPadding(child.getPaddingLeft(), child.getPaddingTop(), child.getPaddingRight(), paddingBottom);
-                    }
-                    break;
-                }
-            }
+    /**
+     * 设置窗口背景颜色，用于覆盖当输入法及导航栏变化时底部的黑色
+     * <p>
+     * 因{android:windowBackground}透明，输入法及导航栏变化时底部为黑色
+     */
+    public void setWindowBackgroundColor(int color) {
+        mWindowBackgroundColor = color;
+        if (mWindowBackGroundView != null) {
+            mWindowBackGroundView.setBackgroundColor(mWindowBackgroundColor);
         }
     }
 
     /**
-     * Activity触摸事件分发，当横向滑动时触发侧滑事件
-     * ①当触摸点为拦截区域时进行滑动方向判断
-     * ②当子View未消费时，在onTouchEvent中进行滑动方向判断
+     * Activity触摸事件分发，当横向滑动时触发侧滑返回，同时触摸事件改变为取消下发给childView
      */
     public void dispatchTouchEvent(MotionEvent event) {
         if (!isSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
@@ -314,6 +329,9 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                     mTouchPointerId = event.getPointerId(actionIndex);
                     //重置拖动方向
                     mDragDirection = 0;
+                    if (mStartX <= mInterceptRect) {
+                        convertToTranslucent(mSwipeBackActivity);
+                    }
                 }
                 break;
             }
@@ -373,10 +391,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                     //计算横向手势速度
                     mVelocityTracker.computeCurrentVelocity(1000);
                     float velocityX = mVelocityTracker.getXVelocity();
-                    if (mVelocityTracker != null) {
-                        mVelocityTracker.recycle();
-                        mVelocityTracker = null;
-                    }
                     float offsetX = event.getX(actionIndex) - mStartX;
                     //处理偏移量越界的情况
                     if (offsetX < 0) {
@@ -385,6 +399,12 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
                         offsetX = mSwipeBackView.getWidth();
                     }
                     startSwipeAnimator(offsetX, 0, mSwipeBackView.getWidth(), velocityX);
+                } else {
+                    convertFromTranslucent(mSwipeBackActivity);
+                }
+                if (mVelocityTracker != null) {
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
                 }
                 //重置拖动方向
                 mDragDirection = 0;
@@ -394,28 +414,98 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     }
 
     /**
-     * Activity触摸事件
-     * 当子View未消费时会调用Activity的onTouchEvent，此时进行滑动方向判断
+     * Activity触摸事件，当子View未消费时进行滑动方向判断
      */
     public void onTouchEvent(MotionEvent event) {
         if (!isSwipeBackEnabled || mSwipeBackActivity.isTaskRoot()) {
             return;
         }
-        //还未产生滑动，触点不在拦截区域内
-        if (mDragDirection == 0 && mStartX > mInterceptRect) {
-            for (int index = 0; index < event.getPointerCount(); index++) {
-                //只响应当前控制指针的移动操作
-                if (event.getPointerId(index) == mTouchPointerId) {
-                    if (Math.abs(event.getY(index) - mStartY) >= mTouchSlop) {//纵向滑动
-                        mDragDirection = vertical;
-                    } else if (Math.abs(event.getX(index) - mStartX) >= mTouchSlop) {
-                        mStartX = event.getX(index);
-                        mDragDirection = horizontal;
-                        HideInputSoft();
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN: {
+                convertToTranslucent(mSwipeBackActivity);
+                break;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                //还未产生滑动，触点不在拦截区域内
+                if (mDragDirection == 0 && mStartX > mInterceptRect) {
+                    for (int index = 0; index < event.getPointerCount(); index++) {
+                        //只响应当前控制指针的移动操作
+                        if (event.getPointerId(index) == mTouchPointerId) {
+                            if (Math.abs(event.getY(index) - mStartY) >= mTouchSlop) {//纵向滑动
+                                mDragDirection = vertical;
+                            } else if (Math.abs(event.getX(index) - mStartX) >= mTouchSlop) {
+                                mStartX = event.getX(index);
+                                mDragDirection = horizontal;
+                                HideInputSoft();
+                            }
+                            break;
+                        }
                     }
-                    break;
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * 利用反射将activity转为透明
+     */
+    private void convertToTranslucent(Activity activity) {
+        if (activity.isTaskRoot()) return;
+        isTranslucentComplete = false;
+        try {
+            if (mTranslucentConversionListenerClass == null) {
+                Class[] clazzArray = Activity.class.getDeclaredClasses();
+                for (Class clazz : clazzArray) {
+                    if (clazz.getSimpleName().contains("TranslucentConversionListener")) {
+                        mTranslucentConversionListenerClass = clazz;
+                    }
                 }
             }
+            if (mTranslucentConversionListener == null && mTranslucentConversionListenerClass != null) {
+                InvocationHandler invocationHandler = new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        isTranslucentComplete = true;
+                        return null;
+                    }
+                };
+                mTranslucentConversionListener = Proxy.newProxyInstance(mTranslucentConversionListenerClass.getClassLoader(), new Class[]{mTranslucentConversionListenerClass}, invocationHandler);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Object options = null;
+                try {
+                    Method getActivityOptions = Activity.class.getDeclaredMethod("getActivityOptions");
+                    getActivityOptions.setAccessible(true);
+                    options = getActivityOptions.invoke(this);
+                } catch (Exception ignored) {
+                }
+                Method convertToTranslucent = Activity.class.getDeclaredMethod("convertToTranslucent", mTranslucentConversionListenerClass, ActivityOptions.class);
+                convertToTranslucent.setAccessible(true);
+                convertToTranslucent.invoke(activity, mTranslucentConversionListener, options);
+            } else {
+                Method convertToTranslucent = Activity.class.getDeclaredMethod("convertToTranslucent", mTranslucentConversionListenerClass);
+                convertToTranslucent.setAccessible(true);
+                convertToTranslucent.invoke(activity, mTranslucentConversionListener);
+            }
+        } catch (Throwable ignored) {
+            isTranslucentComplete = true;
+        }
+        if (mTranslucentConversionListener == null) {
+            isTranslucentComplete = true;
+        }
+    }
+
+    /**
+     * 利用反射将activity转为不透明
+     */
+    private void convertFromTranslucent(Activity activity) {
+        if (activity.isTaskRoot()) return;
+        try {
+            Method convertFromTranslucent = Activity.class.getDeclaredMethod("convertFromTranslucent");
+            convertFromTranslucent.setAccessible(true);
+            convertFromTranslucent.invoke(activity);
+        } catch (Throwable t) {
         }
     }
 
@@ -427,16 +517,6 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         if (!enabled) {
             mSwipeBackView.setTranslationX(0);
             mShadowView.setTranslationX(-mSwipeBackView.getWidth());
-        }
-    }
-
-    /**
-     * 设置窗口背景颜色，防止输入法及导航栏可能造成的透视
-     */
-    public void setWindowBackgroundColor(int color) {
-        mWindowBackgroundColor = color;
-        if (mWindowBackGroundView != null) {
-            mWindowBackGroundView.setBackgroundColor(mWindowBackgroundColor);
         }
     }
 
@@ -469,11 +549,34 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
     }
 
     /**
+     * 开始侧滑返回动画
+     *
+     * @param startValue    初始位移值
+     * @param minFinalValue 终点位移值（小值）
+     * @param maxFinalValue 终点位移值（大值）
+     * @param velocity      滑动速度
+     */
+    private void startSwipeAnimator(float startValue, float minFinalValue, float maxFinalValue, float velocity) {
+        if (mSwipeAnimator == null) {
+            mSwipeAnimator = new DecelerateAnimator(mSwipeBackActivity, false);
+            mSwipeAnimator.growFlingFriction(9F);
+            mSwipeAnimator.addListener(mPrivateListener);
+            mSwipeAnimator.addUpdateListener(mPrivateListener);
+        }
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mSwipeAnimator.startAnimator(startValue, minFinalValue, maxFinalValue, velocity * 8F);
+        } else {
+            mSwipeAnimator.startAnimator(startValue, minFinalValue, maxFinalValue, velocity * 4F);
+        }
+    }
+
+    /**
      * 侧滑返回事件
      *
      * @param translation 移动距离
      */
-    public void swipeBackEvent(int translation) {
+    private void swipeBackEvent(int translation) {
+        if (!isTranslucentComplete) return;
         if (mShadowView.getBackground() != null) {
             int alpha = (int) ((1F - 1F * translation / mSwipeBackView.getWidth()) * 255);
             if (alpha < 0) {
@@ -487,57 +590,80 @@ public class SwipeBackHelper implements Animator.AnimatorListener, ValueAnimator
         mSwipeBackView.setTranslationX(translation);
     }
 
-    /**
-     * 开始侧滑返回动画
-     *
-     * @param startValue    初始位移值
-     * @param minFinalValue 终点位移值（小值）
-     * @param maxFinalValue 终点位移值（大值）
-     * @param velocity      滑动速度
-     */
-    private void startSwipeAnimator(float startValue, float minFinalValue, float maxFinalValue, float velocity) {
-        if (mSwipeAnimator == null) {
-            mSwipeAnimator = new DecelerateAnimator(mSwipeBackActivity, false);
-            mSwipeAnimator.growFlingFriction(9F);
-            mSwipeAnimator.addListener(this);
-            mSwipeAnimator.addUpdateListener(this);
-        }
-        mSwipeAnimator.startAnimator(startValue, minFinalValue, maxFinalValue, velocity * 3F);
-    }
+    private class PrivateListener implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener, View.OnLayoutChangeListener {
 
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-        float translation = (Float) animation.getAnimatedValue();
-        swipeBackEvent((int) translation);
-    }
-
-    @Override
-    public void onAnimationEnd(Animator animation) {
-        if (!isAnimationCancel) {
-            //最终移动距离位置超过半宽，结束当前Activity
-            if (2 * mSwipeBackView.getTranslationX() >= mSwipeBackView.getWidth()) {
-                mShadowView.setVisibility(View.GONE);
-                mSwipeBackActivity.finish();
-                mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
-            } else {
-                mShadowView.setTranslationX(-mSwipeBackView.getWidth());
-                mSwipeBackView.setTranslationX(0);
+        @Override
+        public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            //获取DecorView的可见区域
+            Rect visibleDisplayRect = new Rect();
+            mDecorView.getWindowVisibleDisplayFrame(visibleDisplayRect);
+            //调整mWindowBackGroundView的Y轴偏移量，用于覆盖不可见区域出现的黑色（不可见区域常见为当输入法及导航栏变化时的背景）
+            mWindowBackGroundView = getWindowBackGroundView(mDecorView);
+            if (mWindowBackGroundView != null) {
+                mWindowBackGroundView.setTranslationY(visibleDisplayRect.bottom);
+            }
+            //状态栏透明情况下，输入法的adjustResize不会生效，这里手动调整View的高度以适配
+            if (isStatusBarTransparent()) {
+                for (int i = 0; i < mDecorView.getChildCount(); i++) {
+                    View child = mDecorView.getChildAt(i);
+                    if (child instanceof ViewGroup) {
+                        //获取DecorView的子ViewGroup
+                        ViewGroup.LayoutParams childLp = child.getLayoutParams();
+                        //调整子ViewGroup的paddingBottom
+                        int paddingBottom = bottom - visibleDisplayRect.bottom;
+                        if (childLp instanceof ViewGroup.MarginLayoutParams) {
+                            //此处减去bottomMargin，是考虑到导航栏的高度
+                            paddingBottom -= ((ViewGroup.MarginLayoutParams) childLp).bottomMargin;
+                        }
+                        if (paddingBottom < 0) {
+                            paddingBottom = 0;
+                        }
+                        if (paddingBottom != child.getPaddingBottom()) {
+                            //调整子ViewGroup的paddingBottom，以保证整个ViewGroup可见
+                            child.setPadding(child.getPaddingLeft(), child.getPaddingTop(), child.getPaddingRight(), paddingBottom);
+                        }
+                        break;
+                    }
+                }
             }
         }
-    }
 
-    @Override
-    public void onAnimationStart(Animator animation) {
-        isAnimationCancel = false;
-    }
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            float translation = (Float) animation.getAnimatedValue();
+            swipeBackEvent((int) translation);
+        }
 
-    @Override
-    public void onAnimationCancel(Animator animation) {
-        isAnimationCancel = true;
-    }
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (!isAnimationCancel) {
+                //最终移动距离位置超过半宽，结束当前Activity
+                if (2 * mSwipeBackView.getTranslationX() >= mSwipeBackView.getWidth()) {
+                    mShadowView.setVisibility(View.GONE);
+                    mSwipeBackActivity.finish();
+                    mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
+                } else {
+                    mShadowView.setTranslationX(-mSwipeBackView.getWidth());
+                    mSwipeBackView.setTranslationX(0);
+                    convertFromTranslucent(mSwipeBackActivity);
+                }
+            }
+        }
 
-    @Override
-    public void onAnimationRepeat(Animator animation) {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            isAnimationCancel = false;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            isAnimationCancel = true;
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+        }
+
     }
 
 }
