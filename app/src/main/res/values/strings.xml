@@ -19,7 +19,7 @@
     <string name="swipeback">SwipeBack</string>
     <string name="swipeback_version">v1.0.9</string>
     <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
-    <string name="swipeback_introduction">Activity侧滑辅助，支持Activity的侧滑返回操作。详细使用说明详见GitHub。</string>
+    <string name="swipeback_introduction">Activity侧滑辅助，支持Activity的侧滑返回操作，同时会启用状态栏透明。详细使用说明详见GitHub。</string>
 
     <string name="guidelines">使用指南</string>
     <string name="guide_swipeback_1">1. 仅支持SDK19(Android4.4)及以上</string>

@@ -263,13 +263,13 @@ public class SwipeBackHelper {
     /**
      * 返回侧滑时左侧的阴影视图
      * <p>
-     * 被子类重写时，注意要添加到decorView
+     * 被子类重写时，注意要添加到swipeBackView的父容器中
      */
-    public View getShadowView(ViewGroup decorView) {
+    public View getShadowView(ViewGroup swipeBackView) {
         if (mShadowView == null) {
             mShadowView = new ShadowView(mSwipeBackActivity);
-            mShadowView.setTranslationX(-decorView.getWidth());
-            decorView.addView(mShadowView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mShadowView.setTranslationX(-swipeBackView.getWidth());
+            ((ViewGroup) swipeBackView.getParent()).addView(mShadowView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
         return mShadowView;
     }
@@ -309,7 +309,7 @@ public class SwipeBackHelper {
             return;
         }
         this.mSwipeBackView = getSwipeBackView(mDecorView);
-        this.mShadowView = getShadowView(mDecorView);
+        this.mShadowView = getShadowView(mSwipeBackView);
         int actionIndex = event.getActionIndex();
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
@@ -363,8 +363,8 @@ public class SwipeBackHelper {
                             if (offsetX < 0) {
                                 offsetX = 0;
                                 mStartX = event.getX(index);
-                            } else if (offsetX > mSwipeBackView.getWidth()) {
-                                offsetX = mSwipeBackView.getWidth();
+                            } else if (offsetX > mShadowView.getWidth()) {
+                                offsetX = mShadowView.getWidth();
                                 mStartX = event.getX(index) - offsetX;
                             }
                             //滑动返回事件
@@ -395,10 +395,10 @@ public class SwipeBackHelper {
                     //处理偏移量越界的情况
                     if (offsetX < 0) {
                         offsetX = 0;
-                    } else if (offsetX > mSwipeBackView.getWidth()) {
-                        offsetX = mSwipeBackView.getWidth();
+                    } else if (offsetX > mShadowView.getWidth()) {
+                        offsetX = mShadowView.getWidth();
                     }
-                    startSwipeAnimator(offsetX, 0, mSwipeBackView.getWidth(), velocityX);
+                    startSwipeAnimator(offsetX, 0, mShadowView.getWidth(), velocityX);
                 } else {
                     convertFromTranslucent(mSwipeBackActivity);
                 }
@@ -516,7 +516,7 @@ public class SwipeBackHelper {
         isSwipeBackEnabled = enabled;
         if (!enabled) {
             mSwipeBackView.setTranslationX(0);
-            mShadowView.setTranslationX(-mSwipeBackView.getWidth());
+            mShadowView.setTranslationX(-mShadowView.getWidth());
         }
     }
 
@@ -578,7 +578,7 @@ public class SwipeBackHelper {
     private void swipeBackEvent(int translation) {
         if (!isTranslucentComplete) return;
         if (mShadowView.getBackground() != null) {
-            int alpha = (int) ((1F - 1F * translation / mSwipeBackView.getWidth()) * 255);
+            int alpha = (int) ((1F - 1F * translation / mShadowView.getWidth()) * 255);
             if (alpha < 0) {
                 alpha = 0;
             } else if (alpha > 255) {
@@ -586,7 +586,7 @@ public class SwipeBackHelper {
             }
             mShadowView.getBackground().setAlpha(alpha);
         }
-        mShadowView.setTranslationX(translation - mSwipeBackView.getWidth());
+        mShadowView.setTranslationX(translation - mShadowView.getWidth());
         mSwipeBackView.setTranslationX(translation);
     }
 
@@ -638,12 +638,12 @@ public class SwipeBackHelper {
         public void onAnimationEnd(Animator animation) {
             if (!isAnimationCancel) {
                 //最终移动距离位置超过半宽，结束当前Activity
-                if (2 * mSwipeBackView.getTranslationX() >= mSwipeBackView.getWidth()) {
+                if (mShadowView.getWidth() + 2 * mShadowView.getTranslationX() >= 0) {
                     mShadowView.setVisibility(View.GONE);
                     mSwipeBackActivity.finish();
                     mSwipeBackActivity.overridePendingTransition(-1, -1);//取消返回动画
                 } else {
-                    mShadowView.setTranslationX(-mSwipeBackView.getWidth());
+                    mShadowView.setTranslationX(-mShadowView.getWidth());
                     mSwipeBackView.setTranslationX(0);
                     convertFromTranslucent(mSwipeBackActivity);
                 }
