@@ -5,10 +5,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <!--状态栏颜色-->
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <!--&lt;!&ndash;固定方向&ndash;&gt;-->
-        <!--<item name="android:screenOrientation">landscape</item>-->
-        <!--&lt;!&ndash;输入法模式&ndash;&gt;-->
-        <!--<item name="android:windowSoftInputMode">adjustResize</item>-->
         <!--光标、进度条等颜色-->
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:actionModeBackground">@color/colorPrimary</item>
@@ -20,10 +16,6 @@
     </style>
 
     <style name="WindowAnimation" parent="@android:style/Animation.Activity">
-        <item name="android:windowEnterAnimation">@null</item>
-        <item name="android:windowExitAnimation">@null</item>
-        <!--<item name="android:windowEnterAnimation">@anim/window_unchange</item>-->
-        <!--<item name="android:windowExitAnimation">@anim/window_unchange</item>-->
         <item name="android:activityOpenEnterAnimation">@anim/activity_open_enter</item>
         <item name="android:activityOpenExitAnimation">@anim/activity_open_exit</item>
         <item name="android:activityCloseEnterAnimation">@anim/activity_close_enter</item>

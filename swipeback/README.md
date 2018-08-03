@@ -130,7 +130,7 @@ Android侧滑返回方案，支持SDK19(Android4.4)及以上。
 
 |Author|E-mail|博客|WeChat|
 |:---:|:---:|:---:|:---:|
-|Simon Lee|jmlixiaomeng@163.com|[简书](https://www.jianshu.com/u/c35bd597dafb) · [掘金](https://juejin.im/user/5a38846b6fb9a04528469a89)|![wechat](/wechat.png)|
+|Simon Lee|jmlixiaomeng@163.com|[简书](https://www.jianshu.com/u/c35bd597dafb) · [掘金](https://juejin.im/user/5a38846b6fb9a04528469a89)|![wechat](../wechat.png)|
 
 最后感谢以下博文，让我受益匪浅（有所疏漏，敬请谅解）
 
