@@ -27,7 +27,7 @@ import java.lang.reflect.Proxy;
 /**
  * Activity侧滑返回支持，状态栏透明
  * <p>
- * 原理：
+ * 思路：
  * <p>
  * 1. 在构造方法中设置透明状态栏，利用反射将窗口转为不透明，同时监听布局变化以解决adjustResize失效问题
  * <p>
@@ -285,6 +285,8 @@ public class SwipeBackHelper {
             mWindowBackGroundView.setTranslationY(decorView.getHeight());
             mWindowBackGroundView.setBackgroundColor(mWindowBackgroundColor);
             decorView.addView(mWindowBackGroundView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            //监听DecorView的布局变化
+            mDecorView.addOnLayoutChangeListener(mPrivateListener);
         }
         return mWindowBackGroundView;
     }

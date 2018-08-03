@@ -12,7 +12,6 @@ import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,7 +37,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     @CallSuper
     public void onCreate(Bundle savedInstanceState) {
-        Log.e("SLWidget", getClass().getName() + ".onCreate()");
         supportLandscape();
         super.onCreate(savedInstanceState);
         supportSwipeBack(0);//开启侧滑返回
