@@ -219,7 +219,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ScrollPickerView);
 
         this.mTextRows = typedArray.getInteger(R.styleable.ScrollPickerView_scrollpicker_rows, 5);
-        this.mTextSize = typedArray.getDimension(R.styleable.ScrollPickerView_scrollpicker_textSize, 16 * mDensityDP);
+        this.mTextSize = typedArray.getDimension(R.styleable.ScrollPickerView_scrollpicker_textSize, 16 * mDensitySP);
         this.mTextRatio = typedArray.getFloat(R.styleable.ScrollPickerView_scrollpicker_textRatio, 2F);
         this.mRowSpacing = typedArray.getDimension(R.styleable.ScrollPickerView_scrollpicker_spacing, 0);
         this.mTextFormat = typedArray.getString(R.styleable.ScrollPickerView_scrollpicker_textFormat);
@@ -639,7 +639,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
     }
 
     /**
-     * 设置适配器、重置极值
+     * 设置适配器
      */
     public void setAdapter(PickAdapter adapter) {
         this.mAdapter = adapter;

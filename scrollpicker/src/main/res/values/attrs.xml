@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--显示行数-->
+    <!--行数-->
     <attr name="scrollpicker_rows" format="integer" />
     <!--行间距-->
     <attr name="scrollpicker_spacing" format="reference|dimension" />
@@ -29,7 +29,7 @@
     <attr name="scrollpicker_loop" format="boolean" />
 
     <declare-styleable name="ScrollPickerView">
-        <!--显示行数-->
+        <!--行数-->
         <attr name="scrollpicker_rows" />
         <!--行间距-->
         <attr name="scrollpicker_spacing" />
