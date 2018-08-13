@@ -21,9 +21,9 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 
 * **示例效果**
 
-|侧滑|屏幕旋转|窗口模式|
-|:---:|:---:|:---:|
-|![gif](./demo_swipeback_1.gif)|![gif](./demo_swipeback_2.gif)|![gif](./demo_swipeback_3.gif)|
+    |侧滑|屏幕旋转|窗口模式|
+    |:---:|:---:|:---:|
+    |![gif](./demo_swipeback_1.gif)|![gif](./demo_swipeback_2.gif)|![gif](./demo_swipeback_3.gif)|
 
 ## 实现原理
 
