@@ -30,7 +30,6 @@
 
     <!-- window透明主题 -->
     <style name="BaseActivityTheme.TransparentWindow" parent="BaseActivityTheme">
-        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
