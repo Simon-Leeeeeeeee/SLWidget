@@ -72,7 +72,7 @@ public class BadgeView extends View {
         if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT && heightMode != MeasureSpec.EXACTLY) {
             heightSize = mBadge.getBadgeHeight();
         }
-        super.setMeasuredDimension(widthSize, heightSize);
+        super.setMeasuredDimension(resolveSize(widthSize, widthMeasureSpec), resolveSize(heightSize, heightMeasureSpec));
     }
 
 }

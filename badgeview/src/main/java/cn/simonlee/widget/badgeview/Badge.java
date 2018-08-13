@@ -24,7 +24,7 @@ import android.view.ViewGroup;
  * <p>
  * 用法：
  * 1.自定义View，在构造方法中创建Badge实例;
- * 2.重写dispatchDraw(Canvas canvas)方法，在里面调用Badge.dispatchDraw(canvas);
+ * 2.重写dispatchDraw(Canvas canvas)方法，调用Badge的dispatchDraw(canvas)方法;
  * 3.添加一个getBadge()方法，返回Badge实例。
  */
 @SuppressWarnings("unused")
@@ -198,12 +198,12 @@ public class Badge {
         //字体大小
         this.mBadgeTextSize = typedArray.getDimension(R.styleable.Badge_badge_textSize, 12 * mDensitySP);
         //字体颜色
-        this.mBadgeTextColor = typedArray.getColor(R.styleable.Badge_badge_textColor, 0xFFFFFFFF);
+        this.mBadgeTextColor = typedArray.getColor(R.styleable.Badge_badge_textColor, Color.WHITE);
         //字体加粗
         this.mBoldTextEnable = typedArray.getBoolean(R.styleable.Badge_badge_boldText, true);
 
         //角标小圆点半径
-        this.mBadgeDotRadius = typedArray.getDimension(R.styleable.Badge_badge_dotRadius, 10 * mDensityDP);
+        this.mBadgeDotRadius = typedArray.getDimension(R.styleable.Badge_badge_dotRadius, 5 * mDensityDP);
         typedArray.recycle();
 
         //初始化画笔工具
@@ -575,7 +575,7 @@ public class Badge {
         //先计算角标的宽高
         if (mBadgeText.length() < 1) {
             //文本长度为0，只显示一个小圆点
-            backgroundWidth = backgroundHeight = mBadgeDotRadius;
+            backgroundWidth = backgroundHeight = 2 * mBadgeDotRadius;
         } else {
             //根据文本长度计算角标的宽高
             backgroundHeight = mBadgePaddingTop + mBadgePaddingBottom + mBadgeTextHeight;
