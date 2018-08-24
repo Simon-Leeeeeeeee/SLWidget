@@ -221,6 +221,10 @@ public class SwipeRefreshLayout extends FrameLayout {
     public boolean dispatchTouchEvent(MotionEvent event) {
         //当不可用 或 不支持刷新 或 没有childView 或 正在刷新当中，不干预触摸事件。
         if (!isEnabled() || (!isHeaderRefreshable() && !isFooterRefreshable()) || getChildView() == null || mRefreshState == STATE_REFRESH) {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                mDelayPressedChildren.clear();
+                needCancelPressedWhenScroll = true;
+            }
             return super.dispatchTouchEvent(event);
         }
         int actionIndex = event.getActionIndex();
@@ -315,6 +319,7 @@ public class SwipeRefreshLayout extends FrameLayout {
             for (View child : mDelayPressedChildren) {
                 child.cancelLongPress();
             }
+            mDelayPressedChildren.clear();
             //设置为未按下状态
             setPressed(false);
         }
@@ -452,9 +457,10 @@ public class SwipeRefreshLayout extends FrameLayout {
                 scrollTo(0, (int) scrollY);
             });
         }
+        //起始值和终止值不等，开始动画
         if (endValue != startValue) {
-            //起始值和终止值不等，开始动画
-            mRegressAnimator.startAnimator(startValue, endValue, 4000);
+            mRegressAnimator.setFlingFrictionRatio(mRefreshState == STATE_REFRESH_SUCCESS ? 0.1F : 1F);
+            mRegressAnimator.startAnimator(startValue, endValue, 400);
         } else {
             //起始值和终止值相等，直接通知状态改变
             notifyRefresh(true);
@@ -661,6 +667,13 @@ public class SwipeRefreshLayout extends FrameLayout {
         if (isFooterRefreshable()) {
             startRegressAnimator(getScrollY(), mFooterRefreshView.getHeight());
         }
+    }
+
+    /**
+     * 获取当前刷新控件
+     */
+    public View getCurRefreshView() {
+        return mCurRefreshView;
     }
 
     /**

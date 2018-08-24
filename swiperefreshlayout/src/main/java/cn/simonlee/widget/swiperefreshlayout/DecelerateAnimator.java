@@ -4,6 +4,7 @@ import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.view.ViewConfiguration;
 import android.view.animation.LinearInterpolator;
 
@@ -24,7 +25,12 @@ public class DecelerateAnimator extends ValueAnimator {
     /**
      * 动摩擦系数
      */
-    private float mFlingFriction = ViewConfiguration.getScrollFriction();
+    private float mFlingFriction;
+
+    /**
+     * 动摩擦系数倍率
+     */
+    private float mFlingFrictionRatio = 1F;
 
     /**
      * 物理系数
@@ -125,13 +131,13 @@ public class DecelerateAnimator extends ValueAnimator {
     }
 
     /**
-     * 指定位移距离和动画时间，开始减速动画。
+     * 指定位移距离和最大动画时间，开始减速动画。
      *
-     * @param startValue 起始值
-     * @param finalValue 终止值
-     * @param duration   动画时间
+     * @param startValue  起始值
+     * @param finalValue  终止值
+     * @param maxDuration 最大动画时间
      */
-    public void startAnimator(float startValue, float finalValue, long duration) {
+    public void startAnimator(float startValue, float finalValue, long maxDuration) {
         reset();
         mInitialValue = startValue;
         mDistance = finalValue - startValue;
@@ -139,8 +145,11 @@ public class DecelerateAnimator extends ValueAnimator {
             return;
         }
         mFinalValue = finalValue;
-        mDuration = duration;
-        resetFlingFriction(mDistance, mDuration);
+        mDuration = getDurationByDistance(mDistance);
+        if (mDuration > maxDuration) {
+            resetFlingFriction(mDistance, maxDuration);
+            mDuration = maxDuration;
+        }
         startAnimator();
     }
 
@@ -315,12 +324,13 @@ public class DecelerateAnimator extends ValueAnimator {
     }
 
     private void reset() {
-        isOutside = false;
-        mFrictionCoeff = 1;
-        mBounceDuration = 0;
-        mBounceDistance = 0;
-        mOriginalDuration = 0;
-        mOriginalDistance = 0;
+        this.isOutside = false;
+        this.mFrictionCoeff = 1;
+        this.mBounceDuration = 0;
+        this.mBounceDistance = 0;
+        this.mOriginalDuration = 0;
+        this.mOriginalDistance = 0;
+        this.mFlingFriction = ViewConfiguration.getScrollFriction() * mFlingFrictionRatio;
     }
 
     private void startAnimator() {
@@ -483,16 +493,19 @@ public class DecelerateAnimator extends ValueAnimator {
     /**
      * 根据位移距离和时间重置动摩擦系数
      *
-     * @param distance      位移距离
+     * @param distance 位移距离
      */
     private void resetFlingFriction(float distance, long duration) {
         final double base = Math.pow(duration / 1000F, DECELERATION_RATE);
         mFlingFriction = (float) Math.abs(distance / (base * mPhysicalCoeff));
     }
 
-    public void growFlingFriction(float ratio) {
+    /**
+     * 设置动摩擦系数倍率
+     */
+    public void setFlingFrictionRatio(float ratio) {
         if (ratio > 0) {
-            this.mFlingFriction = ViewConfiguration.getScrollFriction() * ratio;
+            this.mFlingFrictionRatio = ratio;
         }
     }
 
