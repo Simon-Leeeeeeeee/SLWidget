@@ -421,7 +421,9 @@ public class SwipeBackHelper {
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
-                convertToTranslucent(mSwipeBackActivity);
+                if (mDragDirection == 0 && mStartX > mInterceptRect) {
+                    convertToTranslucent(mSwipeBackActivity);
+                }
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -565,10 +567,10 @@ public class SwipeBackHelper {
         }
         if (mSwipeAnimator == null) {
             mSwipeAnimator = new DecelerateAnimator(mSwipeBackActivity, false);
-            mSwipeAnimator.growFlingFriction(9F);
             mSwipeAnimator.addListener(mPrivateListener);
             mSwipeAnimator.addUpdateListener(mPrivateListener);
         }
+        mSwipeAnimator.setFlingFrictionRatio(9F);
         if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             mSwipeAnimator.startAnimator(startValue, minFinalValue, maxFinalValue, velocity * 8F);
         } else {
