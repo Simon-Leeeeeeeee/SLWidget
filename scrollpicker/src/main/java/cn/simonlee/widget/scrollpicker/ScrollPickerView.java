@@ -799,4 +799,8 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         }
     }
 
+    @Override
+    public boolean canScrollVertically(int direction) {
+        return true;
+    }
 }
