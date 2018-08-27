@@ -153,6 +153,39 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/main_layout_swiperefreshlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_card_select_white_gray"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@id/resid_ignore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:text="@string/swiperefreshlayout"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:lines="1"
+                    android:text="@string/swiperefreshlayout_version" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/resid_ignore"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/swiperefreshlayout_introduction" />
+
+            </RelativeLayout>
+
         </LinearLayout>
 
     </ScrollView>

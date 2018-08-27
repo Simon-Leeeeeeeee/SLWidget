@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout
+        android:id="@+id/swiperefreshlayout_swiperefreshlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="横向滑动冲突暂未解决，无展示" />
+
+    </cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout>
+
+</LinearLayout>

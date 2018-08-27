@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout
+        android:id="@+id/swiperefreshlayout_swiperefreshlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/bg_card_select_white_gray"
+            android:text="@string/swiperefreshlayout_introduction" />
+
+    </cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout>
+
+</LinearLayout>

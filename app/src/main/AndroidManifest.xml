@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cn.simonlee.widgetdemo">
+
+    <uses-sdk tools:overrideLibrary="cn.simonlee.widget.swipeback" />
 
     <application
         android:allowBackup="true"
@@ -39,6 +42,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".swipeback.SwipeBackActivity"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".swiperefreshlayout.SwipeRefreshActivity"
             android:screenOrientation="behind"
             android:windowSoftInputMode="adjustResize" />
     </application>

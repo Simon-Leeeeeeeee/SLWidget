@@ -5,10 +5,10 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "cn.simonlee.widgetdemo"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 27
-        versionCode 9
-        versionName "1.0.9"
+        versionCode 10
+        versionName "1.0.10"
     }
     buildTypes {
         release {
@@ -26,4 +26,5 @@ dependencies {
     implementation project(':swipeback')
     implementation project(':scrollpicker')
     implementation project(':autowraplayout')
+    implementation project(':swiperefreshlayout')
 }

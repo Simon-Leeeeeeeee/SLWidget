@@ -9,17 +9,21 @@
     <string name="badgeview_version">v1.0.6</string>
 
     <string name="scrollpicker">ScrollPicker</string>
-    <string name="scrollpicker_version">v1.0.7</string>
+    <string name="scrollpicker_version">v1.0.6</string>
     <string name="scrollpicker_introduction">滚动选择控件。仅支持文本显示，可设置行数、间距、颜色渐变、字体大小渐变等。</string>
 
     <string name="autowraplayout">AutoWrapLayout</string>
-    <string name="autowraplayout_version">v1.0.4</string>
+    <string name="autowraplayout_version">v1.0.5</string>
     <string name="autowraplayout_introduction">自动换行布局，ChildView横向排列并自动换行。可设置首行独占，指定网格尺寸、颜色、对齐方式等。</string>
 
     <string name="swipeback">SwipeBack</string>
-    <string name="swipeback_version">v1.0.11</string>
-    <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
+    <string name="swipeback_version">v1.0.12</string>
     <string name="swipeback_introduction">Android侧滑返回方案，实现沉浸式状态栏。详细使用说明详见GitHub。</string>
+    <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
+
+    <string name="swiperefreshlayout">SwipeRefreshLayout</string>
+    <string name="swiperefreshlayout_version">v1.0.4</string>
+    <string name="swiperefreshlayout_introduction">下拉/上滑刷新布局，可实现任意View的下拉/上滑。</string>
 
     <string name="guidelines">使用指南</string>
     <string name="guide_swipeback_1">1. 仅支持SDK19(Android4.4)及以上</string>
@@ -72,4 +76,8 @@
     <string name="adobe_app_4">Adobe&#8201;&#8201;IV</string>
     <string name="support_landscape">支持横屏</string>
 
+
+    <string name="item_button">Button</string>
+    <string name="item_scrollview">ScrollView</string>
+    <string name="item_viewpager">ViewPager</string>
 </resources>

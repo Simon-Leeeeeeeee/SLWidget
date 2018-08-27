@@ -13,6 +13,7 @@ import cn.simonlee.widgetdemo.autowraplayout.AutoWrapActivity;
 import cn.simonlee.widgetdemo.badge.BadgeActivity;
 import cn.simonlee.widgetdemo.scrollpicker.ScrollPickerActivity;
 import cn.simonlee.widgetdemo.swipeback.SwipeBackActivity;
+import cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshActivity;
 
 /**
  * 主界面
@@ -39,6 +40,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.main_layout_scrollpicker).setOnClickListener(this);
         findViewById(R.id.main_layout_autowraplayout).setOnClickListener(this);
         findViewById(R.id.main_layout_swipeback).setOnClickListener(this);
+        findViewById(R.id.main_layout_swiperefreshlayout).setOnClickListener(this);
     }
 
     @Override
@@ -62,6 +64,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 } else {
                     ToastHelper.showToast(this, R.string.swipeback_nonsupport, ToastHelper.LENGTH_SHORT);
                 }
+                break;
+            }
+            case R.id.main_layout_swiperefreshlayout: {
+                startActivity(new Intent(this, SwipeRefreshActivity.class));
+                break;
+            }
+            default:{
                 break;
             }
         }

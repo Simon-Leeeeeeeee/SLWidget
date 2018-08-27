@@ -15,11 +15,11 @@ import android.widget.Toast;
  * @createdTime 2018-07-18
  */
 @SuppressWarnings({"unused", "ShowToast"})
-class ToastHelper {
+public class ToastHelper {
     private static Toast mToast = null;
 
-    static final int LENGTH_SHORT = 0;
-    static final int LENGTH_LONG = 1;
+    public static final int LENGTH_SHORT = 0;
+    public static final int LENGTH_LONG = 1;
 
     /**
      * 弹出Toast
@@ -27,7 +27,7 @@ class ToastHelper {
      * @param resId    提示文本的资源id
      * @param duration 持续时间（0：短；1：长）
      */
-    static void showToast(Context context, @StringRes int resId, int duration) {
+    public static void showToast(Context context, @StringRes int resId, int duration) {
         show(context, context.getText(resId), duration, null);
     }
 
@@ -37,7 +37,7 @@ class ToastHelper {
      * @param text     提示文本
      * @param duration 持续时间（0：短；1：长）
      */
-    static void showToast(Context context, CharSequence text, int duration) {
+    public static void showToast(Context context, CharSequence text, int duration) {
         show(context, text, duration, null);
     }
 
@@ -48,7 +48,7 @@ class ToastHelper {
      * @param duration 持续时间（0：短；1：长）
      * @param gravity  位置（Gravity.CENTER;Gravity.TOP;...）
      */
-    static void showToast(Context context, @StringRes int resId, int duration, int gravity) {
+    public static void showToast(Context context, @StringRes int resId, int duration, int gravity) {
         show(context, context.getText(resId), duration, gravity);
     }
 
@@ -59,20 +59,20 @@ class ToastHelper {
      * @param duration 持续时间（0：短；1：长）
      * @param gravity  位置（Gravity.CENTER;Gravity.TOP;...）
      */
-    static void showToast(Context context, CharSequence text, int duration, int gravity) {
+    public static void showToast(Context context, CharSequence text, int duration, int gravity) {
         show(context, text, duration, gravity);
     }
 
     /**
      * 关闭Toast
      */
-    static void cancelToast() {
+    public static void cancelToast() {
         if (mToast != null) {
             mToast.cancel();
         }
     }
 
-    private static void show(final Context context, final CharSequence text, final int duration, final Integer gravity) {
+    private static void show(Context context, final CharSequence text, final int duration, final Integer gravity) {
         if (Looper.getMainLooper() == Looper.myLooper()) {
             if (mToast == null) {
                 mToast = Toast.makeText(context.getApplicationContext(), text, duration);
@@ -85,10 +85,11 @@ class ToastHelper {
             }
             mToast.show();
         } else if (context instanceof Activity) {
+            final Context applicationContext = context.getApplicationContext();
             ((Activity) context).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    show(context.getApplicationContext(), text, duration, gravity);
+                    show(applicationContext, text, duration, gravity);
                 }
             });
         }

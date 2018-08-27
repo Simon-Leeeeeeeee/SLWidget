@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.Toolbar;
@@ -145,7 +146,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (mSwipeBackHelper == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mSwipeBackHelper = new SwipeBackHelper(this);
             if (color >>> 24 <= 0) {
-                color = getResources().getColor(R.color.colorWindowBackground);
+                color = ContextCompat.getColor(this, R.color.colorWindowBackground);
             }
 //            //设置窗口背景颜色，覆盖不可见区域出现的黑色（不可见区域常见为当输入法及导航栏变化时的背景）
             mSwipeBackHelper.setWindowBackgroundColor(color | 0XFF000000);
