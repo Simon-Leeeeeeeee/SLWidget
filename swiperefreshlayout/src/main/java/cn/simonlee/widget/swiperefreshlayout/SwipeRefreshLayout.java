@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -140,6 +141,11 @@ public class SwipeRefreshLayout extends FrameLayout {
     private int mTouchPointerId;
 
     /**
+     * 刷新时的阻尼系数
+     */
+    private float mDamping = 2F;
+
+    /**
      * 触摸事件的x,y坐标
      */
     private float mTouchDownX, mTouchDownY;
@@ -227,11 +233,10 @@ public class SwipeRefreshLayout extends FrameLayout {
             }
             return super.dispatchTouchEvent(event);
         }
-        int actionIndex = event.getActionIndex();
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
                 //记录触摸点
-                recordTouchPointer(event, actionIndex);
+                recordTouchPointer(event, event.getActionIndex());
                 //清空集合
                 mDelayPressedChildren.clear();
                 //集合所有被延时设置按下状态的View，包括自身
@@ -257,10 +262,11 @@ public class SwipeRefreshLayout extends FrameLayout {
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
                 //重新记录触摸点
-                recordTouchPointer(event, actionIndex);
+                recordTouchPointer(event, event.getActionIndex());
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
+                int actionIndex = event.getActionIndex();
                 if (event.getPointerId(actionIndex) == mTouchPointerId) {
                     //记录下一个触摸点
                     recordNextTouchPointer(event, actionIndex);
@@ -268,23 +274,26 @@ public class SwipeRefreshLayout extends FrameLayout {
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
-                if (event.getPointerId(actionIndex) == mTouchPointerId) {//判断触摸ID
-                    //当前触摸事件Y坐标
-                    float curY = event.getY(actionIndex);
-                    if (isMoveAction) {//已经开始位移
-                        //计算滚动Y坐标
-                        int scrollY = (int) (mPerTouchY - curY + getScrollY());
-                        //记录当前触摸事件Y坐标
-                        mPerTouchY = curY;
-                        //滚动刷新事件
-                        if (scrollToRefresh(scrollY)) {
-                            return true;
+                for (int index = 0; index < event.getPointerCount(); index++) {
+                    if (event.getPointerId(index) == mTouchPointerId) {
+                        //当前触摸事件Y坐标
+                        float curY = event.getY(index);
+                        if (isMoveAction) {//已经开始位移
+                            //计算滚动Y坐标
+                            int scrollY = (int) ((mPerTouchY - curY) / mDamping + 0.5F) + getScrollY();
+                            //记录当前触摸事件Y坐标
+                            mPerTouchY = curY;
+                            //滚动刷新事件
+                            if (scrollToRefresh(scrollY)) {
+                                return true;
+                            }
+                        } else if (Math.abs(mTouchDownY - curY) >= mTouchSlop) {//判断即将发生位移
+                            //更新标志
+                            isMoveAction = true;
+                            //记录当前触摸事件Y坐标
+                            mPerTouchY = curY;
                         }
-                    } else if (Math.abs(mTouchDownY - curY) >= mTouchSlop) {//判断即将发生位移
-                        //更新标志
-                        isMoveAction = true;
-                        //记录当前触摸事件Y坐标
-                        mPerTouchY = curY;
+                        break;
                     }
                 }
                 break;
@@ -342,6 +351,7 @@ public class SwipeRefreshLayout extends FrameLayout {
         //记录触摸坐标
         mTouchDownX = event.getX(actionIndex);
         mTouchDownY = event.getY(actionIndex);
+        mPerTouchY = mTouchDownY;
         //记录触摸ID
         mTouchPointerId = event.getPointerId(actionIndex);
     }
