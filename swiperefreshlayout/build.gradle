@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 4
-        versionName "1.0.4"
+        versionCode 5
+        versionName "1.0.5"
     }
 
     buildTypes {
@@ -22,10 +22,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 }
 
 dependencies {
@@ -33,4 +29,4 @@ dependencies {
     implementation 'org.jetbrains:annotations:15.0'
 }
 
-//apply from: 'bintray.gradle'
+apply from: 'bintray.gradle'

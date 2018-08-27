@@ -2,6 +2,7 @@ package cn.simonlee.widget.swiperefreshlayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -477,9 +478,12 @@ public class SwipeRefreshLayout extends FrameLayout {
 
             });
             //设置动画更新监听
-            mRegressAnimator.addUpdateListener(animation -> {
-                float scrollY = (Float) animation.getAnimatedValue();
-                scrollTo(0, (int) scrollY);
+            mRegressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float scrollY = (Float) animation.getAnimatedValue();
+                    scrollTo(0, (int) scrollY);
+                }
             });
         }
         //起始值和终止值不等，开始动画
