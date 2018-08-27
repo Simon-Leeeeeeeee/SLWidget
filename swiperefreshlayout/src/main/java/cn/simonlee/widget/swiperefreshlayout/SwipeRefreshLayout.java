@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -156,6 +155,11 @@ public class SwipeRefreshLayout extends FrameLayout {
     private float mPerTouchY;
 
     /**
+     * 总偏移量
+     */
+    private float mTotalOffsetY;
+
+    /**
      * 标志是否垂直触摸移动（手指在屏幕上拖动）
      */
     private boolean isMoveAction;
@@ -258,11 +262,15 @@ public class SwipeRefreshLayout extends FrameLayout {
                 needCancelPressedWhenScroll = true;
                 //标志未发生移动
                 isMoveAction = false;
+                //计算总偏移量
+                mTotalOffsetY = getScrollY() * mDamping;
                 break;
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
                 //重新记录触摸点
                 recordTouchPointer(event, event.getActionIndex());
+                //校正触摸坐标，使ScrollY为0时，子View重新接收到触摸事件，Move距离为0
+                event.offsetLocation(0, getScrollY());
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
@@ -271,6 +279,8 @@ public class SwipeRefreshLayout extends FrameLayout {
                     //记录下一个触摸点
                     recordNextTouchPointer(event, actionIndex);
                 }
+                //校正触摸坐标，使ScrollY为0时，子View重新接收到触摸事件，Move距离为0
+                event.offsetLocation(0, getScrollY());
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -279,8 +289,13 @@ public class SwipeRefreshLayout extends FrameLayout {
                         //当前触摸事件Y坐标
                         float curY = event.getY(index);
                         if (isMoveAction) {//已经开始位移
-                            //计算滚动Y坐标
-                            int scrollY = (int) ((mPerTouchY - curY) / mDamping + 0.5F) + getScrollY();
+                            if (getScrollY() == 0) {//重置总偏移量
+                                mTotalOffsetY = mPerTouchY - curY;
+                            } else {//累加总偏移量
+                                mTotalOffsetY += mPerTouchY - curY;
+                            }
+                            //计算Y轴滚动偏移量
+                            int scrollY = (int) (mTotalOffsetY / mDamping + 0.5F);
                             //记录当前触摸事件Y坐标
                             mPerTouchY = curY;
                             //滚动刷新事件
@@ -469,7 +484,7 @@ public class SwipeRefreshLayout extends FrameLayout {
         }
         //起始值和终止值不等，开始动画
         if (endValue != startValue) {
-            mRegressAnimator.setFlingFrictionRatio(mRefreshState == STATE_REFRESH_SUCCESS ? 0.1F : 1F);
+            mRegressAnimator.setFlingFrictionRatio(mRefreshState == STATE_REFRESH_SUCCESS ? 0.1F : 1.3F);
             mRegressAnimator.startAnimator(startValue, endValue, 400);
         } else {
             //起始值和终止值相等，直接通知状态改变
