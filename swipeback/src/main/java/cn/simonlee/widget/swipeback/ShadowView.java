@@ -7,7 +7,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.view.View;
 
 /**
@@ -74,11 +73,7 @@ public class ShadowView extends View {
             }
         }
         Drawable background = showBackground ? new ColorDrawable(mShadowColor & 0X66FFFFFF) : null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            setBackgroundDrawable(background);
-        } else {
-            setBackground(background);
-        }
+        setBackground(background);
     }
 
     /**

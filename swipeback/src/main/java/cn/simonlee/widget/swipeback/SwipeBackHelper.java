@@ -508,7 +508,7 @@ public class SwipeBackHelper {
             Method convertFromTranslucent = Activity.class.getDeclaredMethod("convertFromTranslucent");
             convertFromTranslucent.setAccessible(true);
             convertFromTranslucent.invoke(activity);
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
         }
     }
 
