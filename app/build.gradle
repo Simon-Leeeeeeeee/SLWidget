@@ -23,7 +23,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     implementation 'cn.simonlee.widget:badgeview:1.0.6'
-    implementation 'cn.simonlee.widget:swipeback:1.0.12'
+    implementation 'cn.simonlee.widget:swipeback:1.0.13'
     implementation 'cn.simonlee.widget:scrollpicker:1.0.8'
     implementation 'cn.simonlee.widget:autowraplayout:1.0.5'
     implementation 'cn.simonlee.widget:swiperefreshlayout:1.0.5'
