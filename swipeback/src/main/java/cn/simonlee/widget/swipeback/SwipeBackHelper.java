@@ -43,7 +43,9 @@ import java.lang.reflect.Proxy;
  * <p>
  * 3. 状态栏透明会导致输入法的adjustPan模式失效，建议设置为adjustResize
  * <p>
- * 4. 侧滑Activity的"android:windowBackground"属性无效，因为需要透视到下层Activity
+ * 4. 必须设置以下属性，否则侧滑时无法透视下层Activity
+ * <p>
+ * <item name="android:windowBackground">@android:color/transparent</item>
  * <p>
  * 5. SDK21(Android5.0)以下必须设置以下属性，否则无法通过反射将窗口转为透明
  * <p>
@@ -495,8 +497,6 @@ public class SwipeBackHelper {
         if (mTranslucentConversionListener == null) {
             isTranslucentComplete = true;
         }
-        //去除窗口背景
-        mSwipeBackActivity.getWindow().setBackgroundDrawable(null);
     }
 
     /**

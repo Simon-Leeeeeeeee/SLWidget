@@ -36,13 +36,20 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:swipeback:1.0.11'
+        implementation 'cn.simonlee.widget:swipeback:1.0.13'
     }
 ```
 
 ## 使用方式
 
 * **Step.1**
+
+    在styles中配置如下属性
+    ```java
+    <item name="android:windowBackground">@android:color/transparent</item>
+    ```
+
+* **Step.2**
 
     在Activity的`onCreate`方法中获取`SwipeBackHelper`实例
     ```java
@@ -58,7 +65,7 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
     }
     ```
 
-* **Step.2**
+* **Step.3**
 
     在Activity的`dispatchTouchEvent`和`onTouchEvent`中分发触摸事件，如果仅希望侧边触发，可以不用`onTouchEvent`
     ```java
