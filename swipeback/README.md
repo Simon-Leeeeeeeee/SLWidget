@@ -143,6 +143,9 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 最后感谢以下博文，让我受益匪浅（有所疏漏，敬请谅解）
 
 [永远即等待](https://www.jianshu.com/u/76330937dc27) | [Android滑动返回（SlideBack for Android）](https://www.jianshu.com/p/cd920718c9fa)
+
 [HolenZhou](https://www.jianshu.com/u/6f17e236f828) | [Android版与微信Activity侧滑后退效果完全相同的SwipeBackLayout](https://www.jianshu.com/p/b6d682e301c2)
+
 [Ziv_xiao](https://www.jianshu.com/u/931023e2bfc7) | [Android右滑退出+沉浸式(透明)状态栏](https://www.jianshu.com/p/7dcfd243b1df)
+
 [挂云帆love](https://www.jianshu.com/u/a84594a629d0) | [仿微信滑动返回，实现背景联动（一、原理）](https://www.jianshu.com/p/c7610170b36c)
