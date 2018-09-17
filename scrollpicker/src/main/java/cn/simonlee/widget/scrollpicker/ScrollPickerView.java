@@ -319,13 +319,13 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
 
         if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT && widthMode != MeasureSpec.EXACTLY) {//宽为WRAP
             if (mTextFormat != null) {
-                widthSize = (int) (mTextPaint.measureText(mTextFormat) * (mTextRatio > 1 ? mTextRatio : 1));
+                widthSize = (int) Math.ceil(mTextPaint.measureText(mTextFormat) * (mTextRatio > 1 ? mTextRatio : 1)) + getPaddingLeft() + getPaddingRight();
             } else {
-                widthSize = 200;
+                widthSize = getPaddingLeft() + getPaddingRight();
             }
         }
         if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT && heightMode != MeasureSpec.EXACTLY) {//高为WRAP
-            heightSize = (int) (mRowHeight * mTextRows + mRowSpacing * (mTextRows - mTextRows % 2));
+            heightSize = (int) Math.ceil(mRowHeight * mTextRows + mRowSpacing * (mTextRows - mTextRows % 2)) + getPaddingTop() + getPaddingBottom();
         }
         setMeasuredDimension(resolveSize(widthSize, widthMeasureSpec), resolveSize(heightSize, heightMeasureSpec));
     }
@@ -532,8 +532,6 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         }
         //动画结束，进行选中回调
         if (!isMoveAction && !mDecelerateAnimator.isStarted() && mItemSelectedListener != null) {
-            //根据当前position对偏移量进行校正
-            mTotalOffset = mMiddleItemPostion * mItemHeight;
             //回调监听
             mItemSelectedListener.onItemSelected(this, mMiddleItemPostion);
         }
@@ -566,7 +564,17 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
                 mMiddleItemOffset = -mItemHeight - offsetRem;
             }
         }
+        //对position取模
         mMiddleItemPostion = getRealPosition(count);
+        //如果停止触摸且动画结束，对最终值和偏移量进行校正
+        if (!isMoveAction && !mDecelerateAnimator.isStarted()) {
+            if (mMiddleItemPostion < 0 || mAdapter == null || mAdapter.getCount() < 1) {
+                mMiddleItemPostion = 0;
+            } else if (mMiddleItemPostion > mAdapter.getCount()) {
+                mMiddleItemPostion = mAdapter.getCount() - 1;
+            }
+            mTotalOffset = mMiddleItemPostion * mItemHeight;
+        }
     }
 
     /**
@@ -604,7 +612,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
      * 循环模式下对position取模
      */
     private int getRealPosition(int position) {
-        if (mLoopEnable && mAdapter != null) {
+        if (mLoopEnable && mAdapter != null && mAdapter.getCount() > 0) {
             position = position % mAdapter.getCount();
             if (position < 0) {
                 position = position + mAdapter.getCount();

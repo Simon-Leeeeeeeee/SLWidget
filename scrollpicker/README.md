@@ -32,7 +32,7 @@
     }
 ```
 
-## 使用方式
+## 使用方式（示例日期选择）
 
 * **STEP.1**
 
@@ -114,27 +114,24 @@
         public void onItemSelected(View view, int position) {
             switch (view.getId()) {
                 case R.id.datepicker_year: {
-                    mSelectDate_Year = mYearAdapter.getDate(position);
-                    mSelectValue_Year = mYearAdapter.getItem(position);
-                    resetMaxDay();//根据年月计算日期的最大值，并进行刷新
+                    mSelectedYear = mYearAdapter.getDate(position);
+                    resetMaxDay();//根据年月计算日期的最大值，并刷新
                     break;
                 }
                 case R.id.datepicker_month: {
-                    mSelectDate_Month = mMonthAdapter.getDate(position);
-                    mSelectValue_Month = mMonthAdapter.getItem(position);
-                    resetMaxDay();//根据年月计算日期的最大值，并进行刷新
+                    mSelectedMonth = mMonthAdapter.getDate(position);
+                    resetMaxDay();//根据年月计算日期的最大值，并刷新
                     break;
                 }
                 case R.id.datepicker_day: {
-                    mSelectDate_Day = mDayAdapter.getDate(position);
-                    mSelectValue_Day = mDayAdapter.getItem(position);
+                    mSelectedDay = mDayAdapter.getDate(position);
                     break;
                 }
                 default:{
                     break;
                 }
             }
-            mTextView_Result.setText(mSelectValue_Year + "-" + mSelectValue_Month + "-" + mSelectValue_Day);
+            mTextView_Result.setText(mSelectedYear + "-" + mSelectedMonth + "-" + mSelectedDay);
         }
     ```
 
@@ -143,6 +140,7 @@
 |接口|说明|
 |:---:|:---:|
 |`boolean` isLoopEnable()|是否开启循环|
+|`void` setLoopEnable(`boolean` enable)|开启/关闭循环|
 |`int` getSelectedPosition()|获取当前选中的position|
 |`void` setSelectedPosition(`int` position)|设置当前选中项|
 |`void` setAdapter(PickAdapter adapter)|设置适配器|
@@ -229,12 +227,6 @@
     |默认值|0xFFFFDD99|
     |API|`void` setOutsideTextColor(`int` color)|
     |说明|未选中字体的颜色，位于外部|
-
-## 注意事项
-
-* **Tips.1**
-
-    数据源改变时，可调用 **setSelectedPosition(`int` position)** 进行刷新并指定当前选中项。不建议使用 **invalidate()**，因为数据源长度改变，可能导致当前选中项显示为空。
 
 ## 关于作者
 
