@@ -570,7 +570,7 @@ public class ScrollPickerView extends View implements ValueAnimator.AnimatorUpda
         if (!isMoveAction && !mDecelerateAnimator.isStarted()) {
             if (mMiddleItemPostion < 0 || mAdapter == null || mAdapter.getCount() < 1) {
                 mMiddleItemPostion = 0;
-            } else if (mMiddleItemPostion > mAdapter.getCount()) {
+            } else if (mMiddleItemPostion >= mAdapter.getCount()) {
                 mMiddleItemPostion = mAdapter.getCount() - 1;
             }
             mTotalOffset = mMiddleItemPostion * mItemHeight;
