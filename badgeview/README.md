@@ -42,41 +42,42 @@
 * **Pattern.2**
 
     1. 自定义View，在构造方法中创建Badge实例。
-    2. 重写`dispatchDraw(...)`方法，调用Badge的`dispatchDraw(...)`方法。
+    2. 重写`dispatchDraw(Canvas canvas)`方法，调用Badge的`dispatchDraw(Canvas canvas)`方法。
     3. 通过`getBadge()`获取Badge对象进行操作。
-     ```java
-     //示例：一个带角标的ImageView
-     public class BadgeImageView extends AppCompatImageView {
 
-         private final Badge mBadge;
+    * **示例：一个带角标的ImageView**
+        ```java
+        public class BadgeImageView extends AppCompatImageView {
 
-         public BadgeImageView(Context context) {
-             super(context);
-             mBadge = new Badge(this, null);
-         }
+            private final Badge mBadge;
 
-         public BadgeImageView(Context context, AttributeSet attrs) {
-             super(context, attrs);
-             mBadge = new Badge(this, attrs);
-         }
+            public BadgeImageView(Context context) {
+                super(context);
+                mBadge = new Badge(this, null);
+            }
 
-         public BadgeImageView(Context context, AttributeSet attrs, int defStyleAttr) {
-             super(context, attrs, defStyleAttr);
-             mBadge = new Badge(this, attrs);
-         }
+            public BadgeImageView(Context context, AttributeSet attrs) {
+                super(context, attrs);
+                mBadge = new Badge(this, attrs);
+            }
 
-         @Override
-         public void dispatchDraw(Canvas canvas) {
-             super.dispatchDraw(canvas);
-             mBadge.dispatchDraw(canvas);
-         }
+            public BadgeImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+                super(context, attrs, defStyleAttr);
+                mBadge = new Badge(this, attrs);
+            }
 
-         public Badge getBadge() {
-             return mBadge;
-         }
+            @Override
+            public void dispatchDraw(Canvas canvas) {
+                super.dispatchDraw(canvas);
+                mBadge.dispatchDraw(canvas);
+            }
 
-     }
-     ```
+            public Badge getBadge() {
+                return mBadge;
+            }
+
+        }
+        ```
 
 ## 接口说明
 

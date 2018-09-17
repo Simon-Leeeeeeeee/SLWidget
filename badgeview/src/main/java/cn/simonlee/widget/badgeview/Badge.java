@@ -146,12 +146,13 @@ public class Badge {
                 measureBackgroundBounds();
             }
         });
+        //初始化变量
+        initBadge(mTargetView.getContext(), attributeSet);
         //IDE编辑模式下，显示预览效果
         if (mTargetView.isInEditMode()) {
             mBadgeText = "99+";
+            measureBackgroundBounds();
         }
-        //初始化变量
-        initBadge(mTargetView.getContext(), attributeSet);
     }
 
     /**
