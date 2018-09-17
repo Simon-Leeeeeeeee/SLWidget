@@ -1,4 +1,4 @@
-# :star2:&nbsp;AutoWrapLayout
+# :star2:&nbsp;ScrollPicker
 
 滚动选择控件（仅文本），支持SDK14(Android4.0)及以上。
 
@@ -27,7 +27,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:scrollpicker:1.0.7'
+        implementation 'cn.simonlee.widget:scrollpicker:1.0.10'
     }
 ```
 
