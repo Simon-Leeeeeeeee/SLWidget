@@ -31,8 +31,7 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
     private DatePickerAdapter mYearAdapter, mMonthAdapter, mDayAdapter, mHourAdapter, mMinAdapter;
     private ScrollPickerView mPicker_Year, mPicker_Month, mPicker_Day, mPicker_Hour, mPicker_Min;
 
-    private int mSelectDate_Year, mSelectDate_Month, mSelectDate_Day;
-    private String mSelectValue_Year, mSelectValue_Month, mSelectValue_Day, mSelectValue_Hour, mSelectValue_Min;
+    private int mSelectedYear, mSelectedMonth, mSelectedDay, mSelectedHour, mSelectedMin;
 
     private TextView mTextView_Result;
     private TextView mTextView_TextRows, mTextView_TextSpacing, mTextView_TextSize, mTextView_TextRatio;
@@ -152,40 +151,34 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
     public void onItemSelected(View view, int position) {
         switch (view.getId()) {
             case R.id.datepicker_year: {
-                mSelectDate_Year = mYearAdapter.getDate(position);
-                mSelectValue_Year = mYearAdapter.getItem(position);
+                mSelectedYear = mYearAdapter.getDate(position);
                 resetMaxDay();
                 break;
             }
             case R.id.datepicker_month: {
-                mSelectDate_Month = mMonthAdapter.getDate(position);
-                mSelectValue_Month = mMonthAdapter.getItem(position);
+                mSelectedMonth = mMonthAdapter.getDate(position);
                 resetMaxDay();
                 break;
             }
             case R.id.datepicker_day: {
-                mSelectDate_Day = mDayAdapter.getDate(position);
-                mSelectValue_Day = mDayAdapter.getItem(position);
+                mSelectedDay = mDayAdapter.getDate(position);
                 break;
             }
             case R.id.datepicker_hour: {
-                mSelectValue_Hour = mHourAdapter.getItem(position);
+                mSelectedHour = mHourAdapter.getDate(position);
                 break;
             }
             case R.id.datepicker_minute: {
-                mSelectValue_Min = mMinAdapter.getItem(position);
+                mSelectedMin = mHourAdapter.getDate(position);
                 break;
             }
         }
-        mTextView_Result.setText(mSelectValue_Year + "-" + mSelectValue_Month + "-" + mSelectValue_Day + " " + mSelectValue_Hour + ":" + mSelectValue_Min);
+        mTextView_Result.setText(mSelectedYear + "-" + mSelectedMonth + "-" + mSelectedDay + " " + mSelectedHour + ":" + mSelectedMin);
     }
 
     private void resetMaxDay() {
-        int newMaxDay = getMaxDay(mSelectDate_Year, mSelectDate_Month);
-        if (newMaxDay < mSelectDate_Day && !mPicker_Day.isLoopEnable()) {
-            mDayAdapter.setMaxValue(newMaxDay);
-            mPicker_Day.setSelectedPosition(mDayAdapter.indexOf(newMaxDay));
-        } else if (newMaxDay != mDayAdapter.getMaxValue()) {
+        int newMaxDay = getMaxDay(mSelectedYear, mSelectedMonth);
+        if (newMaxDay != mDayAdapter.getMaxValue()) {
             mDayAdapter.setMaxValue(newMaxDay);
             mPicker_Day.invalidate();
         }
