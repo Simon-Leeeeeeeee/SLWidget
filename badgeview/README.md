@@ -27,7 +27,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:badgeview:1.0.6'
+        implementation 'cn.simonlee.widget:badgeview:1.0.7'
     }
 ```
 
