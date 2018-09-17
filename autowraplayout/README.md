@@ -26,7 +26,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:autowraplayout:1.0.4'
+        implementation 'cn.simonlee.widget:autowraplayout:1.0.5'
     }
 ```
 
