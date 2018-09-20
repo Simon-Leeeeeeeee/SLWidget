@@ -22,7 +22,7 @@
     <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
 
     <string name="swiperefreshlayout">SwipeRefreshLayout</string>
-    <string name="swiperefreshlayout_version">v1.0.5</string>
+    <string name="swiperefreshlayout_version">v1.0.6</string>
     <string name="swiperefreshlayout_introduction">下拉/上滑刷新布局，可实现任意View的下拉/上滑。</string>
 
     <string name="guidelines">使用指南</string>
@@ -76,8 +76,23 @@
     <string name="adobe_app_4">Adobe&#8201;&#8201;IV</string>
     <string name="support_landscape">支持横屏</string>
 
-
     <string name="item_button">Button</string>
     <string name="item_scrollview">ScrollView</string>
     <string name="item_viewpager">ViewPager</string>
+
+    <string name="pulldown">下拉</string>
+    <string name="pullup">上拉</string>
+
+    <string name="enable">启用</string>
+    <string name="refreshable">可刷新</string>
+    <string name="foldedrefresh">折叠刷新</string>
+
+    <string name="pulldown_refresh">下拉刷新</string>
+    <string name="pullup_refresh">上拉刷新</string>
+    <string name="release_refresh">释放刷新</string>
+    <string name="refresh_complete">刷新完毕</string>
+
+    <string name="pulldown_norefresh">没网了，快充钱</string>
+    <string name="pullup_norefresh">歇会吧，没钱了</string>
+
 </resources>

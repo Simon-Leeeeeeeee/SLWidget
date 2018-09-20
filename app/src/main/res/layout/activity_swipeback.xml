@@ -118,16 +118,12 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/support_landscape"
-            android:textColor="@color/black" />
-
         <Switch
             android:id="@+id/swipeback_swicth_support_landscape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/support_landscape"
+            android:textColor="@color/black"
             android:checked="true" />
 
         <View

@@ -1,18 +1,23 @@
 package cn.simonlee.widgetdemo.swiperefreshlayout;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.CompoundButton;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout;
 import cn.simonlee.widgetdemo.BaseFragment;
 import cn.simonlee.widgetdemo.R;
+import cn.simonlee.widgetdemo.ToastHelper;
 
 /**
  * 下拉刷新的Fragment
@@ -23,10 +28,14 @@ import cn.simonlee.widgetdemo.R;
  * @createdTime 2017-08-24
  */
 @SuppressWarnings("InflateParams")
-public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, Animation.AnimationListener {
+public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private Animation mRotateAnimation;
+
+    private View mHeaderRefreshView;
+    private View mFooterRefreshView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private AlertDialog.Builder mAlertDialogBuilder;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,19 +71,28 @@ public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLa
 
     private void initView() {
         if (mSwipeRefreshLayout == null) {
-            mSwipeRefreshLayout = findViewById(R.id.swiperefreshlayout_swiperefreshlayout);
-            if (mSwipeRefreshLayout != null) {
-                mSwipeRefreshLayout.setHeaderRefreshView(getLayoutInflater().inflate(R.layout.layout_refresh_header, null), this);
-                mSwipeRefreshLayout.setFooterRefreshView(getLayoutInflater().inflate(R.layout.layout_refresh_footer, null), this);
-            }
+            mSwipeRefreshLayout = findViewById(R.id.swiperefreshfragment_swiperefresh);
+            mSwipeRefreshLayout.setOnRefreshListener(this);
+            mHeaderRefreshView = mSwipeRefreshLayout.getHeaderRefreshView();
+            mFooterRefreshView = mSwipeRefreshLayout.getFooterRefreshView();
         }
+
+        ((Switch) findViewById(R.id.swiperefresh_pullup_enable)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.swiperefresh_pullup_folded)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.swiperefresh_pullup_refreshable)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.swiperefresh_pulldown_enable)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.swiperefresh_pulldown_folded)).setOnCheckedChangeListener(this);
+        ((Switch) findViewById(R.id.swiperefresh_pulldown_refreshable)).setOnCheckedChangeListener(this);
+
+        findViewById(R.id.swiperefresh_pullup_refresh).setOnClickListener(this);
+        findViewById(R.id.swiperefresh_pulldown_refresh).setOnClickListener(this);
+        findViewById(R.id.swiperefresh_refresh_complete).setOnClickListener(this);
 
         if (mRotateAnimation == null) {
             mRotateAnimation = new RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5F);
-            mRotateAnimation.setRepeatCount(1);
+            mRotateAnimation.setRepeatCount(-1);
             mRotateAnimation.setDuration(1000);
             mRotateAnimation.setInterpolator(new LinearInterpolator());
-            mRotateAnimation.setAnimationListener(this);
         }
 
     }
@@ -82,7 +100,8 @@ public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLa
     @Override
     public void onResume() {
         super.onResume();
-        if (mSwipeRefreshLayout != null && mSwipeRefreshLayout.getRefreshState() == SwipeRefreshLayout.STATE_REFRESH) {
+        if (mSwipeRefreshLayout != null &&
+                (mSwipeRefreshLayout.getRefreshState() == SwipeRefreshLayout.STATE_REFRESHING_HEADER || mSwipeRefreshLayout.getRefreshState() == SwipeRefreshLayout.STATE_REFRESHING_FOOTER)) {
             View curRefreshView = mSwipeRefreshLayout.getCurRefreshView();
             if (curRefreshView != null) {
                 View loadingImage = curRefreshView.findViewById(R.id.refresh_image);
@@ -94,68 +113,165 @@ public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLa
     }
 
     @Override
-    public void onRefresh(SwipeRefreshLayout parent, View refreshView, int state, float offsetY) {
-        if (refreshView == null) return;
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.swiperefresh_pullup_refresh: {
+                mSwipeRefreshLayout.requestFooterRefresh();
+                break;
+            }
+            case R.id.swiperefresh_pulldown_refresh: {
+                mSwipeRefreshLayout.requestHeaderRefresh();
+                break;
+            }
+            case R.id.swiperefresh_refresh_complete: {
+                mSwipeRefreshLayout.notifyRefreshComplete();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()) {
+            case R.id.swiperefresh_pullup_enable: {
+                mSwipeRefreshLayout.setFooterEnabled(isChecked);
+                break;
+            }
+            case R.id.swiperefresh_pulldown_enable: {
+                mSwipeRefreshLayout.setHeaderEnabled(isChecked);
+                break;
+            }
+            case R.id.swiperefresh_pullup_folded: {
+                mSwipeRefreshLayout.setFooterRefreshFolded(isChecked);
+                break;
+            }
+            case R.id.swiperefresh_pulldown_folded: {
+                mSwipeRefreshLayout.setHeaderRefreshFolded(isChecked);
+                break;
+            }
+            case R.id.swiperefresh_pullup_refreshable: {
+                mSwipeRefreshLayout.setFooterRefreshable(isChecked);
+                View loadingImage = mFooterRefreshView.findViewById(R.id.refresh_image);
+                TextView loadingText = mFooterRefreshView.findViewById(R.id.refresh_text);
+                loadingText.setText(isChecked ? R.string.pullup_refresh : R.string.pullup_norefresh);
+                loadingImage.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                break;
+            }
+            case R.id.swiperefresh_pulldown_refreshable: {
+                mSwipeRefreshLayout.setHeaderRefreshable(isChecked);
+                View loadingImage = mHeaderRefreshView.findViewById(R.id.refresh_image);
+                TextView loadingText = mHeaderRefreshView.findViewById(R.id.refresh_text);
+                loadingText.setText(isChecked ? R.string.pulldown_refresh : R.string.pulldown_norefresh);
+                loadingImage.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onRefresh(boolean isStateChange, int state, float offsetY, View refreshView, SwipeRefreshLayout parent) {
+        if (refreshView == null) {
+            return;
+        }
+        if (refreshView == mHeaderRefreshView && !parent.isHeaderRefreshable()) {
+            return;
+        }
+        if (refreshView == mFooterRefreshView && !parent.isFooterRefreshable()) {
+            return;
+        }
         View loadingImage = refreshView.findViewById(R.id.refresh_image);
         TextView loadingText = refreshView.findViewById(R.id.refresh_text);
         switch (state) {
             case SwipeRefreshLayout.STATE_CLOSE: {
-                loadingImage.clearAnimation();
+                if (isStateChange) {
+                    loadingImage.clearAnimation();
+                }
                 break;
             }
             case SwipeRefreshLayout.STATE_ENABLE: {
-                if (offsetY < 0) {
-                    loadingText.setText("下拉刷新");
-                } else if (offsetY > 0) {
-                    loadingText.setText("上拉刷新");
+                if (isStateChange) {
+                    loadingText.setText(refreshView == mHeaderRefreshView ? R.string.pulldown_refresh : R.string.pullup_refresh);
                 }
                 loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
                 break;
             }
             case SwipeRefreshLayout.STATE_READY: {
-                loadingText.setText("释放刷新");
+                if (isStateChange) {
+                    loadingText.setText(R.string.release_refresh);
+                }
                 loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
                 break;
             }
-            case SwipeRefreshLayout.STATE_REFRESH: {
-                loadingText.setText("正在加载...");
-                loadingImage.startAnimation(mRotateAnimation);
+            case SwipeRefreshLayout.STATE_REFRESHING_HEADER: {
+                if (isStateChange && refreshView == mHeaderRefreshView) {
+                    if (parent.isHeaderRefreshFolded()) {
+                        showAlertDialog("正在加载中（顶部）");
+                    } else {
+                        loadingText.setText("正在加载...");
+                        loadingImage.startAnimation(mRotateAnimation);
+                    }
+                }
                 break;
             }
-            case SwipeRefreshLayout.STATE_REFRESH_SUCCESS: {
-                loadingText.setText("加载完成");
-                loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
+            case SwipeRefreshLayout.STATE_REFRESHING_FOOTER: {
+                if (isStateChange && refreshView == mFooterRefreshView) {
+                    if (parent.isFooterRefreshFolded()) {
+                        showAlertDialog("正在加载中（底部）");
+                    } else {
+                        loadingText.setText("正在加载...");
+                        loadingImage.startAnimation(mRotateAnimation);
+                    }
+                }
+                break;
+            }
+            case SwipeRefreshLayout.STATE_REFRESH_COMPLETE: {
+                if (isStateChange) {
+                    loadingText.setText("加载完成");
+                    loadingImage.clearAnimation();
+                    loadingImage.setRotation(0);
+                }
                 break;
             }
         }
 
         View childView = parent.getChildView();
         if (childView != null && childView instanceof ScrollView) {
-            int padding = state == SwipeRefreshLayout.STATE_REFRESH ? refreshView.getHeight() : 0;
-            if (offsetY < 0) {
-                childView.setPadding(0, 0, 0, padding);
-            } else if (offsetY > 0) {
-                childView.setPadding(0, padding, 0, 0);
-                childView.scrollBy(0, padding);
-            } else {
+            if (state == SwipeRefreshLayout.STATE_REFRESHING_HEADER && Math.abs(offsetY) == refreshView.getHeight()) {
+                int diff = refreshView.getHeight() - childView.getPaddingBottom();
+                if (diff > 0) {
+                    childView.setPadding(0, 0, 0, refreshView.getHeight());
+                }
+            } else if (state == SwipeRefreshLayout.STATE_REFRESHING_FOOTER && Math.abs(offsetY) == refreshView.getHeight()) {
+                int diff = refreshView.getHeight() - childView.getPaddingTop();
+                if (diff > 0) {
+                    childView.setPadding(0, diff, 0, 0);
+                    childView.scrollBy(0, diff);
+                }
+            } else if (childView.getPaddingTop() != 0 || childView.getPaddingBottom() != 0) {
+                int diff = -childView.getPaddingTop();
                 childView.setPadding(0, 0, 0, 0);
+                childView.scrollBy(0, diff);
             }
         }
     }
 
-    @Override
-    public void onAnimationStart(Animation animation) {
-    }
-
-    @Override
-    public void onAnimationEnd(Animation animation) {
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.notifyRefreshComplete();
+    private void showAlertDialog(String title) {
+        if (mAlertDialogBuilder == null) {
+            mAlertDialogBuilder = new AlertDialog.Builder(requireContext()).setPositiveButton("加载完毕", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    mSwipeRefreshLayout.notifyRefreshComplete();
+                }
+            });
         }
+        mAlertDialogBuilder.setMessage(title).show();
     }
 
-    @Override
-    public void onAnimationRepeat(Animation animation) {
-
-    }
 }

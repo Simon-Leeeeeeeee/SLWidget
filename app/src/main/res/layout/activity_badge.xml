@@ -90,17 +90,13 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/bold"
-                    android:textColor="@color/black" />
-
                 <Switch
                     android:id="@+id/swicth_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/bold"
+                    android:padding="4dp"
+                    android:textColor="@color/black"
                     android:checked="true" />
 
                 <View

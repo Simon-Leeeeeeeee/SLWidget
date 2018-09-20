@@ -28,8 +28,7 @@ public class SwipeRefreshActivity extends BaseActivity implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_swiperefreshlayout);
-
+        setContentView(R.layout.activity_swiperefresh);
         initView();
     }
 
@@ -40,7 +39,7 @@ public class SwipeRefreshActivity extends BaseActivity implements View.OnClickLi
             toolbar.setNavigationOnClickListener(this);
         }
 
-        mViewPager = findViewById(R.id.swiperefreshlayout_viewpager);
+        mViewPager = findViewById(R.id.swiperefresh_viewpager);
 
         mSwipeRefreshPagerAdapter = new SwipeRefreshPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSwipeRefreshPagerAdapter);

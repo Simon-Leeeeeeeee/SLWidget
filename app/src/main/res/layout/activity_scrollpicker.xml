@@ -191,17 +191,13 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/loop"
-                    android:textColor="@color/black" />
-
                 <Switch
                     android:id="@+id/swicth_loop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/loop"
+                    android:textColor="@color/black"
                     android:checked="true" />
 
                 <View

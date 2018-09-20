@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="20dp">
 
     <cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout
-        android:id="@+id/swiperefreshlayout_swiperefreshlayout"
+        android:id="@+id/swiperefreshfragment_swiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:swiperefresh_footer_layout="@layout/layout_refresh_footer"
+        app:swiperefresh_header_layout="@layout/layout_refresh_header">
 
         <Button
             android:layout_width="match_parent"
@@ -16,5 +21,144 @@
             android:text="@string/swiperefreshlayout_introduction" />
 
     </cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray" />
+
+    <!--下拉-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="14dp"
+        android:text="@string/pulldown"
+        android:textColor="@color/black" />
+
+    <!--下拉：启用&可刷新&请求刷新-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <Switch
+            android:id="@+id/swiperefresh_pulldown_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/enable"
+            android:textColor="@color/black" />
+
+        <Switch
+            android:id="@+id/swiperefresh_pulldown_refreshable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/refreshable"
+            android:textColor="@color/black" />
+
+        <Switch
+            android:id="@+id/swiperefresh_pulldown_folded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/foldedrefresh"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <!--上拉-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="4dp"
+        android:text="@string/pullup"
+        android:textColor="@color/black" />
+
+    <!--上拉：启用&可刷新&请求刷新-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <Switch
+            android:id="@+id/swiperefresh_pullup_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/enable"
+            android:textColor="@color/black" />
+
+        <Switch
+            android:id="@+id/swiperefresh_pullup_refreshable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/refreshable"
+            android:textColor="@color/black" />
+
+        <Switch
+            android:id="@+id/swiperefresh_pullup_folded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/foldedrefresh"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <!--下拉刷新、上拉刷新、刷新完毕-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <Button
+            android:id="@+id/swiperefresh_pulldown_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pulldown_refresh" />
+
+        <Button
+            android:id="@+id/swiperefresh_pullup_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pullup_refresh" />
+
+        <Button
+            android:id="@+id/swiperefresh_refresh_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh_complete" />
+    </LinearLayout>
 
 </LinearLayout>

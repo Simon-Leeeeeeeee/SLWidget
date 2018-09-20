@@ -1,9 +1,7 @@
 package cn.simonlee.widgetdemo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -13,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 /**
  * Fragment基类
@@ -25,38 +24,39 @@ import android.view.ViewGroup;
 @SuppressWarnings("unused")
 public abstract class BaseFragment extends Fragment {
 
-    private View mRootView;
     private Toolbar mToolbar;
 
-    private Integer layoutResID;
+    private int mLayoutResID = View.NO_ID;
 
-    public final void setContentView(@LayoutRes Integer layoutResID) {
-        this.layoutResID = layoutResID;
-    }
-
-    @Override
-    public Context getContext() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return super.getContext();
-        } else {
-            return getActivity();
-        }
+    public final void setContentView(@LayoutRes int layoutResID) {
+        this.mLayoutResID = layoutResID;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (this.layoutResID != null && layoutResID != View.NO_ID) {
-            if (mRootView == null) {
-                mRootView = inflater.inflate(this.layoutResID, container, false);
-            } else {
-                ViewGroup parent = (ViewGroup) mRootView.getParent();
-                if (parent != null && parent != container) {
-                    parent.removeView(mRootView);
-                }
+        if (getView() != null) {
+            ViewParent parent = getView().getParent();
+            if (parent != null && parent instanceof ViewGroup) {
+                ((ViewGroup) parent).removeView(getView());
             }
-            return mRootView;
+            return getView();
+        } else if (mLayoutResID != View.NO_ID) {
+            return inflater.inflate(this.mLayoutResID, container, false);
+        } else {
+            return super.onCreateView(inflater, container, savedInstanceState);
         }
-        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    public final Toolbar getToolBar() {
+        if (mToolbar == null && getActivity() != null) {
+            mToolbar = getActivity().findViewById(R.id.base_toolbar);
+        }
+        return mToolbar;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public final <T extends View> T findViewById(@IdRes int id) {
+        return getView().findViewById(id);
     }
 
     /**
@@ -67,14 +67,13 @@ public abstract class BaseFragment extends Fragment {
     public void onEnterAnimationComplete() {
     }
 
-    public final <T extends View> T findViewById(@IdRes int id) {
-        return mRootView.findViewById(id);
-    }
-
     public final void startActivity(Class<?> Class, boolean finishMyself, Intent intent) {
         if (getActivity() != null) {
             startActivityForResult(Class, -1, intent);
-            if (finishMyself) getActivity().finish();
+            if (finishMyself) {
+                getActivity().finish();
+                getActivity().overridePendingTransition(R.anim.activity_fade_enter, R.anim.activity_fade_exit);
+            }
         }
     }
 
@@ -89,13 +88,6 @@ public abstract class BaseFragment extends Fragment {
             }
             startActivityForResult(intent, requestCode);
         }
-    }
-
-    public final Toolbar getToolBar() {
-        if (mToolbar == null && getActivity() != null) {
-            mToolbar = getActivity().findViewById(R.id.base_toolbar);
-        }
-        return mToolbar;
     }
 
 }
