@@ -186,7 +186,7 @@ public class SwipeRefreshLayout extends FrameLayout {
     private float mPerTouchY;
 
     /**
-     * 总偏移量
+     * 触摸拖动的总偏移量
      */
     private float mTotalOffsetY;
 
@@ -327,6 +327,8 @@ public class SwipeRefreshLayout extends FrameLayout {
                 if (mRegressAnimator != null && mRegressAnimator.isStarted()) {
                     mRegressAnimator.cancel();
                     isMoveAction = true;
+                    //计算总偏移量
+                    mTotalOffsetY = getScrollY() * mDamping;
                     super.dispatchTouchEvent(event);
                     for (View child : mDelayPressedChildren) {
                         child.cancelLongPress();
@@ -338,8 +340,6 @@ public class SwipeRefreshLayout extends FrameLayout {
                 needCancelPressedWhenScroll = true;
                 //标志未发生移动
                 isMoveAction = false;
-                //计算总偏移量
-                mTotalOffsetY = getScrollY() * mDamping;
                 break;
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
