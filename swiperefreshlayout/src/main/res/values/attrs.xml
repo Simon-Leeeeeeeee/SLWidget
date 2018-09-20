@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--顶部是否可用-->
+    <attr name="swiperefresh_header_enabled" format="boolean" />
+    <!--底部是否可用-->
+    <attr name="swiperefresh_footer_enabled" format="boolean" />
+
+    <!--顶部是否可刷新-->
+    <attr name="swiperefresh_header_refreshable" format="boolean" />
+    <!--底部是否可刷新-->
+    <attr name="swiperefresh_footer_refreshable" format="boolean" />
+
+    <!--顶部是否折叠刷新-->
+    <attr name="swiperefresh_header_folded" format="boolean" />
+    <!--底部是否折叠刷新-->
+    <attr name="swiperefresh_footer_folded" format="boolean" />
+
+    <!--顶部视图-->
+    <attr name="swiperefresh_header_layout" format="reference" />
+    <!--底部视图-->
+    <attr name="swiperefresh_footer_layout" format="reference" />
+
+    <declare-styleable name="SwipeRefreshLayout">
+
+        <!--顶部是否可用-->
+        <attr name="swiperefresh_header_enabled" />
+        <!--底部是否可用-->
+        <attr name="swiperefresh_footer_enabled" />
+
+        <!--顶部是否可刷新-->
+        <attr name="swiperefresh_header_refreshable" />
+        <!--底部是否可刷新-->
+        <attr name="swiperefresh_footer_refreshable" />
+
+        <!--顶部是否折叠刷新-->
+        <attr name="swiperefresh_header_folded" />
+        <!--底部是否折叠刷新-->
+        <attr name="swiperefresh_footer_folded" />
+
+        <!--顶部视图-->
+        <attr name="swiperefresh_header_layout" />
+        <!--底部视图-->
+        <attr name="swiperefresh_footer_layout" />
+
+    </declare-styleable>
+
+</resources>

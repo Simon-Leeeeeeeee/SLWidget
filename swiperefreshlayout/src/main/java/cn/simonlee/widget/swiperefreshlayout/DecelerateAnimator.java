@@ -139,11 +139,8 @@ public class DecelerateAnimator extends ValueAnimator {
     public void startAnimator(float startValue, float finalValue, long maxDuration) {
         reset();
         mInitialValue = startValue;
-        mDistance = finalValue - startValue;
-        if (mDistance == 0) {
-            return;
-        }
         mFinalValue = finalValue;
+        mDistance = finalValue - startValue;
         mDuration = getDurationByDistance(mDistance);
         if (mDuration > maxDuration) {
             resetFlingFriction(mDistance, maxDuration);
