@@ -518,7 +518,13 @@ public class SwipeRefreshLayout extends FrameLayout {
             if (mRefreshState == STATE_ENABLE || mRefreshState == STATE_REFRESH_COMPLETE) {
                 changeRefreshState(STATE_CLOSE);
             } else if (mRefreshState == STATE_READY) {
-                changeRefreshState(mCurRefreshView == mHeaderRefreshView ? STATE_REFRESHING_HEADER : STATE_REFRESHING_FOOTER);
+                if (mCurRefreshView == mHeaderRefreshView && isHeaderRefreshable()) {
+                    changeRefreshState(STATE_REFRESHING_HEADER);
+                } else if (mCurRefreshView == mFooterRefreshView && isFooterRefreshable()) {
+                    changeRefreshState(STATE_REFRESHING_FOOTER);
+                } else {
+                    changeRefreshState(STATE_CLOSE);
+                }
             } else if (mRefreshState == STATE_REFRESHING_HEADER) {
                 mCurRefreshView = mHeaderRefreshView;
             } else if (mRefreshState == STATE_REFRESHING_FOOTER) {
