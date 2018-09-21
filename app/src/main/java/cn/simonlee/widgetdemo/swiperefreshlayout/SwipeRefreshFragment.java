@@ -183,7 +183,7 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
 
     @Override
     public void onFooterRefresh(SwipeRefreshLayout parent, float offsetY, int state, boolean isStateChange, boolean isFinalState) {
-        if (!parent.isHeaderRefreshable()) {
+        if (!parent.isFooterRefreshable()) {
             return;
         }
         onRefresh(parent, mFooterRefreshView, offsetY, state, isStateChange);
