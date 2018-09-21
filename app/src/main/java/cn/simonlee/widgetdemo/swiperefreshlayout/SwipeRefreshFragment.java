@@ -17,7 +17,6 @@ import android.widget.TextView;
 import cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout;
 import cn.simonlee.widgetdemo.BaseFragment;
 import cn.simonlee.widgetdemo.R;
-import cn.simonlee.widgetdemo.ToastHelper;
 
 /**
  * 下拉刷新的Fragment
@@ -28,7 +27,7 @@ import cn.simonlee.widgetdemo.ToastHelper;
  * @createdTime 2017-08-24
  */
 @SuppressWarnings("InflateParams")
-public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class SwipeRefreshFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     private Animation mRotateAnimation;
 
@@ -175,16 +174,22 @@ public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLa
     }
 
     @Override
-    public void onRefresh(boolean isStateChange, int state, float offsetY, View refreshView, SwipeRefreshLayout parent) {
-        if (refreshView == null) {
+    public void onHeaderRefresh(SwipeRefreshLayout parent, float offsetY, int state, boolean isStateChange, boolean isFinalState) {
+        if (!parent.isHeaderRefreshable()) {
             return;
         }
-        if (refreshView == mHeaderRefreshView && !parent.isHeaderRefreshable()) {
+        onRefresh(parent, mHeaderRefreshView, offsetY, state, isStateChange);
+    }
+
+    @Override
+    public void onFooterRefresh(SwipeRefreshLayout parent, float offsetY, int state, boolean isStateChange, boolean isFinalState) {
+        if (!parent.isHeaderRefreshable()) {
             return;
         }
-        if (refreshView == mFooterRefreshView && !parent.isFooterRefreshable()) {
-            return;
-        }
+        onRefresh(parent, mFooterRefreshView, offsetY, state, isStateChange);
+    }
+
+    private void onRefresh(SwipeRefreshLayout parent, View refreshView, float offsetY, int state, boolean isStateChange) {
         View loadingImage = refreshView.findViewById(R.id.refresh_image);
         TextView loadingText = refreshView.findViewById(R.id.refresh_text);
         switch (state) {
@@ -239,7 +244,6 @@ public class SwipeRefreshFragment extends BaseFragment implements SwipeRefreshLa
                 break;
             }
         }
-
         View childView = parent.getChildView();
         if (childView != null && childView instanceof ScrollView) {
             if (state == SwipeRefreshLayout.STATE_REFRESHING_HEADER && Math.abs(offsetY) == refreshView.getHeight()) {

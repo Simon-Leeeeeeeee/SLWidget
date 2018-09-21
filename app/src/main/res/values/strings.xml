@@ -22,7 +22,7 @@
     <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
 
     <string name="swiperefreshlayout">SwipeRefreshLayout</string>
-    <string name="swiperefreshlayout_version">v1.0.6</string>
+    <string name="swiperefreshlayout_version">v1.0.8</string>
     <string name="swiperefreshlayout_introduction">下拉/上滑刷新布局，可实现任意View的下拉/上滑。</string>
 
     <string name="guidelines">使用指南</string>
