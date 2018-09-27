@@ -174,69 +174,62 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Override
-    public void onHeaderRefresh(SwipeRefreshLayout parent, float offsetY, int state, boolean isStateChange, boolean isFinalState) {
-        if (!parent.isHeaderRefreshable()) {
+    public void onRefresh(SwipeRefreshLayout parent, View refreshView, float offsetY, int state, boolean isChanged, boolean isFinally) {
+        if (refreshView == mHeaderRefreshView && !parent.isHeaderRefreshable()) {
             return;
         }
-        onRefresh(parent, mHeaderRefreshView, offsetY, state, isStateChange);
-    }
-
-    @Override
-    public void onFooterRefresh(SwipeRefreshLayout parent, float offsetY, int state, boolean isStateChange, boolean isFinalState) {
-        if (!parent.isFooterRefreshable()) {
+        if (refreshView == mFooterRefreshView && !parent.isFooterRefreshable()) {
             return;
         }
-        onRefresh(parent, mFooterRefreshView, offsetY, state, isStateChange);
-    }
-
-    private void onRefresh(SwipeRefreshLayout parent, View refreshView, float offsetY, int state, boolean isStateChange) {
         View loadingImage = refreshView.findViewById(R.id.refresh_image);
         TextView loadingText = refreshView.findViewById(R.id.refresh_text);
         switch (state) {
             case SwipeRefreshLayout.STATE_CLOSE: {
-                if (isStateChange) {
+                if (isChanged) {
                     loadingImage.clearAnimation();
                 }
                 break;
             }
             case SwipeRefreshLayout.STATE_ENABLE: {
-                if (isStateChange) {
+                if (isChanged) {
                     loadingText.setText(refreshView == mHeaderRefreshView ? R.string.pulldown_refresh : R.string.pullup_refresh);
                 }
                 loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
                 break;
             }
             case SwipeRefreshLayout.STATE_READY: {
-                if (isStateChange) {
+                if (isChanged) {
                     loadingText.setText(R.string.release_refresh);
                 }
                 loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
                 break;
             }
             case SwipeRefreshLayout.STATE_REFRESHING_HEADER: {
-                if (isStateChange && refreshView == mHeaderRefreshView) {
-                    if (parent.isHeaderRefreshFolded()) {
-                        showAlertDialog("正在加载中（顶部）");
-                    } else {
+                if (refreshView == mHeaderRefreshView) {
+                    if (isChanged && !parent.isHeaderRefreshFolded()) {
                         loadingText.setText("正在加载...");
                         loadingImage.startAnimation(mRotateAnimation);
+                    }
+                    if (isFinally && parent.isHeaderRefreshFolded()) {
+                        showAlertDialog("正在加载中（顶部）");
                     }
                 }
                 break;
             }
             case SwipeRefreshLayout.STATE_REFRESHING_FOOTER: {
-                if (isStateChange && refreshView == mFooterRefreshView) {
-                    if (parent.isFooterRefreshFolded()) {
-                        showAlertDialog("正在加载中（底部）");
-                    } else {
+                if (refreshView == mFooterRefreshView) {
+                    if (isChanged && !parent.isFooterRefreshFolded()) {
                         loadingText.setText("正在加载...");
                         loadingImage.startAnimation(mRotateAnimation);
+                    }
+                    if (isFinally && parent.isFooterRefreshFolded()) {
+                        showAlertDialog("正在加载中（底部）");
                     }
                 }
                 break;
             }
             case SwipeRefreshLayout.STATE_REFRESH_COMPLETE: {
-                if (isStateChange) {
+                if (isChanged) {
                     loadingText.setText("加载完成");
                     loadingImage.clearAnimation();
                     loadingImage.setRotation(0);
