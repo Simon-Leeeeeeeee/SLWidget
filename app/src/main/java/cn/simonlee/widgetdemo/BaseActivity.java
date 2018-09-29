@@ -91,7 +91,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.base_toolbar);
         if (mToolbar == null) return;
         Menu menu = mToolbar.getMenu();
-        if (menu != null && menu instanceof MenuBuilder) {
+        if (menu instanceof MenuBuilder) {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
     }

@@ -7,19 +7,18 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <!--光标、进度条等颜色-->
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:actionModeBackground">@color/colorPrimary</item>
-        <!--ActionMode配置-->
+        <!--ActionMode高度-->
         <item name="android:actionBarSize">48dp</item>
-        <item name="android:windowActionModeOverlay">true</item>
+        <!--ActionMode样式-->
+        <item name="actionModeStyle">@style/ActionModeStyle</item>
+        <!--ActionMode关闭按钮样式-->
+        <item name="actionModeCloseButtonStyle">@style/ActionModeCloseButtonStyle</item>
+        <!--ActionMode浮动-->
+        <item name="windowActionModeOverlay">true</item>
+        <!--窗口背景色-->
         <item name="android:windowBackground">@color/colorWindowBackground</item>
-        <item name="android:windowAnimationStyle">@style/WindowAnimation</item>
-    </style>
-
-    <style name="WindowAnimation" parent="@android:style/Animation.Activity">
-        <item name="android:activityOpenEnterAnimation">@anim/activity_open_enter</item>
-        <item name="android:activityOpenExitAnimation">@anim/activity_open_exit</item>
-        <item name="android:activityCloseEnterAnimation">@anim/activity_close_enter</item>
-        <item name="android:activityCloseExitAnimation">@anim/activity_close_exit</item>
+        <!--窗口动画样式-->
+        <item name="android:windowAnimationStyle">@style/WindowAnimationStyle</item>
     </style>
 
     <!-- 启动页主题 -->
@@ -32,6 +31,35 @@
     <style name="BaseActivityTheme.TransparentWindow" parent="BaseActivityTheme">
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <!--ActionMode样式-->
+    <style name="ActionModeStyle" parent="@style/Widget.AppCompat.ActionMode">
+        <!--对SDK19 android:actionBarSize无效 -->
+        <item name="actionBarSize">48dp</item>
+        <!--暗色主题（图标显示白色） TODO 对SDK19无效-->
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="background">@color/colorPrimary</item>
+    </style>
+
+    <!--ActionMode关闭按钮样式-->
+    <style name="ActionModeCloseButtonStyle" parent="@style/Widget.AppCompat.ActionButton.CloseMode">
+        <!--图标-->
+        <item name="android:src">@drawable/ic_navigate_close_white</item>
+        <!--内边距-->
+        <item name="android:padding">0dp</item>
+        <!--最小高度-->
+        <item name="android:minWidth">40dp</item>
+        <!--缩放规则-->
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <!--窗口动画样式-->
+    <style name="WindowAnimationStyle" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_open_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_open_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_close_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_close_exit</item>
     </style>
 
     <!--Toolbar样式-->
