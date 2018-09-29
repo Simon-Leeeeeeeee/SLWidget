@@ -47,21 +47,25 @@ import java.lang.reflect.Proxy;
  * <p>
  * <item name="android:windowBackground">@android:color/transparent</item>
  * <p>
- * 5. SDK21(Android5.0)以下必须设置以下属性，否则无法通过反射将窗口转为透明
+ * 5. 必须设置以下属性，否则ActionMode会插入页面顶端，且状态栏会显示黑色
+ * <p>
+ * <item name="windowActionModeOverlay">true</item>
+ * <p>
+ * 6. SDK21(Android5.0)以下必须设置以下属性，否则无法通过反射将窗口转为透明
  * <p>
  * <item name="android:windowIsTranslucent">true</item>
  * <p>
- * 6. 侧滑时会利用反射将窗口转为透明，此时会引起下层Activity生命周期变化，留意可能因此导致的严重问题
+ * 7. 侧滑时会利用反射将窗口转为透明，此时会引起下层Activity生命周期变化，留意可能因此导致的严重问题
  * <p>
  * (a) onDestory -> onCreat -> onStart -> (onResume -> onPause) -> onStop
  * <p>
  * (b) onRestart -> onStart -> (onResume -> onPause) -> onStop
  * <p>
- * 7. 当顶层Activity方向与下层Activity方向不一致时侧滑会失效（下层方向未锁定除外），建议关闭该层Activity侧滑功能。
+ * 8. 当顶层Activity方向与下层Activity方向不一致时侧滑会失效（下层方向未锁定除外），建议关闭该层Activity侧滑功能。
  * <p>
  * 示例场景：视频APP的播放页面和下层页面。
  * <p>
- * 8. 如需动态支持横竖屏切换，屏幕方向需指定为"behind"跟随栈底Activity方向，同时在onCreate中判断若不支持横竖屏切换，则锁定屏幕方向（避免behind失效）。
+ * 9. 如需动态支持横竖屏切换，屏幕方向需指定为"behind"跟随栈底Activity方向，同时在onCreate中判断若不支持横竖屏切换，则锁定屏幕方向（避免behind失效）。
  *
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
@@ -238,7 +242,27 @@ public class SwipeBackHelper {
         }
         //监听DecorView的布局变化
         mDecorView.addOnLayoutChangeListener(mPrivateListener);
+        //修复SDK小于23（Android 6.0以下）时，ActionMode会导致状态栏黑色的问题。
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            fixActionModeStatusBarAbnormal();
+        }
         return true;
+    }
+
+    /**
+     * 在SDK小于23（Android 6.0以下）时，弹出ActionMode会在状态栏位置插入一个黑色View遮挡状态栏，影响用户体验。
+     */
+    protected void fixActionModeStatusBarAbnormal() {
+        ViewGroup contentParent = (ViewGroup) mSwipeBackActivity.findViewById(android.R.id.content).getParent();
+        contentParent.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                ViewGroup contentParent = (ViewGroup) v;
+                if (contentParent.getChildCount() > 2) {
+                    contentParent.removeView(contentParent.getChildAt(2));
+                }
+            }
+        });
     }
 
     /**
