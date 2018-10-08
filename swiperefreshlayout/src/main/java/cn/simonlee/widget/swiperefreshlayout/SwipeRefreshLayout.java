@@ -827,12 +827,12 @@ public class SwipeRefreshLayout extends FrameLayout {
         if (mCurRefreshView == null || mRefreshState != STATE_REFRESHING) {
             return;
         }
-        if (!isHeaderRefreshable() && !isFooterRefreshable()) {
+        if ((mCurRefreshView != mHeaderRefreshView || !isHeaderRefreshable()) && (mCurRefreshView != mFooterRefreshView || !isFooterRefreshable())) {
             return;
         }
         changeRefreshState(STATE_REFRESH_COMPLETE);
         if (getScrollY() == 0) {
-            //若无实际偏移，动画会直接结束，状态会被指定为STATE_CLOSE或finalState，不会回调STATE_COMPLETE状态
+            //若无实际偏移，动画会直接结束，状态会被指定为STATE_CLOSE，不会回调STATE_COMPLETE状态
             notifyRefresh(false);
         }
         startRegressAnimator(0);
