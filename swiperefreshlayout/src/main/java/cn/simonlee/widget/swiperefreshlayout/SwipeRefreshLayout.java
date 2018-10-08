@@ -37,39 +37,34 @@ import android.app.Activity;
 public class SwipeRefreshLayout extends FrameLayout {
 
     /**
+     * 当前刷新状态
+     */
+    private int mRefreshState;
+
+    /**
      * 刷新状态：已关闭
      */
     public static final int STATE_CLOSE = 0;
 
     /**
-     * 刷新状态：已激活
+     * 刷新状态：已展开（距离还不够）
      */
-    public static final int STATE_ENABLE = 1;
+    public static final int STATE_OPEN = 1;
 
     /**
-     * 刷新状态：已就绪
+     * 刷新状态：已就绪（松手刷新）
      */
     public static final int STATE_READY = 2;
 
     /**
-     * 刷新状态：顶部刷新中
+     * 刷新状态：刷新中
      */
-    public static final int STATE_REFRESHING_HEADER = 3;
-
-    /**
-     * 刷新状态：底部刷新中
-     */
-    public static final int STATE_REFRESHING_FOOTER = 4;
+    public static final int STATE_REFRESHING = 3;
 
     /**
      * 刷新状态：刷新完成
      */
-    public static final int STATE_REFRESH_COMPLETE = 5;
-
-    /**
-     * 当前刷新状态
-     */
-    private int mRefreshState;
+    public static final int STATE_REFRESH_COMPLETE = 4;
 
     /**
      * 标志刷新状态是否改变
@@ -137,7 +132,7 @@ public class SwipeRefreshLayout extends FrameLayout {
          * @param parent      父容器
          * @param refreshView 刷新视图
          * @param offsetY     偏移量
-         * @param state       状态值 {@link #STATE_CLOSE}、{@link #STATE_ENABLE}、{@link #STATE_READY}、{@link #STATE_REFRESHING_HEADER}、{@link #STATE_REFRESHING_FOOTER}、{@link #STATE_REFRESH_COMPLETE}
+         * @param state       状态值 {@link #STATE_CLOSE}、{@link #STATE_OPEN}、{@link #STATE_READY}、{@link #STATE_REFRESHING}、{@link #STATE_REFRESH_COMPLETE}
          * @param isChanged   状态是否改变
          * @param isFinally   是否最终状态
          */
@@ -305,8 +300,7 @@ public class SwipeRefreshLayout extends FrameLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         //当不可用 或 没有childView 或 没有指定刷新 或 正在刷新中 或 正在结束刷新，不干预触摸事件。
-        if ((!isHeaderEnabled() && !isFooterEnabled()) || getChildView() == null || mRefreshState == STATE_REFRESHING_HEADER
-                || mRefreshState == STATE_REFRESHING_FOOTER || mRefreshState == STATE_REFRESH_COMPLETE) {
+        if ((!isHeaderEnabled() && !isFooterEnabled()) || getChildView() == null || mRefreshState == STATE_REFRESHING || mRefreshState == STATE_REFRESH_COMPLETE) {
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                 mDelayPressedChildren.clear();
                 needCancelPressedWhenScroll = true;
@@ -370,16 +364,16 @@ public class SwipeRefreshLayout extends FrameLayout {
                             } else {//累加总偏移量
                                 mTotalOffsetY += mPerTouchY - curY;
                             }
+                            //记录当前触摸事件Y坐标
                             mPerTouchY = curY;
                             //计算Y轴滚动偏移量
                             int scrollY = (int) (mTotalOffsetY / mDamping + (mTotalOffsetY < 0 ? -0.5F : 0.5F));
-                            //记录当前触摸事件Y坐标
                             //判断是否可以拉开
-                            if (canScrollExtensible(scrollY)) {
-                                scrollToExtensible(scrollY);
+                            if (canScrollRefresh(scrollY)) {
+                                scrollToRefresh(scrollY, true);
                                 return true;
                             } else {
-                                scrollToExtensible(0);
+                                scrollToRefresh(0, true);
                             }
                         } else if (Math.abs(mTouchDownY - curY) >= mTouchSlop) {//判断即将发生位移
                             //更新标志
@@ -395,10 +389,23 @@ public class SwipeRefreshLayout extends FrameLayout {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
                 isMoveAction = false;
-                //发生过刷新事件
-                if (mRefreshState != STATE_CLOSE) {
-                    //开启回归动画
-                    startRegressAnimator();
+                int scrollY = getScrollY();
+                if (scrollY == 0) {
+                    changeRefreshState(STATE_CLOSE);
+                } else {
+                    //根据偏移量改变刷新视图和刷新状态
+                    changeRefreshView(scrollY > 0 ? mFooterRefreshView : mHeaderRefreshView);
+                    changeRefreshState(Math.abs(scrollY) < mCurRefreshView.getHeight() ? STATE_OPEN : STATE_READY);
+                    //计算松手后动画结束位置，并开启动画
+                    int endValue;
+                    if (isHeaderRefreshable() && scrollY <= -mHeaderRefreshView.getHeight()) {
+                        endValue = isHeaderRefreshFolded() ? 0 : -mHeaderRefreshView.getHeight();
+                    } else if (isFooterRefreshable() && scrollY >= mFooterRefreshView.getHeight()) {
+                        endValue = isFooterRefreshFolded() ? 0 : mFooterRefreshView.getHeight();
+                    } else {
+                        endValue = 0;
+                    }
+                    startRegressAnimator(endValue);
                     //下发一个取消事件给子View
                     MotionEvent cancelEvent = MotionEvent.obtain(event);
                     cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
@@ -441,7 +448,7 @@ public class SwipeRefreshLayout extends FrameLayout {
      *
      * @param scrollY Y轴偏移量
      */
-    private boolean canScrollExtensible(int scrollY) {
+    private boolean canScrollRefresh(int scrollY) {
         if (scrollY == 0) {
             return false;
         }
@@ -458,14 +465,26 @@ public class SwipeRefreshLayout extends FrameLayout {
     /**
      * 拉开刷新视图
      *
-     * @param scrollY 拉开偏移量
+     * @param scrollY    偏移量
+     * @param needChange 是否改变刷新状态、刷新视图
      */
-    public void scrollToExtensible(int scrollY) {
+    public void scrollToRefresh(int scrollY, boolean needChange) {
         if (getScrollY() == scrollY) {
             return;
         }
-        //通知刷新状态改变
+        //改变偏移量
         scrollTo(getScrollX(), scrollY);
+        //根据偏移量改变刷新状态及刷新视图
+        if (needChange) {
+            scrollY = getScrollY();
+            if (scrollY == 0) {
+                changeRefreshState(STATE_CLOSE);
+            } else {
+                changeRefreshView(scrollY > 0 ? mFooterRefreshView : mHeaderRefreshView);
+                changeRefreshState(Math.abs(scrollY) < mCurRefreshView.getHeight() ? STATE_OPEN : STATE_READY);
+            }
+        }
+        //通知刷新状态改变
         notifyRefresh(false);
     }
 
@@ -491,33 +510,22 @@ public class SwipeRefreshLayout extends FrameLayout {
      */
     private void notifyRefresh(boolean isFinally) {
         final int scrollY = getScrollY();
-        //指定当前刷新视图
-        if (scrollY > 0) {
-            changeRefreshView(mFooterRefreshView);
-        } else if (scrollY < 0) {
-            changeRefreshView(mHeaderRefreshView);
-        }
+        //触摸移动中，根据偏移量指定刷新状态和当前刷新视图
         if (isFinally) {//动画完毕的最终状态
-            if (mRefreshState == STATE_ENABLE || mRefreshState == STATE_REFRESH_COMPLETE) {
+            if (mRefreshState == STATE_OPEN || mRefreshState == STATE_REFRESH_COMPLETE) {
                 changeRefreshState(STATE_CLOSE);
             } else if (mRefreshState == STATE_READY) {
                 if (mCurRefreshView == mHeaderRefreshView && isHeaderRefreshable()) {
-                    changeRefreshState(STATE_REFRESHING_HEADER);
+                    changeRefreshState(STATE_REFRESHING);
                 } else if (mCurRefreshView == mFooterRefreshView && isFooterRefreshable()) {
-                    changeRefreshState(STATE_REFRESHING_FOOTER);
+                    changeRefreshState(STATE_REFRESHING);
                 } else {
                     changeRefreshState(STATE_CLOSE);
                 }
-            } else if (mRefreshState == STATE_REFRESHING_HEADER) {
-                changeRefreshView(mHeaderRefreshView);
-            } else if (mRefreshState == STATE_REFRESHING_FOOTER) {
-                changeRefreshView(mFooterRefreshView);
             }
-        } else if (isMoveAction) {//触摸移动中，根据偏移量指定刷新状态
-            changeRefreshState(scrollY == 0 ? STATE_CLOSE : Math.abs(scrollY) < mCurRefreshView.getHeight() ? STATE_ENABLE : STATE_READY);
         }
         if (mOnRefreshListener != null && mCurRefreshView != null) {
-            mOnRefreshListener.onRefresh(this, mCurRefreshView, getScrollY(), mRefreshState, isChanged, isFinally);
+            mOnRefreshListener.onRefresh(this, mCurRefreshView, scrollY, mRefreshState, isChanged, isFinally);
         }
         isChanged = false;
     }
@@ -569,7 +577,7 @@ public class SwipeRefreshLayout extends FrameLayout {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float scrollY = (Float) animation.getAnimatedValue();
-                    scrollToExtensible((int) (scrollY + (scrollY < 0 ? -0.5F : 0.5F)));
+                    scrollToRefresh((int) (scrollY + (scrollY < 0 ? -0.5F : 0.5F)), false);
                 }
             });
         }
@@ -578,28 +586,13 @@ public class SwipeRefreshLayout extends FrameLayout {
     /**
      * 根据指定状态或当前偏移量计算最终偏移量，并开始回归动画
      */
-    private void startRegressAnimator() {
-        if (mRegressAnimator != null) {
-            //先取消动画
-            mRegressAnimator.cancel();
-        }
-        int endValue;
-        if (mRefreshState == STATE_REFRESH_COMPLETE) {//指定状态为刷新完成
-            endValue = 0;
-        } else if (mRefreshState == STATE_REFRESHING_HEADER) {//指定状态为顶部刷新
-            endValue = isHeaderRefreshFolded() ? 0 : -mHeaderRefreshView.getHeight();
-        } else if (mRefreshState == STATE_REFRESHING_FOOTER) {//指定状态为底部刷新
-            endValue = isFooterRefreshFolded() ? 0 : mFooterRefreshView.getHeight();
-        } else if (isHeaderRefreshable() && getScrollY() <= -mHeaderRefreshView.getHeight()) {
-            endValue = isHeaderRefreshFolded() ? 0 : -mHeaderRefreshView.getHeight();
-        } else if (isFooterRefreshable() && getScrollY() >= mFooterRefreshView.getHeight()) {
-            endValue = isFooterRefreshFolded() ? 0 : mFooterRefreshView.getHeight();
-        } else {
-            endValue = 0;
-        }
+    private void startRegressAnimator(int endValue) {
         if (mRegressAnimator == null) {
             //初始化回归动画
             initRegressAnimator();
+        } else {
+            //先取消动画
+            mRegressAnimator.cancel();
         }
         mRegressAnimator.setFlingFrictionRatio(mRefreshState == STATE_REFRESH_COMPLETE ? 0.1F : 1.3F);
         mRegressAnimator.startAnimator(getScrollY(), endValue, 400);
@@ -610,7 +603,7 @@ public class SwipeRefreshLayout extends FrameLayout {
      */
     private boolean isInScrollingContainer() {
         ViewParent parent = this;
-        while (parent != null && parent instanceof ViewGroup) {
+        while (parent instanceof ViewGroup) {
             if (((ViewGroup) parent).shouldDelayChildPressedState()) {
                 return true;
             }
@@ -828,15 +821,21 @@ public class SwipeRefreshLayout extends FrameLayout {
     }
 
     /**
-     * 通知刷新完成。将会设置状态为刷新完成，并开始一个回归动画
+     * 通知刷新完成，并开始回归动画
      */
     public void notifyRefreshComplete() {
+        if (mCurRefreshView == null || mRefreshState != STATE_REFRESHING) {
+            return;
+        }
+        if (!isHeaderRefreshable() && !isFooterRefreshable()) {
+            return;
+        }
         changeRefreshState(STATE_REFRESH_COMPLETE);
         if (getScrollY() == 0) {
-            //防止不会回调STATE_REFRESH_COMPLETE状态。因为不会发生实际偏移，动画会直接结束，状态会被强制转为STATE_CLOSE
+            //若无实际偏移，动画会直接结束，状态会被指定为STATE_CLOSE或finalState，不会回调STATE_COMPLETE状态
             notifyRefresh(false);
         }
-        startRegressAnimator();
+        startRegressAnimator(0);
     }
 
     /**
@@ -849,9 +848,10 @@ public class SwipeRefreshLayout extends FrameLayout {
      * 2.如果要在进入activity的时候自动刷新，请在{@link Activity#onEnterAnimationComplete()}中处理，原因参见该API注释。
      */
     public void requestHeaderRefresh() {
-        if (isHeaderRefreshable()) {
-            changeRefreshState(STATE_REFRESHING_HEADER);
-            startRegressAnimator();
+        if (isHeaderRefreshable() && mRefreshState != STATE_REFRESH_COMPLETE && mRefreshState != STATE_REFRESHING) {
+            mCurRefreshView = mHeaderRefreshView;
+            changeRefreshState(STATE_REFRESHING);
+            startRegressAnimator(isHeaderRefreshFolded() ? 0 : -mHeaderRefreshView.getHeight());
         }
     }
 
@@ -865,9 +865,10 @@ public class SwipeRefreshLayout extends FrameLayout {
      * 2.如果要在进入activity的时候自动刷新，请在{@link Activity#onEnterAnimationComplete()}中处理，原因参见该API注释。
      */
     public void requestFooterRefresh() {
-        if (isFooterRefreshable()) {
-            changeRefreshState(STATE_REFRESHING_FOOTER);
-            startRegressAnimator();
+        if (isFooterRefreshable() && mRefreshState != STATE_REFRESH_COMPLETE && mRefreshState != STATE_REFRESHING) {
+            mCurRefreshView = mFooterRefreshView;
+            changeRefreshState(STATE_REFRESHING);
+            startRegressAnimator(isFooterRefreshFolded() ? 0 : mFooterRefreshView.getHeight());
         }
     }
 
