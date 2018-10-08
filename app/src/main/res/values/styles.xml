@@ -23,12 +23,14 @@
 
     <!-- 启动页主题 -->
     <style name="SplashActivityTheme" parent="BaseActivityTheme">
+        <item name="colorPrimaryDark">@color/transparent</item>
         <item name="android:windowBackground">@drawable/bg_splash</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
     <!-- window透明主题 -->
     <style name="BaseActivityTheme.TransparentWindow" parent="BaseActivityTheme">
+        <item name="colorPrimaryDark">@color/transparent</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
@@ -45,7 +47,7 @@
     <!--ActionMode关闭按钮样式-->
     <style name="ActionModeCloseButtonStyle" parent="@style/Widget.AppCompat.ActionButton.CloseMode">
         <!--图标-->
-        <item name="android:src">@drawable/ic_navigate_close_white</item>
+        <item name="android:src">@drawable/ic_navigate_close_white_24dp</item>
         <!--内边距-->
         <item name="android:padding">0dp</item>
         <!--最小高度-->
@@ -77,6 +79,7 @@
         <item name="actionMenuTextAppearance">@style/ToolbarMenuTextTheme</item>
         <item name="actionOverflowButtonStyle">@style/ToolbarActionOverflowButtonTheme</item>
     </style>
+
     <!--Toolbar返回键样式-->
     <style name="ToolbarNavigationButtonTheme" parent="@style/Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="android:id">@id/base_toolbar_navigation</item>
@@ -95,7 +98,7 @@
     </style>
     <!-- toolbar菜单文字 -->
     <style name="ToolbarMenuTextTheme" parent="@style/TextAppearance.AppCompat.Menu">
-        <item name="android:textSize">19dp</item>
+        <item name="android:textSize">18dp</item>
     </style>
     <!--Toolbar菜单键样式-->
     <style name="ToolbarActionButtonTheme">
@@ -112,14 +115,16 @@
     <style name="ToolbarOverflowMenuTheme" parent="@style/Widget.AppCompat.PopupMenu.Overflow">
         <!-- 是否覆盖锚点，默认为true，即盖住Toolbar-->
         <item name="overlapAnchor">false</item>
+        <!-- 弹出层字体颜色 -->
+        <item name="android:textColor">@color/black</item>
         <!-- 弹出层分割线 -->
         <item name="android:dropDownListViewStyle">@style/ToolbarPopupMenuListTheme</item>
         <!-- 弹出层背景颜色 -->
-        <item name="android:colorBackground">@color/colorPrimaryLight</item>
+        <item name="android:colorBackground">@color/white</item>
     </style>
     <!--Toolbar弹出菜单分割线样式-->
     <style name="ToolbarPopupMenuListTheme" parent="@android:style/Widget.Holo.ListView.DropDown">
-        <item name="android:divider">@color/colorPrimary</item><!--menu列表项分割线的颜色-->
+        <item name="android:divider">@color/gray_light_lv4</item><!--menu列表项分割线的颜色-->
         <item name="android:dividerHeight">1px</item><!--menu列表项分割线的高度-->
         <item name="android:scaleType">center</item>
     </style>
