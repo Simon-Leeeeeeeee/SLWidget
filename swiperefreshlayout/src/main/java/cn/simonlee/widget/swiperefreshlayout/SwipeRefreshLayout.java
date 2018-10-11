@@ -512,7 +512,7 @@ public class SwipeRefreshLayout extends FrameLayout {
         final int scrollY = getScrollY();
         //触摸移动中，根据偏移量指定刷新状态和当前刷新视图
         if (isFinally) {//动画完毕的最终状态
-            if (mRefreshState == STATE_OPEN || mRefreshState == STATE_REFRESH_COMPLETE) {
+            if (mRefreshState == STATE_OPEN) {
                 changeRefreshState(STATE_CLOSE);
             } else if (mRefreshState == STATE_READY) {
                 if (mCurRefreshView == mHeaderRefreshView && isHeaderRefreshable()) {
@@ -526,6 +526,9 @@ public class SwipeRefreshLayout extends FrameLayout {
         }
         if (mOnRefreshListener != null && mCurRefreshView != null) {
             mOnRefreshListener.onRefresh(this, mCurRefreshView, scrollY, mRefreshState, isChanged, isFinally);
+        }
+        if (isFinally && mRefreshState == STATE_REFRESH_COMPLETE) {
+            changeRefreshState(STATE_CLOSE);
         }
         isChanged = false;
     }
