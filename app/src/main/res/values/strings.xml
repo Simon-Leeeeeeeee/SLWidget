@@ -17,12 +17,12 @@
     <string name="autowraplayout_introduction">自动换行布局，ChildView横向排列并自动换行。可设置首行独占，指定网格尺寸、颜色、对齐方式等。</string>
 
     <string name="swipeback">SwipeBack</string>
-    <string name="swipeback_version">v1.0.13</string>
+    <string name="swipeback_version">v1.0.14</string>
     <string name="swipeback_introduction">Android侧滑返回方案，实现沉浸式状态栏。详细使用说明详见GitHub。</string>
     <string name="swipeback_nonsupport">SwipeBack仅支持API19及以上</string>
 
     <string name="swiperefreshlayout">SwipeRefreshLayout</string>
-    <string name="swiperefreshlayout_version">v1.0.10</string>
+    <string name="swiperefreshlayout_version">v1.0.12</string>
     <string name="swiperefreshlayout_introduction">下拉/上滑刷新布局，可实现任意View的下拉/上滑。</string>
 
     <string name="guidelines">使用指南</string>
