@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 指示器图标 -->
+    <attr name="slidingtab_indicator_src" format="reference|color" />
+
+    <!-- 指示器宽度 -->
+    <attr name="slidingtab_indicator_width" format="reference|dimension" />
+    <!-- 指示器高度 -->
+    <attr name="slidingtab_indicator_height" format="reference|dimension" />
+
+    <!--指示器边距-->
+    <attr name="slidingtab_indicator_margin" format="reference|dimension" />
+    <!--指示器左边距-->
+    <attr name="slidingtab_indicator_marginLeft" format="reference|dimension" />
+    <!--指示器上边距-->
+    <attr name="slidingtab_indicator_marginTop" format="reference|dimension" />
+    <!--指示器右边距-->
+    <attr name="slidingtab_indicator_marginRight" format="reference|dimension" />
+    <!--指示器下边距-->
+    <attr name="slidingtab_indicator_marginBottom" format="reference|dimension" />
+
+    <!-- 指示器对齐方式 -->
+    <attr name="slidingtab_indicator_gravity">
+        <flag name="left" value="1" />
+        <flag name="top" value="2" />
+        <flag name="right" value="4" />
+        <flag name="bottom" value="8" />
+        <flag name="center" value="16" />
+    </attr>
+
+    <declare-styleable name="SlidingTabLayout">
+
+        <!--指示器图标-->
+        <attr name="slidingtab_indicator_src" />
+
+        <!-- 指示器宽度 -->
+        <attr name="slidingtab_indicator_width" />
+        <!-- 指示器高度 -->
+        <attr name="slidingtab_indicator_height" />
+
+        <!--指示器边距-->
+        <attr name="slidingtab_indicator_margin" />
+        <!--指示器左边距-->
+        <attr name="slidingtab_indicator_marginLeft" />
+        <!--指示器上边距-->
+        <attr name="slidingtab_indicator_marginTop" />
+        <!--指示器右边距-->
+        <attr name="slidingtab_indicator_marginRight" />
+        <!--指示器下边距-->
+        <attr name="slidingtab_indicator_marginBottom" />
+
+        <!-- 指示器对齐方式 -->
+        <attr name="slidingtab_indicator_gravity" />
+    </declare-styleable>
+
+</resources>
