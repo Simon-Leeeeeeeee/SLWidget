@@ -9,6 +9,7 @@
 * [集成方式](#集成方式)
 * [属性说明](#属性说明)
 * [注意事项](#注意事项)
+* [版本记录](#版本记录)
 * [关于作者](#关于作者)
 
 ## 示例demo
@@ -26,7 +27,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:autowraplayout:1.0.5'
+        implementation 'cn.simonlee.widget:autowraplayout:1.0.6'
     }
 ```
 
@@ -98,6 +99,13 @@
 
     ChildView宽高的`match_parent`属性均无效，当`wrap_content`处理。
     **特例：** 首行独占的宽允许`match_parent`生效。
+
+## 版本记录
+
+*  **V1.0.6**   `2018/11/06`
+
+    1. 优化onMeasure方法，解决单元格测量尺寸与实际尺寸不相符的问题。
+    2. 修复在某些情况下网格线显示异常的问题。
 
 ## 关于作者
 

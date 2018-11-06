@@ -57,10 +57,10 @@ public class AutoWrapGridLayout extends ViewGroup {
     private int mAppointGridCellWidth, mAppointGridCellHeight;
 
     /**
-     * AutoWrapGridLayout的宽被单元格平分后的余数。
+     * 网格的宽被单元格平分后的余量。
      * 每行从左至右每个单元格从余数中取1，尽可能使每个单元格看起来一样宽
      */
-    private int mRowSurplusWidth;
+    private int mRemnantWidth;
 
     /**
      * 网格线宽
@@ -83,24 +83,19 @@ public class AutoWrapGridLayout extends ViewGroup {
     private boolean isStickFirst;
 
     /**
-     * 置顶FirstChildView的宽，未置顶则为0
-     */
-    private int mStickFirstWidth;
-
-    /**
-     * 置顶FirstChildView的高，未置顶则为0
-     */
-    private int mStickFirstHeight;
-
-    /**
-     * LayoutParams宽高
-     */
-    private int mLayoutWidth, mLayoutHeight;
-
-    /**
      * 单元格的行列数
      */
-    private int mColumnCount, mRowCount;
+    private int mRowCount, mColumnCount;
+
+    /**
+     * padding宽高
+     */
+    private int mPaddingWidth, mPaddingHeight;
+
+    /**
+     * 网格绘制的起始顶点
+     */
+    private int mGridDrawTop;
 
     public AutoWrapGridLayout(Context context) {
         super(context);
@@ -132,205 +127,283 @@ public class AutoWrapGridLayout extends ViewGroup {
     }
 
     @Override
-    public void setLayoutParams(LayoutParams params) {
-        mLayoutWidth = params.width;
-        mLayoutHeight = params.height;
-        super.setLayoutParams(params);
-    }
-
-    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        final int paddingWidth = getPaddingLeft() + getPaddingRight();
-        final int paddingHeight = getPaddingTop() + getPaddingBottom();
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-        int childState = 0;
-        //单元格个数
-        int gridCellCount = 0;
-        mGridCellWidth = mAppointGridCellWidth;
-        mGridCellHeight = mAppointGridCellHeight;
-        mStickFirstWidth = mStickFirstHeight = 0;
-        //测量每个子View，并记录宽高等数据
+
+        //Step.1 初始化临时变量
+        View stickFirst = null;//置顶的首行控件
+        int childState = 0; //child状态
+        int gridCellCount = 0;//单元格数量
+        int gridCellWidth = mAppointGridCellWidth;//单元格宽度
+        int gridCellHeight = mAppointGridCellHeight;//单元格高度
+        final boolean skipMeasure = mAppointGridCellWidth > 0 && mAppointGridCellHeight > 0;//单元格跳过首次测量
+
+        //Step.2 获取padding的宽高，用于后续计算
+        mPaddingWidth = getPaddingLeft() + getPaddingRight();
+        mPaddingHeight = getPaddingTop() + getPaddingBottom();
+
+        //Step.3 测量置顶的首行控件，并确定单元格数量及尺寸
         for (int index = 0; index < getChildCount(); index++) {
             View child = getChildAt(index);
             if (child == null || child.getVisibility() == View.GONE) {
                 continue;
             }
-            MarginLayoutParams childLP = (MarginLayoutParams) child.getLayoutParams();
-            boolean matchWidth = childLP.width == LayoutParams.MATCH_PARENT;
-            boolean matchHeight = childLP.height == LayoutParams.MATCH_PARENT;
-
-            if (isStickFirst && index == 0) {
-                //将高度的MATCH_PARENT属性转为WRAP_CONTENT，然后再测量宽高值
-                if (matchHeight) childLP.height = LayoutParams.WRAP_CONTENT;
-                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+            //测量置顶的首行控件
+            if (index == 0 && isStickFirst) {
+                stickFirst = child;
+                measureChild(child, widthMeasureSpec, heightMeasureSpec, false);
                 childState = combineMeasuredStates(childState, child.getMeasuredState());
-                if (matchHeight) childLP.height = LayoutParams.MATCH_PARENT;
+                continue;
+            }
+            //未指定单元格尺寸时，测量子控件尺寸，取最大值做为单元格宽高
+            if (!skipMeasure) {
+                measureChild(child, widthMeasureSpec, heightMeasureSpec, true);
+                childState = combineMeasuredStates(childState, child.getMeasuredState());
+                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+                if (mAppointGridCellWidth <= 0) {
+                    gridCellWidth = Math.max(gridCellWidth, lp.leftMargin + lp.rightMargin + child.getMeasuredWidth());
+                }
+                if (mAppointGridCellHeight <= 0) {
+                    gridCellHeight = Math.max(gridCellHeight, lp.topMargin + lp.bottomMargin + child.getMeasuredHeight());
+                }
+            }
+            gridCellCount++;
+        }
 
-                //记录置顶的firstChild宽高
-                mStickFirstWidth = childLP.leftMargin + childLP.rightMargin + child.getMeasuredWidth();
-                mStickFirstHeight = childLP.topMargin + childLP.bottomMargin + child.getMeasuredHeight();
+        //Step.4 宽不是精确值，需要进行计算
+        if (widthMode != MeasureSpec.EXACTLY) {
+            //计算单元格最大宽度
+            int maxGridWidth = gridCellCount * (gridCellWidth + mGridLineWidth) - mGridLineWidth;
+            if (stickFirst != null) {
+                //最大宽度与首行控件宽度取极大值
+                final MarginLayoutParams lp = (MarginLayoutParams) stickFirst.getLayoutParams();
+                maxGridWidth = Math.max(maxGridWidth, stickFirst.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+            }
+            if (widthMode == MeasureSpec.AT_MOST) {
+                //限定高度和最大高度取极小值
+                widthSize = Math.min(widthSize, mPaddingWidth + maxGridWidth);
             } else {
-                gridCellCount++;
-                //将宽高的MATCH_PARENT属性均转为WRAP_CONTENT，然后再测量宽高值
-                if (matchWidth) childLP.width = LayoutParams.WRAP_CONTENT;
-                if (matchHeight) childLP.height = LayoutParams.WRAP_CONTENT;
-                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
-                childState = combineMeasuredStates(childState, child.getMeasuredState());
-                if (matchWidth) childLP.width = LayoutParams.MATCH_PARENT;
-                if (matchHeight) childLP.height = LayoutParams.MATCH_PARENT;
-
-                //未指定单元格的尺寸，以childView的宽高最大值为准
-                if (mAppointGridCellWidth <= 0 || mAppointGridCellHeight <= 0) {
-                    int childMarginWidth = childLP.leftMargin + childLP.rightMargin;
-                    int childMarginHeight = childLP.topMargin + childLP.bottomMargin;
-                    mGridCellWidth = Math.max(mGridCellWidth, childMarginWidth + child.getMeasuredWidth());
-                    mGridCellHeight = Math.max(mGridCellHeight, childMarginHeight + child.getMeasuredHeight());
+                widthSize = mPaddingWidth + maxGridWidth;
+            }
+            //改变宽度模式，指定宽值
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
+            if (stickFirst != null) {
+                //当首行控件的宽为match_content，重新进行测量，使首行控件的宽为最大宽度
+                final MarginLayoutParams lp = (MarginLayoutParams) stickFirst.getLayoutParams();
+                if (lp.width == LayoutParams.MATCH_PARENT) {
+                    int stickFirstWidthMeasureSpec = MeasureSpec.makeMeasureSpec(widthSize - mPaddingWidth - lp.leftMargin - lp.rightMargin, MeasureSpec.EXACTLY);
+                    stickFirst.measure(stickFirstWidthMeasureSpec, stickFirst.getMeasuredHeightAndState());
+                    childState = combineMeasuredStates(childState, stickFirst.getMeasuredState());
                 }
             }
         }
-        //宽为wrap_content,需要根据子view来计算实际宽度
-        if (mLayoutWidth == LayoutParams.WRAP_CONTENT && widthMode != MeasureSpec.EXACTLY) {
-            //计算需要的宽度
-            int maxGridWidth = Math.max(mStickFirstWidth, gridCellCount * (mGridCellWidth + mGridLineWidth) - mGridLineWidth);
-            if (widthSize <= 0) {
-                widthSize = paddingWidth + maxGridWidth;
-            } else {
-                //不能超过最大宽，否则不会换行了
-                widthSize = Math.min(widthSize, paddingWidth + maxGridWidth);
-            }
-            View firstChild = getChildAt(0);
-            //重新测量置顶的firstChild
-            if (isStickFirst && firstChild != null && firstChild.getVisibility() != View.GONE) {
-                MarginLayoutParams firstChildLP = (MarginLayoutParams) firstChild.getLayoutParams();
-                if (firstChildLP.width == LayoutParams.MATCH_PARENT) {
-                    //改变宽度模式重新测量置顶的firstChild，使其MATCH_PARENT生效
-                    measureChildWithMargins(firstChild, MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), 0, heightMeasureSpec, 0);
-                }
-            }
-        }
-        //计算单元格的列数
-        mColumnCount = Math.max(1, (widthSize - paddingWidth + mGridLineWidth) / (mGridCellWidth + mGridLineWidth));
-        //校正单元格的宽度，使之填满整个View
-        mGridCellWidth = (widthSize - paddingWidth + mGridLineWidth) / mColumnCount - mGridLineWidth;
-        //宽被单元格平分后的余数
-        mRowSurplusWidth = widthSize - paddingWidth + mGridLineWidth - (mGridCellWidth + mGridLineWidth) * mColumnCount;
-        //计算单元格的行数
+
+        //Step.5 计算单元格行列数、校正单元格宽度、确定网格宽度余量
+        //列数
+        mColumnCount = Math.max(1, (widthSize - mPaddingWidth + mGridLineWidth) / (gridCellWidth + mGridLineWidth));
+        //行数
         mRowCount = (int) Math.ceil(1F * gridCellCount / mColumnCount);
-        //高为wrap_content，根据子view来计算实际高度
-        if (mLayoutHeight == LayoutParams.WRAP_CONTENT && heightMode != MeasureSpec.EXACTLY) {
-            //计算需要的高度
-            int maxChildHeight = mStickFirstHeight + mRowCount * (mGridCellHeight + mGridLineWidth);
-            //firstChild未置顶，需要减去一行网格线宽
-            if (mStickFirstHeight <= 0 && mRowCount > 0) {
-                maxChildHeight -= mGridLineWidth;
+        //校正单元格宽度
+        mGridCellWidth = (widthSize - mPaddingWidth + mGridLineWidth) / mColumnCount - mGridLineWidth;
+        //单元格高度
+        mGridCellHeight = gridCellHeight;
+        //网格宽度余量
+        mRemnantWidth = widthSize - mPaddingWidth + mGridLineWidth - (mGridCellWidth + mGridLineWidth) * mColumnCount;
+
+        //Step.6 根据单元格尺寸测量单元格控件
+        final boolean fillGravity = (mGridCellGravity & GRAVITY_FILL) == GRAVITY_FILL;//填充单元格
+        final int gridCellMeasureSpec_Width = MeasureSpec.makeMeasureSpec(mGridCellWidth, MeasureSpec.EXACTLY);
+        final int gridCellMeasureSpec_Height = MeasureSpec.makeMeasureSpec(mGridCellHeight, MeasureSpec.EXACTLY);
+        final int gridCellMeasureSpec_WidthPlus = MeasureSpec.makeMeasureSpec(mGridCellWidth + 1, MeasureSpec.EXACTLY);
+        int columnNum = 0;//列数
+        for (int index = 0; index < getChildCount(); index++) {
+            View child = getChildAt(index);
+            if (child == null || child.getVisibility() == View.GONE) {
+                continue;
             }
-            //高度不需要限制最大值，因为如果在ScrollView中，会丢失超出ScrollView高度的部分
-            heightSize = paddingHeight + maxChildHeight;
+            if (index != 0 || !isStickFirst) {
+                //若当前列数大于等于网格列数，则换行
+                if (columnNum >= mColumnCount) {
+                    columnNum = 0;
+                }
+                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+                final boolean matchWidth = fillGravity || lp.width == LayoutParams.MATCH_PARENT;
+                final boolean matchHeight = fillGravity || lp.height == LayoutParams.MATCH_PARENT;
+
+                int childWidthMeasureSpec = 0, childHeightMeasureSpec = 0;
+                if (matchWidth && matchHeight) {//宽高都要填满单元格
+                    childWidthMeasureSpec = columnNum < mRemnantWidth ? gridCellMeasureSpec_WidthPlus : gridCellMeasureSpec_Width;
+                    childHeightMeasureSpec = gridCellMeasureSpec_Height;
+                } else if (matchWidth) {//宽度填满单元格
+                    childWidthMeasureSpec = columnNum > mRemnantWidth ? gridCellMeasureSpec_Width : gridCellMeasureSpec_WidthPlus;
+                    childHeightMeasureSpec = skipMeasure ? getChildHeightMeasureSpec(heightMeasureSpec, lp, true) : child.getMeasuredWidthAndState();
+                } else if (matchHeight) {//高度填满单元格
+                    childWidthMeasureSpec = skipMeasure ? getChildWidthMeasureSpec(widthMeasureSpec, lp, true) : child.getMeasuredHeightAndState();
+                    childHeightMeasureSpec = gridCellMeasureSpec_Height;
+                } else if (skipMeasure) {//宽高都不填满单元格，但是前面跳过了测量
+                    childWidthMeasureSpec = getChildWidthMeasureSpec(widthMeasureSpec, lp, true);
+                    childHeightMeasureSpec = getChildHeightMeasureSpec(heightMeasureSpec, lp, true);
+                }
+                if (matchWidth || matchHeight || skipMeasure) {
+                    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+                    childState = combineMeasuredStates(childState, child.getMeasuredState());
+                }
+                columnNum++;
+            }
+        }
+
+        //Step.7 高不是精确值，需要进行计算
+        if (heightMode != MeasureSpec.EXACTLY) {
+            //根据单元格行数计算高度
+            int maxHeightSize = mPaddingHeight + mRowCount * (mGridCellHeight + mGridLineWidth) - mGridLineWidth;
+            if (stickFirst != null) {
+                //加上首行置顶的高度
+                final MarginLayoutParams lp = (MarginLayoutParams) stickFirst.getLayoutParams();
+                maxHeightSize += stickFirst.getMeasuredHeight() + lp.topMargin + lp.bottomMargin + mGridLineWidth;
+            } else if (mRowCount == 0) {
+                maxHeightSize = mPaddingHeight;
+            }
+            if (heightMode == MeasureSpec.AT_MOST) {
+                //限定高度和最大高度取极小值
+                heightSize = Math.min(heightSize, maxHeightSize);
+            } else {
+                heightSize = maxHeightSize;
+            }
         }
         setMeasuredDimension(resolveSizeAndState(widthSize, widthMeasureSpec, childState), resolveSizeAndState(heightSize, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT));
     }
 
+    /**
+     * 计算child尺寸，忽略MATCH_PARENT属性（非单元格的宽为MATCH_PARENT除外）
+     */
+    protected void measureChild(View child, int parentWidthMeasureSpec, int parentHeightMeasureSpec, boolean isGridCell) {
+        final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+        final int childWidthMeasureSpec = getChildWidthMeasureSpec(parentWidthMeasureSpec, lp, isGridCell);
+        final int childHeightMeasureSpec = getChildHeightMeasureSpec(parentHeightMeasureSpec, lp, isGridCell);
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+    }
+
+    private int getChildHeightMeasureSpec(int parentHeightMeasureSpec, MarginLayoutParams lp, boolean isGridCell) {
+        final int childHeightDimension = lp.height != LayoutParams.MATCH_PARENT ? lp.height : (isGridCell ? LayoutParams.WRAP_CONTENT : lp.height);
+        return getChildMeasureSpec(parentHeightMeasureSpec, mPaddingHeight + lp.topMargin + lp.bottomMargin, childHeightDimension);
+    }
+
+    private int getChildWidthMeasureSpec(int parentWidthMeasureSpec, MarginLayoutParams lp, boolean isGridCell) {
+        final int childWidthDimension = lp.width != LayoutParams.MATCH_PARENT ? lp.width : (isGridCell ? LayoutParams.WRAP_CONTENT : lp.width);
+        return getChildMeasureSpec(parentWidthMeasureSpec, mPaddingWidth + lp.leftMargin + lp.rightMargin, childWidthDimension);
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        final int paddingLeft = getPaddingLeft();
-        final int paddingRight = getPaddingRight();
         //布局的左边
-        int layoutLeft = paddingLeft;
+        int layoutLeft = getPaddingLeft();
         //布局的上边
         int layoutTop = getPaddingTop();
-        //每行剩余宽度的余量
-        int rowSurplusWidth = mRowSurplusWidth;
 
+        //列数
+        int columnNum = 0;
         for (int index = 0; index < getChildCount(); index++) {
             View child = getChildAt(index);
             if (child == null || child.getVisibility() == View.GONE) {
                 continue;
             }
             //childView的布局参数，用于获取margin值
-            MarginLayoutParams childLP = (MarginLayoutParams) child.getLayoutParams();
+            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
             if (isStickFirst && index == 0) {
-                //firstChild置顶，并使布局上边下移
-                child.layout(layoutLeft + childLP.leftMargin, layoutTop + childLP.topMargin, layoutLeft + childLP.leftMargin + child.getMeasuredWidth(), layoutTop + childLP.topMargin + child.getMeasuredHeight());
-                layoutTop += child.getMeasuredHeight() + childLP.topMargin + childLP.bottomMargin + mGridLineWidth;
+                //firstChild置顶
+                child.layout(layoutLeft + lp.leftMargin, layoutTop + lp.topMargin,
+                        layoutLeft + lp.leftMargin + child.getMeasuredWidth(), layoutTop + lp.topMargin + child.getMeasuredHeight());
+                //使布局上边下移
+                layoutTop += child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin + mGridLineWidth;
             } else {
-                if (layoutLeft > paddingLeft && layoutLeft + mGridCellWidth > right - paddingRight) {
-                    //当前行已经排满，进行换行，左边重置为paddingLeft，上边加一行的高度，每行剩余宽度也重置为mRowSurplusWidth
-                    layoutLeft = paddingLeft;
+                //若当前列数大于网格列数，则换行
+                if (columnNum >= mColumnCount) {
+                    columnNum = 0;
+                    layoutLeft = getPaddingLeft();
                     layoutTop += mGridCellHeight + mGridLineWidth;
-                    rowSurplusWidth = mRowSurplusWidth;
                 }
-                //当前单元格的宽度，剩余宽度未取完则+1
-                int gridCellWidth = mGridCellWidth + (rowSurplusWidth-- > 0 ? 1 : 0);
+                //当前单元格的实际宽度
+                int gridCellWidth = columnNum < mRemnantWidth ? (mGridCellWidth + 1) : mGridCellWidth;
+
                 //当前单元格中child的上下左右值
-                int childLeft = layoutLeft + childLP.leftMargin;
-                int childTop = layoutTop + childLP.topMargin;
-                int childRight = layoutLeft + gridCellWidth - childLP.rightMargin;
-                int childBottom = layoutTop + mGridCellHeight - childLP.bottomMargin;
-                //根据水平对齐方式调整左右值
-                if ((mGridCellGravity & GRAVITY_FILL) == GRAVITY_FILL) {//填满
-//                    childRight = layoutLeft + gridCellWidth - childLP.rightMargin;
-                } else if ((mGridCellGravity & GRAVITY_LEFT) == GRAVITY_LEFT) {//水平居左
-                    childRight = Math.min(childRight, childLeft + child.getMeasuredWidth());
-                } else if ((mGridCellGravity & GRAVITY_RIGHT) == GRAVITY_RIGHT) {//水平居右
-                    childLeft = Math.max(childLeft, childRight - child.getMeasuredWidth());
-                } else if ((mGridCellGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//水平居中
-                    childLeft = (int) Math.max(childLeft, (childLeft + childRight - child.getMeasuredWidth()) / 2F + 0.5F);
-                    childRight = Math.min(childRight, childLeft + child.getMeasuredWidth());
-                }
-                //根据垂直对齐方式调整上下值
-                if ((mGridCellGravity & GRAVITY_FILL) == GRAVITY_FILL) {//填满
-//                    childBottom = layoutTop + mGridCellHeight - childLP.bottomMargin;
-                } else if ((mGridCellGravity & GRAVITY_TOP) == GRAVITY_TOP) {//垂直居上
-                    childBottom = Math.min(childBottom, childTop + child.getMeasuredHeight());
-                } else if ((mGridCellGravity & GRAVITY_BOTTOM) == GRAVITY_BOTTOM) {//垂直居下
-                    childTop = Math.max(childTop, childBottom - child.getMeasuredHeight());
-                } else if ((mGridCellGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//垂直居中
-                    childTop = (int) Math.max(childTop, (childTop + childBottom - child.getMeasuredHeight()) / 2F + 0.5F);
-                    childBottom = Math.min(childBottom, childTop + child.getMeasuredHeight());
+                int childLeft = layoutLeft + lp.leftMargin;
+                int childTop = layoutTop + lp.topMargin;
+                int childRight = layoutLeft + gridCellWidth - lp.rightMargin;
+                int childBottom = layoutTop + mGridCellHeight - lp.bottomMargin;
+                if ((mGridCellGravity & GRAVITY_FILL) != GRAVITY_FILL) {//非填满对齐方式
+                    //根据水平对齐方式调整左右值
+                    if ((mGridCellGravity & GRAVITY_LEFT) == GRAVITY_LEFT) {//水平居左
+                        childRight = Math.min(childRight, childLeft + child.getMeasuredWidth());
+                    } else if ((mGridCellGravity & GRAVITY_RIGHT) == GRAVITY_RIGHT) {//水平居右
+                        childLeft = Math.max(childLeft, childRight - child.getMeasuredWidth());
+                    } else if ((mGridCellGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//水平居中
+                        childLeft = Math.max(childLeft, (int) ((childLeft + childRight - child.getMeasuredWidth()) / 2F + 0.5F));
+                        childRight = Math.min(childRight, childLeft + child.getMeasuredWidth());
+                    }
+                    //根据垂直对齐方式调整上下值
+                    if ((mGridCellGravity & GRAVITY_TOP) == GRAVITY_TOP) {//垂直居上
+                        childBottom = Math.min(childBottom, childTop + child.getMeasuredHeight());
+                    } else if ((mGridCellGravity & GRAVITY_BOTTOM) == GRAVITY_BOTTOM) {//垂直居下
+                        childTop = Math.max(childTop, childBottom - child.getMeasuredHeight());
+                    } else if ((mGridCellGravity & GRAVITY_CENTER) == GRAVITY_CENTER) {//垂直居中
+                        childTop = (int) Math.max(childTop, (childTop + childBottom - child.getMeasuredHeight()) / 2F + 0.5F);
+                        childBottom = Math.min(childBottom, childTop + child.getMeasuredHeight());
+                    }
                 }
                 child.layout(childLeft, childTop, childRight, childBottom);
-                //childView布局后对左边增加一个单元格的宽度
+                columnNum++;
                 layoutLeft += gridCellWidth + mGridLineWidth;
             }
         }
     }
 
     @Override
+    protected void dispatchDraw(Canvas canvas) {
+        mGridDrawTop = 0;
+        if (isStickFirst) {
+            View child = getChildAt(0);
+            if (child != null && child.getVisibility() != View.GONE) {
+                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+                mGridDrawTop = child.getBottom() + lp.bottomMargin + mGridLineWidth;
+            }
+        }
+        super.dispatchDraw(canvas);
+    }
+
+    @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         //网格线的颜色为透明，则不进行绘制
-        if (mGridLineColor >>> 24 <= 0 || child.getVisibility() == GONE) {
+        if (mGridLineWidth <= 0 || mGridLineColor >>> 24 <= 0 || child.getVisibility() == GONE) {
             return super.drawChild(canvas, child, drawingTime);
         }
         if (isStickFirst && child == getChildAt(0)) {
             //绘制置顶的firstChild下边网格线
-            int gridLineY = getPaddingTop() + mStickFirstHeight;
-            canvas.drawRect(0, gridLineY, getWidth(), gridLineY + mGridLineWidth, mGridLinePaint);
+            canvas.drawRect(0, mGridDrawTop - mGridLineWidth, getWidth(), mGridDrawTop, mGridLinePaint);
         } else {
             //计算当前child所在的行
-            int childRow = (int) (1F * (child.getBottom() - getPaddingTop() - mStickFirstHeight) / (mGridCellHeight + mGridLineWidth) + 0.5F);
-            //计算当前child所在的列
-            int childColumn = (int) (1F * (child.getRight() - getPaddingLeft()) / (mGridCellWidth + mGridLineWidth) + 0.5F);
-            //计算当前child所在单元格的底边
-            int gridCellBottom = getPaddingTop() + mStickFirstHeight + childRow * (mGridCellHeight + mGridLineWidth);
-            //firstChild未置顶，需要减去一个网格线宽
-            if (isStickFirst && getChildAt(0).getVisibility() != GONE) {
-                gridCellBottom -= mGridLineWidth;
+            int rowNum = (child.getBottom() - mGridDrawTop) / (mGridCellHeight + mGridLineWidth);
+            //计算当前child所在的列（要考虑网格宽度余量的影响）
+            int columnNum = (child.getRight() - getPaddingLeft()) / (mGridCellWidth + mGridLineWidth + 1);
+            if (columnNum >= mRemnantWidth) {
+                columnNum = (child.getRight() - getPaddingLeft() - mRemnantWidth) / (mGridCellWidth + mGridLineWidth);
             }
+            //计算当前child所在单元格的底边
+            int gridCellBottom = mGridDrawTop + rowNum * (mGridCellHeight + mGridLineWidth) + mGridCellHeight;
             //计算当前child所在单元格的右边
-            int gridCellRight = getPaddingLeft() + childColumn * (mGridCellWidth + mGridLineWidth) - mGridLineWidth;
+            int gridCellRight = getPaddingLeft() + columnNum * (mGridCellWidth + mGridLineWidth) + mGridCellWidth;
             //宽存在余量，需要校正单元格的右边
-            if (mRowSurplusWidth > 0) {
-                gridCellRight += Math.min(mRowSurplusWidth, childColumn);
+            if (mRemnantWidth > 0) {
+                gridCellRight += Math.min(mRemnantWidth, columnNum + 1);
             }
             //当前child为该行的第一个单元格且不是最后一行，绘制下边网格线
-            if (child.getLeft() < mGridCellWidth && childRow < mRowCount) {
+            if (columnNum == 0 && rowNum < mRowCount - 1) {
                 canvas.drawRect(0, gridCellBottom, getWidth(), gridCellBottom + mGridLineWidth, mGridLinePaint);
             }
             //当前child不是最后一列，绘制child右边网格线
-            if (childColumn < mColumnCount) {
+            if (columnNum < mColumnCount - 1) {
                 canvas.drawRect(gridCellRight, gridCellBottom - mGridCellHeight, gridCellRight + mGridLineWidth, gridCellBottom, mGridLinePaint);
             }
         }
@@ -433,17 +506,17 @@ public class AutoWrapGridLayout extends ViewGroup {
     }
 
     @Override
+    public boolean shouldDelayChildPressedState() {
+        return false;
+    }
+
+    @Override
     protected LayoutParams generateLayoutParams(LayoutParams lp) {
         if (lp instanceof MarginLayoutParams) {
             return new MarginLayoutParams((MarginLayoutParams) lp);
         } else {
             return new MarginLayoutParams(lp);
         }
-    }
-
-    @Override
-    public boolean shouldDelayChildPressedState() {
-        return false;
     }
 
     @Override
