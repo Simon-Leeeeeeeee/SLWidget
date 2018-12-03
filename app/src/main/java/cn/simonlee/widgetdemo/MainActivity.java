@@ -12,6 +12,7 @@ import android.view.View;
 import cn.simonlee.widgetdemo.autowraplayout.AutoWrapActivity;
 import cn.simonlee.widgetdemo.badge.BadgeActivity;
 import cn.simonlee.widgetdemo.scrollpicker.ScrollPickerActivity;
+import cn.simonlee.widgetdemo.slidingtablayout.SlidingTabActivity;
 import cn.simonlee.widgetdemo.swipeback.SwipeBackActivity;
 import cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshActivity;
 
@@ -41,6 +42,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.main_layout_autowraplayout).setOnClickListener(this);
         findViewById(R.id.main_layout_swipeback).setOnClickListener(this);
         findViewById(R.id.main_layout_swiperefreshlayout).setOnClickListener(this);
+        findViewById(R.id.main_layout_slidingtablayout).setOnClickListener(this);
     }
 
     @Override
@@ -70,7 +72,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 startActivity(new Intent(this, SwipeRefreshActivity.class));
                 break;
             }
-            default:{
+            case R.id.main_layout_slidingtablayout: {
+                startActivity(new Intent(this, SlidingTabActivity.class));
+                break;
+            }
+            default: {
                 break;
             }
         }

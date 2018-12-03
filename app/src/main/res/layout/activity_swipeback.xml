@@ -22,10 +22,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="20dp"
                 android:paddingLeft="15dp"
-                android:paddingRight="15dp"
                 android:paddingTop="20dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="20dp"
                 android:text="@string/guidelines"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
@@ -33,73 +33,55 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/guide_swipeback_1"
                 android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/guide_swipeback_2"
                 android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/guide_swipeback_3"
                 android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/guide_swipeback_4"
                 android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/guide_swipeback_5"
                 android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/guide_swipeback_6"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/guide_swipeback_7"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/guide_swipeback_8"
                 android:textColor="@color/black" />
 
         </LinearLayout>
@@ -113,8 +95,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
 
@@ -122,9 +104,9 @@
             android:id="@+id/swipeback_swicth_support_landscape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="@string/support_landscape"
-            android:textColor="@color/black"
-            android:checked="true" />
+            android:textColor="@color/black" />
 
         <View
             android:layout_width="1dp"
@@ -143,8 +125,8 @@
         android:id="@+id/swipeback_btn_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
         android:text="@string/next" />
 </LinearLayout>

@@ -32,6 +32,7 @@
     <color name="blue_light_lv9">#C5DFFF</color>
     <color name="blue_light_lv10">#ECF9FF</color>
 
+    <color name="grayxx">#AA888888</color>
     <color name="gray">#888888</color>
     <color name="gray_light_lv0">#8F8E94</color>
     <color name="gray_light_lv1">#999999</color>

@@ -1,1 +1,1 @@
-include ':app', ':scrollpicker', ':badgeview', ':swipeback', ':autowraplayout', ':swiperefreshlayout'
+include ':app', ':scrollpicker', ':badgeview', ':swipeback', ':autowraplayout', ':swiperefreshlayout', ':slidingtablayout'

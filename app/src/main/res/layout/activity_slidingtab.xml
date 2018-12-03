@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWindowBackground"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_toolbar" />
+
+    <cn.simonlee.widget.slidingtablayout.SlidingTabLayout
+        android:id="@+id/slidingtab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:scrollbars="none"
+        app:slidingtab_indicator_gravity="bottom"
+        app:slidingtab_indicator_height="3dp"
+        app:slidingtab_indicator_marginLeft="5dp"
+        app:slidingtab_indicator_marginRight="5dp"
+        app:slidingtab_indicator_src="@color/blue"
+        app:slidingtab_indicator_width="40dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@drawable/divider_tab_gray_1dp"
+            android:dividerPadding="10dp"
+            android:orientation="horizontal"
+            android:showDividers="middle">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:text="Tab0"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:id="@+id/slidingtab_table_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:singleLine="true"
+                android:text="Tab1"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:id="@+id/slidingtab_table_scrollview"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:text="Tab2"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:singleLine="true"
+                android:text="Tab3"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:text="Tab4"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:singleLine="true"
+                android:text="Tab5"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:text="Tab6"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:singleLine="true"
+                android:text="Tab7"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:text="Tab8"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:singleLine="true"
+                android:text="Tab9"
+                android:textColor="@drawable/bg_text_select_black_blue" />
+
+        </LinearLayout>
+
+    </cn.simonlee.widget.slidingtablayout.SlidingTabLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/slidingtab_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:overScrollMode="never" />
+
+</LinearLayout>

@@ -60,7 +60,7 @@ public class SwipeRefreshActivity extends BaseActivity implements View.OnClickLi
     @Override
     public void onEnterAnimationComplete() {
         Fragment curFragment = mSwipeRefreshPagerAdapter.getCurrentFragment();
-        if (curFragment != null && curFragment instanceof BaseFragment) {
+        if (curFragment instanceof BaseFragment) {
             ((BaseFragment) curFragment).onEnterAnimationComplete();
         }
     }

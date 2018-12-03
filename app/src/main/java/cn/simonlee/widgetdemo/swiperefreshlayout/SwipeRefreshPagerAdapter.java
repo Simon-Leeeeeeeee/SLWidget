@@ -125,5 +125,4 @@ public class SwipeRefreshPagerAdapter extends PagerAdapter {
         return mCurrentFragment;
     }
 
-
 }

@@ -37,7 +37,7 @@ public class BadgeImageView extends AppCompatImageView {
     @Override
     public void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        mBadge.dispatchDraw(canvas);
+        mBadge.drawBadge(canvas);
     }
 
     public Badge getBadge() {

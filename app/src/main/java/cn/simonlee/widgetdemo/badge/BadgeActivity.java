@@ -1,6 +1,5 @@
 package cn.simonlee.widgetdemo.badge;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -32,8 +31,8 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
     private BadgeImageView mBadgeImageView;
 
     private TextView mTextView_TextSize;
+    private TextView mTextView_OffsetX, mTextView_OffsetY;
     private TextView mTextView_PaddingLeft, mTextView_PaddingTop, mTextView_PaddingRight, mTextView_PaddingBottom;
-    private TextView mTextView_MarginLeft, mTextView_MarginTop, mTextView_MarginRight, mTextView_MarginBottom;
 
     private RadioButton mRadioButton_GravityLeft, mRadioButton_GravityTop, mRadioButton_GravityRight, mRadioButton_GravityBottom, mRadioButton_GravityCenter;
     private float mDensityDP, mDensitySP;
@@ -64,10 +63,8 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
         mTextView_PaddingRight = findViewById(R.id.tv_paddingright);
         mTextView_PaddingBottom = findViewById(R.id.tv_paddingbottom);
 
-        mTextView_MarginLeft = findViewById(R.id.tv_marginleft);
-        mTextView_MarginTop = findViewById(R.id.tv_margintop);
-        mTextView_MarginRight = findViewById(R.id.tv_marginright);
-        mTextView_MarginBottom = findViewById(R.id.tv_marginbottom);
+        mTextView_OffsetX = findViewById(R.id.tv_offsetx);
+        mTextView_OffsetY = findViewById(R.id.tv_offsety);
 
         ((Switch) findViewById(R.id.swicth_bold)).setOnCheckedChangeListener(this);
 
@@ -78,10 +75,8 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
         ((SeekBar) findViewById(R.id.sb_paddingright)).setOnSeekBarChangeListener(this);
         ((SeekBar) findViewById(R.id.sb_paddingbottom)).setOnSeekBarChangeListener(this);
 
-        ((SeekBar) findViewById(R.id.sb_marginleft)).setOnSeekBarChangeListener(this);
-        ((SeekBar) findViewById(R.id.sb_margintop)).setOnSeekBarChangeListener(this);
-        ((SeekBar) findViewById(R.id.sb_marginright)).setOnSeekBarChangeListener(this);
-        ((SeekBar) findViewById(R.id.sb_marginbottom)).setOnSeekBarChangeListener(this);
+        ((SeekBar) findViewById(R.id.sb_offsetx)).setOnSeekBarChangeListener(this);
+        ((SeekBar) findViewById(R.id.sb_offsety)).setOnSeekBarChangeListener(this);
 
         mRadioButton_GravityLeft = findViewById(R.id.radio_gravityleft);
         mRadioButton_GravityTop = findViewById(R.id.radio_gravitytop);
@@ -123,6 +118,20 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
                 mBadgeView.getBadge().setBadgeTextSize(progress * mDensitySP);
                 break;
             }
+            case R.id.sb_offsetx: {
+                progress -= 20;
+                mTextView_OffsetX.setText(progress + "DP");
+                mBadgeView.getBadge().setBadgeOffsetX(progress * mDensityDP);
+                mBadgeImageView.getBadge().setBadgeOffsetX(progress * mDensityDP);
+                break;
+            }
+            case R.id.sb_offsety: {
+                progress -= 20;
+                mTextView_OffsetY.setText(progress + "DP");
+                mBadgeView.getBadge().setBadgeOffsetY(progress * mDensityDP);
+                mBadgeImageView.getBadge().setBadgeOffsetY(progress * mDensityDP);
+                break;
+            }
             case R.id.sb_paddingleft: {
                 mTextView_PaddingLeft.setText(progress + "DP");
                 mBadgeView.getBadge().setBadgePaddingLeft(progress * mDensityDP);
@@ -145,30 +154,6 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
                 mTextView_PaddingBottom.setText(progress + "DP");
                 mBadgeView.getBadge().setBadgePaddingBottom(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgePaddingBottom(progress * mDensityDP);
-                break;
-            }
-            case R.id.sb_marginleft: {
-                mTextView_MarginLeft.setText(progress + "DP");
-                mBadgeView.getBadge().setBadgeMarginLeft(progress * mDensityDP);
-                mBadgeImageView.getBadge().setBadgeMarginLeft(progress * mDensityDP);
-                break;
-            }
-            case R.id.sb_margintop: {
-                mTextView_MarginTop.setText(progress + "DP");
-                mBadgeView.getBadge().setBadgeMarginTop(progress * mDensityDP);
-                mBadgeImageView.getBadge().setBadgeMarginTop(progress * mDensityDP);
-                break;
-            }
-            case R.id.sb_marginright: {
-                mTextView_MarginRight.setText(progress + "DP");
-                mBadgeView.getBadge().setBadgeMarginRight(progress * mDensityDP);
-                mBadgeImageView.getBadge().setBadgeMarginRight(progress * mDensityDP);
-                break;
-            }
-            case R.id.sb_marginbottom: {
-                mTextView_MarginBottom.setText(progress + "DP");
-                mBadgeView.getBadge().setBadgeMarginBottom(progress * mDensityDP);
-                mBadgeImageView.getBadge().setBadgeMarginBottom(progress * mDensityDP);
                 break;
             }
         }

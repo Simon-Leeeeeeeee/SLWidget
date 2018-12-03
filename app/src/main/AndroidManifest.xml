@@ -7,9 +7,11 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@null"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/BaseActivityTheme.TransparentWindow">
+        android:theme="@style/BaseActivityTheme.TransparentWindow"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="portrait"
@@ -46,6 +48,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".swiperefreshlayout.SwipeRefreshActivity"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".slidingtablayout.SlidingTabActivity"
             android:screenOrientation="behind"
             android:windowSoftInputMode="adjustResize" />
     </application>

@@ -15,12 +15,14 @@
 
         <cn.simonlee.widgetdemo.badge.BadgeImageView
             android:id="@+id/badge_avatar"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:padding="5dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="10dp"
             android:src="@drawable/ic_avatar"
+            app:badge_offsetX="-10.5dp"
+            app:badge_offsetY="10.5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/badge_author"
@@ -58,7 +60,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
-            app:badge_background="@drawable/bg_badge_stroke_purple_black"
+            android:tag="TEST"
+            app:badge_background="@drawable/bg_badge_stroke_blue_black"
             app:badge_textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/badge_author"
@@ -94,10 +97,10 @@
                     android:id="@+id/swicth_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/bold"
+                    android:checked="true"
                     android:padding="4dp"
-                    android:textColor="@color/black"
-                    android:checked="true" />
+                    android:text="@string/bold"
+                    android:textColor="@color/black" />
 
                 <View
                     android:layout_width="1dp"
@@ -122,16 +125,93 @@
 
                 <TextView
                     android:id="@+id/tv_textsize"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="end"
+                    android:minWidth="44dp"
                     android:paddingRight="4dp"
                     android:text="12SP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
-            <!--内边距-->
+            <!--偏移量-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:text="@string/offset"
+                android:textColor="@color/black" />
+
+            <!--偏移量：横-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/horizontal"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_offsetx"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="21" />
+
+                <TextView
+                    android:id="@+id/tv_offsetx"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:minWidth="44dp"
+                    android:paddingRight="4dp"
+                    android:text="0DP"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--偏移量：纵-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/vertical"
+                    android:textColor="@color/black" />
+
+                <SeekBar
+                    android:id="@+id/sb_offsety"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progress="21" />
+
+                <TextView
+                    android:id="@+id/tv_offsety"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:minWidth="44dp"
+                    android:paddingRight="4dp"
+                    android:text="0DP"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!--边距-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -139,7 +219,7 @@
                 android:text="@string/padding"
                 android:textColor="@color/black" />
 
-            <!--内边距：左&上-->
+            <!--边距：左&上-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -193,16 +273,17 @@
 
                 <TextView
                     android:id="@+id/tv_paddingtop"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="end"
+                    android:minWidth="44dp"
                     android:paddingRight="4dp"
                     android:text="2DP"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
-            <!--内边距：右&下-->
+            <!--边距：右&下-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -256,145 +337,12 @@
 
                 <TextView
                     android:id="@+id/tv_paddingbottom"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="end"
+                    android:minWidth="44dp"
                     android:paddingRight="4dp"
                     android:text="2DP"
-                    android:textColor="@color/black" />
-
-            </LinearLayout>
-
-            <!--外边距-->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="4dp"
-                android:text="@string/margin"
-                android:textColor="@color/black" />
-
-            <!--外边距：左&上-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/left"
-                    android:textColor="@color/black" />
-
-                <SeekBar
-                    android:id="@+id/sb_marginleft"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0" />
-
-                <TextView
-                    android:id="@+id/tv_marginleft"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:minWidth="40dp"
-                    android:text="0DP"
-                    android:textColor="@color/black" />
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:background="@color/gray" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/top"
-                    android:textColor="@color/black" />
-
-                <SeekBar
-                    android:id="@+id/sb_margintop"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0" />
-
-                <TextView
-                    android:id="@+id/tv_margintop"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:paddingRight="4dp"
-                    android:text="0DP"
-                    android:textColor="@color/black" />
-
-            </LinearLayout>
-
-            <!--外边距：右&下-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/right"
-                    android:textColor="@color/black" />
-
-                <SeekBar
-                    android:id="@+id/sb_marginright"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0" />
-
-                <TextView
-                    android:id="@+id/tv_marginright"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:minWidth="40dp"
-                    android:text="0DP"
-                    android:textColor="@color/black" />
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:background="@color/gray" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@string/bottom"
-                    android:textColor="@color/black" />
-
-                <SeekBar
-                    android:id="@+id/sb_marginbottom"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="0" />
-
-                <TextView
-                    android:id="@+id/tv_marginbottom"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:paddingRight="4dp"
-                    android:text="0DP"
                     android:textColor="@color/black" />
 
             </LinearLayout>

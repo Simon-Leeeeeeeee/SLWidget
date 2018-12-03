@@ -67,10 +67,8 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
     }
 
     private void initView() {
-        if (mSwipeRefreshLayout == null) {
-            mSwipeRefreshLayout = findViewById(R.id.swiperefreshfragment_swiperefresh);
-            mSwipeRefreshLayout.setOnRefreshListener(this);
-        }
+        mSwipeRefreshLayout = findViewById(R.id.swiperefreshfragment_swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         ((Switch) findViewById(R.id.swiperefresh_pullup_enable)).setOnCheckedChangeListener(this);
         ((Switch) findViewById(R.id.swiperefresh_pullup_folded)).setOnCheckedChangeListener(this);
@@ -83,27 +81,10 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
         findViewById(R.id.swiperefresh_pulldown_refresh).setOnClickListener(this);
         findViewById(R.id.swiperefresh_refresh_complete).setOnClickListener(this);
 
-        if (mRotateAnimation == null) {
-            mRotateAnimation = new RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5F);
-            mRotateAnimation.setRepeatCount(-1);
-            mRotateAnimation.setDuration(1000);
-            mRotateAnimation.setInterpolator(new LinearInterpolator());
-        }
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mSwipeRefreshLayout != null && mSwipeRefreshLayout.getRefreshState() == SwipeRefreshLayout.STATE_REFRESHING) {
-            View curRefreshView = mSwipeRefreshLayout.getCurRefreshView();
-            if (curRefreshView != null) {
-                View loadingImage = curRefreshView.findViewById(R.id.refresh_image);
-                if (loadingImage != null && loadingImage.getAnimation() == null) {
-                    loadingImage.startAnimation(mRotateAnimation);
-                }
-            }
-        }
+        mRotateAnimation = new RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5F);
+        mRotateAnimation.setRepeatCount(-1);
+        mRotateAnimation.setDuration(1000);
+        mRotateAnimation.setInterpolator(new LinearInterpolator());
     }
 
     @Override

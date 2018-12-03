@@ -18,8 +18,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="8dp">
+            android:paddingTop="8dp"
+            android:paddingRight="8dp">
 
             <RelativeLayout
                 android:id="@+id/main_layout_badgeview"
@@ -183,6 +183,39 @@
                     android:layout_below="@id/resid_ignore"
                     android:layout_marginTop="5dp"
                     android:text="@string/swiperefreshlayout_introduction" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/main_layout_slidingtablayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_card_select_white_gray"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@id/resid_ignore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:text="@string/slidingtablayout"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:lines="1"
+                    android:text="@string/slidingtablayout_version" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/resid_ignore"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/slidingtablayout_introduction" />
 
             </RelativeLayout>
 

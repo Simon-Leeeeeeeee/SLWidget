@@ -545,10 +545,10 @@
             android:id="@+id/swicth_stickfirst"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:padding="4dp"
             android:text="@string/stickfirst"
-            android:textColor="@color/black"
-            android:checked="true" />
+            android:textColor="@color/black" />
 
         <View
             android:layout_width="1dp"
@@ -587,8 +587,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:paddingTop="4dp"
+        android:paddingRight="10dp"
         android:text="@string/gridline"
         android:textColor="@color/black" />
 
@@ -653,8 +653,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:paddingTop="4dp"
+        android:paddingRight="10dp"
         android:text="@string/gridcell"
         android:textColor="@color/black" />
 

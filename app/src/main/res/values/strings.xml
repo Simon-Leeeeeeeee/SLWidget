@@ -6,14 +6,14 @@
 
     <string name="badgeview">BadgeView</string>
     <string name="badgeview_introduction">简单易用的角标控件，可实现任意View的角标指示。支持字体、边距、背景、对齐方式等属性。</string>
-    <string name="badgeview_version">v1.0.7</string>
+    <string name="badgeview_version">v1.0.8</string>
 
     <string name="scrollpicker">ScrollPicker</string>
     <string name="scrollpicker_version">v1.0.10</string>
     <string name="scrollpicker_introduction">滚动选择控件。仅支持文本显示，可设置行数、间距、颜色渐变、字体大小渐变等。</string>
 
     <string name="autowraplayout">AutoWrapLayout</string>
-    <string name="autowraplayout_version">v1.0.5</string>
+    <string name="autowraplayout_version">v1.0.6</string>
     <string name="autowraplayout_introduction">自动换行布局，ChildView横向排列并自动换行。可设置首行独占，指定网格尺寸、颜色、对齐方式等。</string>
 
     <string name="swipeback">SwipeBack</string>
@@ -25,15 +25,17 @@
     <string name="swiperefreshlayout_version">v1.0.12</string>
     <string name="swiperefreshlayout_introduction">下拉/上滑刷新布局，可实现任意View的下拉/上滑。</string>
 
+    <string name="slidingtablayout">SlidingTabLayout</string>
+    <string name="slidingtablayout_version">v1.0.1</string>
+    <string name="slidingtablayout_introduction">横向滑动标签布局，继承自HorizontalScrollView。标签、容器、指示器、动画、联动等等充分解耦，使用起来更随心。</string>
+
     <string name="guidelines">使用指南</string>
     <string name="guide_swipeback_1">1. 仅支持SDK19(Android4.4)及以上</string>
     <string name="guide_swipeback_2">2. 因状态栏透明，布局从屏幕顶端开始绘制，Toolbar高度需自行调整</string>
     <string name="guide_swipeback_3">3. 状态栏透明会导致输入法的adjustPan模式失效，建议设置为adjustResize</string>
-    <string name="guide_swipeback_4">4. SDK21(Android5.0)以下需指定"android:windowIsTranslucent"为true</string>
-    <string name="guide_swipeback_5">5. 侧滑时会利用反射将窗口转为透明，会引起下层Activity生命周期变化，留意可能因此导致的严重问题</string>
-    <string name="guide_swipeback_6">6. 与下层Activity方向不一致时务必禁用侧滑（下层方向未锁定除外）</string>
-    <string name="guide_swipeback_7">7. 如需动态支持横竖屏切换，屏幕方向需指定为"behind"跟随栈底Activity方向，同时在onCreate中判断若不支持横竖屏切换，则锁定屏幕方向</string>
-    <string name="guide_swipeback_8">8. 使用示例请参考demo，更多细节请阅读源码</string>
+    <string name="guide_swipeback_4">4. 侧滑时会利用反射将窗口转为透明，会引起下层Activity生命周期变化，留意可能因此导致的严重问题</string>
+    <string name="guide_swipeback_5">5. 与下层Activity方向不一致时务必禁用侧滑（下层方向未锁定除外）</string>
+    <string name="guide_swipeback_6">6. 使用示例请参考demo，更多细节请阅读源码</string>
 
     <string name="next">下一页</string>
     <string name="random">随机</string>
@@ -46,8 +48,10 @@
     <string name="text_size">字体大小:</string>
     <string name="text_ratio">放大倍数:</string>
     <string name="bold">加粗:</string>
-    <string name="margin">外边距:</string>
-    <string name="padding">内边距:</string>
+    <string name="offset">偏移量:</string>
+    <string name="horizontal">横:</string>
+    <string name="vertical">纵:</string>
+    <string name="padding">边距:</string>
     <string name="left">左:</string>
     <string name="top">上:</string>
     <string name="right">右:</string>
@@ -94,5 +98,7 @@
 
     <string name="pulldown_norefresh">没网了，快充钱</string>
     <string name="pullup_norefresh">歇会吧，没钱了</string>
+
+    <string name="number_tab">这是第%1$d个标签页</string>
 
 </resources>
