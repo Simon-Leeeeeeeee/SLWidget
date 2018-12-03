@@ -20,6 +20,7 @@ public class BadgeView extends View {
     private final Badge mBadge;
 
     private int mLayoutWidth, mLayoutHeight;
+    private boolean isExactlyDimension = true;
 
     public BadgeView(Context context) {
         super(context);
@@ -45,7 +46,7 @@ public class BadgeView extends View {
     @Override
     public void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        mBadge.dispatchDraw(canvas);
+        mBadge.drawBadge(canvas);
     }
 
     public Badge getBadge() {
@@ -56,7 +57,6 @@ public class BadgeView extends View {
     public void setLayoutParams(ViewGroup.LayoutParams params) {
         mLayoutWidth = params.width;
         mLayoutHeight = params.height;
-        mBadge.setLayoutParams(params.width, params.height);
         super.setLayoutParams(params);
     }
 
@@ -66,13 +66,32 @@ public class BadgeView extends View {
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-        if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT && widthMode != MeasureSpec.EXACTLY) {
+
+        isExactlyDimension = widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY;
+
+        //if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT)
+        if (widthMode == MeasureSpec.UNSPECIFIED) {
             widthSize = mBadge.getBadgeWidth();
+        } else if (widthMode == MeasureSpec.AT_MOST) {
+            widthSize = Math.min(widthSize, mBadge.getBadgeWidth());
         }
-        if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT && heightMode != MeasureSpec.EXACTLY) {
+
+        //if (mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT)
+        if (heightMode == MeasureSpec.UNSPECIFIED) {
             heightSize = mBadge.getBadgeHeight();
+        } else if (heightMode == MeasureSpec.AT_MOST) {
+            heightSize = Math.min(heightSize, mBadge.getBadgeHeight());
         }
+
         super.setMeasuredDimension(resolveSize(widthSize, widthMeasureSpec), resolveSize(heightSize, heightMeasureSpec));
+    }
+
+    public void refreshBadge() {
+        if (mLayoutWidth == ViewGroup.LayoutParams.WRAP_CONTENT || mLayoutHeight == ViewGroup.LayoutParams.WRAP_CONTENT || !isExactlyDimension) {
+            super.requestLayout();
+        } else {
+            super.invalidate();
+        }
     }
 
 }

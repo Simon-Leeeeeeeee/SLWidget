@@ -5,11 +5,12 @@
 ## 目录
 
 * [示例demo](#示例demo)
-* [实现原理](#实现原理)
+* [功能介绍](#功能介绍)
 * [集成方式](#集成方式)
 * [使用方式](#使用方式)
 * [接口说明](#接口说明)
 * [属性说明](#属性说明)
+* [版本记录](#版本记录)
 * [注意事项](#注意事项)
 
 ## 示例demo
@@ -18,16 +19,16 @@
 |:---:|:---:|
 |[点此下载](http://fir.im/SLWidget) 或扫描下面二维码<br/>[![demo](../download.png)](http://fir.im/SLWidget  "扫码下载示例程序")|[![gif](./demo_badgeview.png)](http://fir.im/SLWidget  "示例效果")|
 
-## 实现原理
+## 功能介绍
 
-在自定义View的`void dispatchDraw(Canvas canvas)`方法中绘制角标。
+通过在自定义View中加入简单几行代码，实现任意View的角标绘制。
 
 ## 集成方式
 
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:badgeview:1.0.7'
+        implementation 'cn.simonlee.widget:badgeview:1.0.8'
     }
 ```
 
@@ -42,7 +43,7 @@
 * **Pattern.2**
 
     1. 自定义View，在构造方法中创建Badge实例。
-    2. 重写`dispatchDraw(Canvas canvas)`方法，调用Badge的`dispatchDraw(Canvas canvas)`方法。
+    2. 重写`dispatchDraw(Canvas canvas)`或`onDraw(Canvas canvas)`方法，调用Badge的`drawBadge(Canvas canvas)`方法。
     3. 通过`getBadge()`获取Badge对象进行操作。
 
     * **示例：一个带角标的ImageView**
@@ -69,7 +70,7 @@
             @Override
             public void dispatchDraw(Canvas canvas) {
                 super.dispatchDraw(canvas);
-                mBadge.dispatchDraw(canvas);
+                mBadge.drawBadge(canvas);
             }
 
             public Badge getBadge() {
@@ -148,7 +149,17 @@
     |API|`void` setBadgeDotRadius(`float` dotRadius)|
     |说明|API中的单位为px，当角标文本长度为0时仅显示一个小圆点|
 
-* **角标内边距**
+* **角标偏移量**
+
+    |KEY|VALUE|
+    |:---:|:---:|
+    |属性名|badge_offsetX &#124; badge_offsetY|
+    |类型|dimension|
+    |默认值|0dp|
+    |API|`void`  setBadgeOffset...(float... offset)|
+    |说明|API中的单位为px|
+
+* **角标边距**
 
     |KEY|VALUE|
     |:---:|:---:|
@@ -158,21 +169,18 @@
     |API|`void`  setBadgePadding...(float... padding)|
     |说明|API中的单位为px|
 
-* **角标外边距**
-
-    |KEY|VALUE|
-    |:---:|:---:|
-    |属性名|badge_margin ( badge_marginLeft &#124; badge_marginTop &#124; badge_marginRight &#124; badge_marginBottom )|
-    |类型|dimension|
-    |默认值|0dp|
-    |API|`void`  setBadgeMargin...(float... margin)|
-    |说明|API中的单位为px|
-
 ## 注意事项
 
 * **Tips.1**
 
     当角标文本为`null`时不显示角标，当长度为0时，显示一个小圆点。
+
+## 版本记录
+
+*  **V1.0.8**   `2018/12/03`
+
+    1. 移除不实用的margin属性。
+    2. 新增offset属性，以解决角标内容长度变化时的对齐问题。
 
 ## 关于作者
 

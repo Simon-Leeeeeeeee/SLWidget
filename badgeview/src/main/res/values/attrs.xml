@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 角标对齐方式 -->
+    <!-- 角标相对于View的对齐方式 -->
     <attr name="badge_gravity">
         <flag name="left" value="1" />
         <flag name="top" value="2" />
@@ -12,27 +12,21 @@
     <!--角标背景-->
     <attr name="badge_background" format="reference|color" />
 
-    <!--角标内边距-->
+    <!--角标边距-->
     <attr name="badge_padding" format="reference|dimension" />
-    <!--角标内左边距-->
+    <!--角标左边距-->
     <attr name="badge_paddingLeft" format="reference|dimension" />
-    <!--角标内上边距-->
+    <!--角标上边距-->
     <attr name="badge_paddingTop" format="reference|dimension" />
-    <!--角标内右边距-->
+    <!--角标右边距-->
     <attr name="badge_paddingRight" format="reference|dimension" />
-    <!--角标内下边距-->
+    <!--角标下边距-->
     <attr name="badge_paddingBottom" format="reference|dimension" />
 
-    <!--角标外边距-->
-    <attr name="badge_margin" format="reference|dimension" />
-    <!--角标外左边距-->
-    <attr name="badge_marginLeft" format="reference|dimension" />
-    <!--角标外上边距-->
-    <attr name="badge_marginTop" format="reference|dimension" />
-    <!--角标外右边距-->
-    <attr name="badge_marginRight" format="reference|dimension" />
-    <!--角标外下边距-->
-    <attr name="badge_marginBottom" format="reference|dimension" />
+    <!--角标横向偏移量-->
+    <attr name="badge_offsetX" format="reference|dimension" />
+    <!--角标纵向偏移量-->
+    <attr name="badge_offsetY" format="reference|dimension" />
 
     <!--角标字体大小-->
     <attr name="badge_textSize" format="reference|dimension" />
@@ -51,27 +45,21 @@
         <!--角标背景-->
         <attr name="badge_background" />
 
-        <!--角标内边距-->
+        <!--角标边距-->
         <attr name="badge_padding" />
-        <!--角标内左边距-->
+        <!--角标左边距-->
         <attr name="badge_paddingLeft" />
-        <!--角标内上边距-->
+        <!--角标上边距-->
         <attr name="badge_paddingTop" />
-        <!--角标内右边距-->
+        <!--角标右边距-->
         <attr name="badge_paddingRight" />
-        <!--角标内下边距-->
+        <!--角标下边距-->
         <attr name="badge_paddingBottom" />
 
-        <!--角标外边距-->
-        <attr name="badge_margin" />
-        <!--角标外左边距-->
-        <attr name="badge_marginLeft" />
-        <!--角标外上边距-->
-        <attr name="badge_marginTop" />
-        <!--角标外右边距-->
-        <attr name="badge_marginRight" />
-        <!--角标外下边距-->
-        <attr name="badge_marginBottom" />
+        <!--角标横向偏移量-->
+        <attr name="badge_offsetX" />
+        <!--角标纵向偏移量-->
+        <attr name="badge_offsetY" />
 
         <!--字体大小-->
         <attr name="badge_textSize" />
