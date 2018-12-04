@@ -210,8 +210,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
         if (tabsContainer != null) {
             int measuredWidthAndState, measuredHeightAndState;
             ViewGroup.LayoutParams lp = tabsContainer.getLayoutParams();
-            if (lp.width == LayoutParams.MATCH_PARENT && measuredWidth > tabsContainer.getMeasuredWidth()) {//tabsContainer宽度不够，让其充满SlidingTabLayout
-                measuredWidthAndState = MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY);
+            if (lp.width == LayoutParams.MATCH_PARENT && measuredWidth - getPaddingLeft() - getPaddingRight() > tabsContainer.getMeasuredWidth()) {//tabsContainer宽度不够，让其充满SlidingTabLayout
+                measuredWidthAndState = MeasureSpec.makeMeasureSpec(measuredWidth - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY);
             } else if (lp.width != LayoutParams.MATCH_PARENT && lp.width != LayoutParams.WRAP_CONTENT) {//tabsContainer指定了宽度值，使其生效
                 measuredWidthAndState = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
             } else if (lp.height != LayoutParams.WRAP_CONTENT) {//高度不是自适应，说明需要重新测量高度，宽度不做调整
@@ -220,7 +220,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 return;
             }
             if (lp.height == LayoutParams.MATCH_PARENT) {//tabsContainer指定最大高度，使其生效
-                measuredHeightAndState = MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY);
+                measuredHeightAndState = MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
             } else if (lp.height != LayoutParams.WRAP_CONTENT) {//tabsContainer指定高度值，使其生效
                 measuredHeightAndState = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
             } else {
@@ -551,8 +551,11 @@ public class SlidingTabLayout extends HorizontalScrollView {
                     break;
                 }
                 final int pointerIndex = ev.findPointerIndex(mActivePointerId);
-                if (pointerIndex != -1 && Math.abs(mLastMotionX - (int) ev.getX(pointerIndex)) > mTouchSlop) {
-                    //判断触摸事件位移已达到拖拽判定，将触摸标签置null
+                if (pointerIndex == -1) {
+                    break;
+                }
+                if (Math.abs(mLastMotionX - (int) ev.getX(pointerIndex)) > mTouchSlop || ev.getY(pointerIndex) > getHeight() || ev.getY(pointerIndex) < 0) {
+                    //判断触摸事件位移已达到拖拽判定或者已移出视图边界，将触摸标签置null
                     mTouchTab = null;
                     setPressed(false);//取消按压状态
                 }
@@ -569,6 +572,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
         }
         return expend;
+    }
+
+    private boolean pointInView(View view, float localX, float localY) {
+        return view != null && localX >= view.getLeft() && localY >= view.getTop() && localX < view.getRight() && localY < view.getBottom();
     }
 
     public void setIndicatorGravity(int gravity) {
