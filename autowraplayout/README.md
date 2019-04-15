@@ -27,7 +27,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:autowraplayout:1.0.6'
+        implementation 'cn.simonlee.widget:autowraplayout:1.0.7'
     }
 ```
 
@@ -101,6 +101,10 @@
     **特例：** 首行独占的宽允许`match_parent`生效。
 
 ## 版本记录
+
+*  **V1.0.7**   `2019/04/15`
+
+    1. targetSdkVersion 27 -> 28.
 
 *  **V1.0.6**   `2018/11/06`
 
