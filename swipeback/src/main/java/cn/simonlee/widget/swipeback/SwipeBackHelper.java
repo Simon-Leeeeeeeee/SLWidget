@@ -542,8 +542,12 @@ public class SwipeBackHelper {
     public void setSwipeBackEnabled(boolean enabled) {
         isSwipeBackEnabled = enabled;
         if (!enabled) {
-            mSwipeBackView.setTranslationX(0);
-            mShadowView.setTranslationX(-mShadowView.getWidth());
+            if (mSwipeBackView != null) {
+                mSwipeBackView.setTranslationX(0);
+            }
+            if (mShadowView != null) {
+                mShadowView.setTranslationX(-mShadowView.getWidth());
+            }
         }
     }
 

@@ -36,7 +36,7 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:swipeback:1.0.14'
+        implementation 'cn.simonlee.widget:swipeback:1.0.15'
     }
 ```
 
@@ -135,6 +135,13 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 * **Tips.6**
 
     如需动态支持横竖屏切换（比如APP中有“支持横屏”开关），屏幕方向需指定为`behind`跟随栈底Activity方向，同时在onCreate中进行判断，若不支持横竖屏切换则锁定屏幕方向（因为经测试SDK21中`behind`无效）。
+
+## 版本记录
+
+*  **V1.0.15**   `2019/04/15`
+
+    1. targetSdkVersion 27 -> 28.
+    2. 解决`setSwipeBackEnabled(...)`中未做非空判断的问题。
 
 ## 关于作者
 
