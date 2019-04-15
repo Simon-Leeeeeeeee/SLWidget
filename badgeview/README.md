@@ -28,7 +28,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:badgeview:1.0.8'
+        implementation 'cn.simonlee.widget:badgeview:1.0.9'
     }
 ```
 
@@ -176,6 +176,10 @@
     当角标文本为`null`时不显示角标，当长度为0时，显示一个小圆点。
 
 ## 版本记录
+
+*  **V1.0.9**   `2019/04/15`
+
+    1. targetSdkVersion 27 -> 28.
 
 *  **V1.0.8**   `2018/12/03`
 
