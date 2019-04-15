@@ -11,7 +11,7 @@
     <cn.simonlee.widget.slidingtablayout.SlidingTabLayout
         android:id="@+id/slidingtab_layout"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="60dp"
         android:background="@color/white"
         android:scrollbars="none"
         app:slidingtab_indicator_gravity="bottom"
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@drawable/divider_tab_gray_1dp"
-            android:dividerPadding="10dp"
+            android:dividerPadding="18dp"
             android:orientation="horizontal"
             android:showDividers="middle">
 
