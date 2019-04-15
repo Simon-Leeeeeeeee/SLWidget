@@ -10,6 +10,7 @@
 * [使用方式](#使用方式)
 * [接口说明](#接口说明)
 * [属性说明](#属性说明)
+* [版本记录](#版本记录)
 * [关于作者](#关于作者)
 
 ## 示例demo
@@ -27,7 +28,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:scrollpicker:1.0.10'
+        implementation 'cn.simonlee.widget:scrollpicker:1.0.11'
     }
 ```
 
@@ -226,6 +227,12 @@
     |默认值|0xFFFFDD99|
     |API|`void` setOutsideTextColor(`int` color)|
     |说明|未选中字体的颜色，位于外部|
+
+## 版本记录
+
+*  **V1.0.11**   `2019/04/15`
+
+    1. targetSdkVersion 27 -> 28.
 
 ## 关于作者
 
