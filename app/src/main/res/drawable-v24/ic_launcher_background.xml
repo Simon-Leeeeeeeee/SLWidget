@@ -21,7 +21,7 @@
                 android:startY="93"
                 android:type="linear">
                 <item
-                    android:color="#99000000"
+                    android:color="#88000000"
                     android:offset="0.0"/>
                 <item
                     android:color="#00000000"
