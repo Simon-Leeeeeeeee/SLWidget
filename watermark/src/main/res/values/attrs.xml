@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--水印文本-->
+    <attr name="watermark_text" format="reference|string"/>
+    <!--水印字体大小-->
+    <attr name="watermark_textSize" format="reference|dimension"/>
+    <!--水印字体颜色-->
+    <attr name="watermark_textColor" format="reference|color"/>
+
+    <!--水印底色-->
+    <attr name="watermark_textBackgroundColor" format="reference|color"/>
+    <!--水印旋转角度-->
+    <attr name="watermark_degrees" format="integer"/>
+
+    <!--水印密度，取值0-1-->
+    <attr name="watermark_density" format="float"/>
+
+    <!--水印行距-->
+    <attr name="watermark_rowSpacing" format="reference|dimension"/>
+    <!--水印列距-->
+    <attr name="watermark_columnSpacing" format="reference|dimension"/>
+    <!--水印最大行距-->
+    <attr name="watermark_maxSpacing_row" format="reference|dimension"/>
+    <!--水印最小行距-->
+    <attr name="watermark_minSpacing_row" format="reference|dimension"/>
+    <!--水印最大列距-->
+    <attr name="watermark_maxSpacing_column" format="reference|dimension"/>
+    <!--水印最小列距-->
+    <attr name="watermark_minSpacing_column" format="reference|dimension"/>
+
+    <!--水印区域边距-->
+    <attr name="watermark_drawPadding" format="reference|dimension"/>
+    <!--水印区域左边距-->
+    <attr name="watermark_drawPaddingLeft" format="reference|dimension"/>
+    <!--水印区域上边距-->
+    <attr name="watermark_drawPaddingTop" format="reference|dimension"/>
+    <!--水印区域右边距-->
+    <attr name="watermark_drawPaddingRight" format="reference|dimension"/>
+    <!--水印区域下边距-->
+    <attr name="watermark_drawPaddingBottom" format="reference|dimension"/>
+
+    <!--水印-->
+    <declare-styleable name="WaterMark">
+
+        <!--水印文本-->
+        <attr name="watermark_text"/>
+        <!--水印字体大小-->
+        <attr name="watermark_textSize"/>
+        <!--水印字体颜色-->
+        <attr name="watermark_textColor"/>
+
+        <!--水印底色-->
+        <attr name="watermark_textBackgroundColor"/>
+        <!--水印旋转角度-->
+        <attr name="watermark_degrees"/>
+
+        <!--水印密度，取值0-1-->
+        <attr name="watermark_density"/>
+
+        <!--水印行距-->
+        <attr name="watermark_rowSpacing"/>
+        <!--水印列距-->
+        <attr name="watermark_columnSpacing"/>
+        <!--水印最大行距-->
+        <attr name="watermark_maxSpacing_row"/>
+        <!--水印最小行距-->
+        <attr name="watermark_minSpacing_row"/>
+        <!--水印最大列距-->
+        <attr name="watermark_maxSpacing_column"/>
+        <!--水印最小列距-->
+        <attr name="watermark_minSpacing_column"/>
+
+        <!--水印区域边距-->
+        <attr name="watermark_drawPadding"/>
+        <!--水印区域左边距-->
+        <attr name="watermark_drawPaddingLeft"/>
+        <!--水印区域上边距-->
+        <attr name="watermark_drawPaddingTop"/>
+        <!--水印区域右边距-->
+        <attr name="watermark_drawPaddingRight"/>
+        <!--水印区域下边距-->
+        <attr name="watermark_drawPaddingBottom"/>
+
+    </declare-styleable>
+</resources>
