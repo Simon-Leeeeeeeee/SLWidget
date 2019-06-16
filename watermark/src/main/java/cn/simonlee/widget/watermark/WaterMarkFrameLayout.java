@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2019/6/15
  */
-public class WaterMarkFrameLayout extends FrameLayout {
+public class WaterMarkFrameLayout extends FrameLayout implements IWaterMark {
 
     private final WaterMark mWaterMark;
 
@@ -45,6 +45,7 @@ public class WaterMarkFrameLayout extends FrameLayout {
         mWaterMark.drawWaterMark(canvas);
     }
 
+    @Override
     public WaterMark getWaterMark() {
         return mWaterMark;
     }

@@ -15,7 +15,7 @@ def key_ProjectName = 'WaterMark'//项目名称
 def key_ProjectDesc = ''//项目描述
 def key_ProjectGroupId = properties.getProperty('project.groupId')
 def key_ProjectWebsite = properties.getProperty('project.website')
-def key_ProjectVersion = '1.0.1'//项目版本
+def key_ProjectVersion = '1.0.2'//项目版本
 def key_ProjectVersionDesc = ''//版本描述
 
 def key_BintrayKey = properties.getProperty('bintray.key')

@@ -17,9 +17,9 @@ import android.view.View;
  * @createdTime 2019/6/15
  * <p>
  * 用法：
- * 1.自定义View，在构造方法中创建WaterMark实例;
+ * 1.自定义View，实现IWaterMark接口；
+ * 2.在构造方法中创建WaterMark实例，在getWaterMark()方法中返回WaterMark实例;
  * 2.重写dispatchDraw(Canvas canvas)方法，调用WaterMark的drawWaterMark(canvas)方法;
- * 3.添加一个getWaterMark()方法，返回WaterMark实例。
  *
  * <p>
  * 自定义属性：
