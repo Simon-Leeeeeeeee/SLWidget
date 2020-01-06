@@ -11,15 +11,11 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * @author Simon Lee
- * @e-mail jmlixiaomeng@163.com
- * @github https://github.com/Simon-Leeeeeeeee/SLWidget
- * @createdTime 2019/6/15
- * <p>
  * 用法：
+ * <p>
  * 1.自定义View，实现IWaterMark接口；
- * 2.在构造方法中创建WaterMark实例，在getWaterMark()方法中返回WaterMark实例;
- * 2.重写dispatchDraw(Canvas canvas)方法，调用WaterMark的drawWaterMark(canvas)方法;
+ * 2.在构造方法中创建WaterMark实例，在getWaterMark()方法中返回WaterMark实例；
+ * 3.重写dispatchDraw(Canvas canvas)方法，调用WaterMark的drawWaterMark(canvas)方法。
  *
  * <p>
  * 自定义属性：
@@ -44,8 +40,13 @@ import android.view.View;
  * watermark_drawPaddingTop      水印区域上边距
  * watermark_drawPaddingRight    水印区域右边距
  * watermark_drawPaddingBottom   水印区域下边距
+ *
+ * @author Simon Lee
+ * @e-mail jmlixiaomeng@163.com
+ * @github https://github.com/Simon-Leeeeeeeee/SLWidget
+ * @createdTime 2019/6/15
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WaterMark {
 
     /**
@@ -156,18 +157,14 @@ public class WaterMark {
     private int mDrawPaddingBottom;
 
     /**
-     * dp转px的系数
-     */
-    private float mDensityDP;
-    /**
-     * sp转px的系数
-     */
-    private float mDensitySP;
-
-    /**
      * 文本基线高度（用于计算文本绘制点）
      */
     private float mTextBaseLine;
+
+    /**
+     * 是否开启水印
+     */
+    private boolean isEnabled = true;
 
     public WaterMark(View targetView, AttributeSet attributeSet, int defStyleAttr) {
         this.mTargetView = targetView;
@@ -183,17 +180,17 @@ public class WaterMark {
      * 初始化相关自定义属性设置
      */
     private void initWaterMark(Context context, AttributeSet attributeSet, int defStyleAttr) {
-        //DP密度
-        mDensityDP = context.getResources().getDisplayMetrics().density;
-        //SP密度
-        mDensitySP = context.getResources().getDisplayMetrics().scaledDensity;
+        //dp转px的系数
+        float densityDP = context.getResources().getDisplayMetrics().density;
+        //sp转px的系数
+        float densitySP = context.getResources().getDisplayMetrics().scaledDensity;
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.WaterMark, defStyleAttr, 0);
 
         //水印文本
         this.mWaterMarkText = typedArray.getString(R.styleable.WaterMark_watermark_text);
         //水印字号
-        this.mTextSize = typedArray.getDimension(R.styleable.WaterMark_watermark_textSize, 14 * mDensitySP);
+        this.mTextSize = typedArray.getDimension(R.styleable.WaterMark_watermark_textSize, 14 * densitySP);
         //水印字色
         this.mTextColor = typedArray.getColor(R.styleable.WaterMark_watermark_textColor, 0x11000000);
         //水印底色
@@ -210,14 +207,14 @@ public class WaterMark {
         this.mColumnSpacing = typedArray.getDimensionPixelSize(R.styleable.WaterMark_watermark_columnSpacing, -1);
 
         //最小行距
-        this.mMinRowSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_minSpacing_row, 40 * mDensityDP);
+        this.mMinRowSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_minSpacing_row, 40 * densityDP);
         //最大行距
-        this.mMaxRowSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_maxSpacing_row, 100 * mDensityDP);
+        this.mMaxRowSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_maxSpacing_row, 100 * densityDP);
 
         //最小列距
-        this.mMinColumnSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_minSpacing_column, 40 * mDensityDP);
+        this.mMinColumnSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_minSpacing_column, 40 * densityDP);
         //最大列距
-        this.mMaxColumnSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_maxSpacing_column, 150 * mDensityDP);
+        this.mMaxColumnSpacing = typedArray.getDimension(R.styleable.WaterMark_watermark_maxSpacing_column, 150 * densityDP);
 
         //角标内边距
         int drawPadding = typedArray.getDimensionPixelSize(R.styleable.WaterMark_watermark_drawPadding, -1);
@@ -292,7 +289,7 @@ public class WaterMark {
      * 在目标View的dispatchDraw方法中最后调用，保证水印在最顶层显示
      */
     public void drawWaterMark(Canvas canvas) {
-        if (mWaterMarkText == null || mWaterMarkText.length() < 1) {
+        if (!isEnabled || mWaterMarkText == null || mWaterMarkText.length() < 1) {
             return;
         }
 
@@ -548,7 +545,7 @@ public class WaterMark {
     }
 
     /**
-     * 返回水印行距
+     * 返回水印行距，单位px
      *
      * @return 水印行距
      */
@@ -557,7 +554,7 @@ public class WaterMark {
     }
 
     /**
-     * 设置水印行距
+     * 设置水印行距，单位px
      *
      * @param rowSpacing 水印行距
      */
@@ -566,7 +563,7 @@ public class WaterMark {
     }
 
     /**
-     * 返回水印列距
+     * 返回水印列距，单位px
      *
      * @return 水印列距
      */
@@ -575,7 +572,7 @@ public class WaterMark {
     }
 
     /**
-     * 设置水印列距
+     * 设置水印列距，单位px
      *
      * @param columnSpacing 水印列距
      */
@@ -603,7 +600,7 @@ public class WaterMark {
     }
 
     /**
-     * 返回水印最小行距
+     * 返回水印最小行距，单位px
      *
      * @return 水印最小行距
      */
@@ -621,7 +618,7 @@ public class WaterMark {
     }
 
     /**
-     * 返回水印最大行距
+     * 返回水印最大行距，单位px
      *
      * @return 水印最大行距
      */
@@ -639,7 +636,7 @@ public class WaterMark {
     }
 
     /**
-     * 返回水印最小列距
+     * 返回水印最小列距，单位px
      *
      * @return 水印最小列距
      */
@@ -657,7 +654,7 @@ public class WaterMark {
     }
 
     /**
-     * 返回水印最大列距
+     * 返回水印最大列距，单位px
      *
      * @return 水印最大列距
      */
@@ -672,6 +669,20 @@ public class WaterMark {
      */
     public void setMaxColumnSpacing(float maxColumnSpacing) {
         this.mMaxColumnSpacing = maxColumnSpacing;
+    }
+
+    /**
+     * 返回是否开启水印
+     */
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    /**
+     * 设置是否开启水印
+     */
+    public void setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
     }
 
     /**
@@ -719,6 +730,9 @@ public class WaterMark {
         this.mDrawPaddingBottom = bottom;
     }
 
+    /**
+     * 重绘
+     */
     public void invalidate() {
         this.mTargetView.invalidate();
     }
