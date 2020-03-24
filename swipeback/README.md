@@ -39,7 +39,7 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:swipeback:1.0.15'
+        implementation 'cn.simonlee.widget:swipeback:1.1.0'
     }
 ```
 
@@ -49,7 +49,6 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 
     在styles中配置如下属性
     ```java
-    <item name="windowActionModeOverlay">true</item>
     <item name="android:windowBackground">@android:color/transparent</item>
     ```
 
@@ -60,23 +59,20 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_swipeback);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mSwipeBackHelper = new SwipeBackHelper(this);
-            //设置窗口背景颜色，以覆盖不可见区域的黑色背景（不可见区域常见为当输入法及导航栏变化时的背景）
-            mSwipeBackHelper.setWindowBackgroundColor(getResources().getColor(R.color.colorWindowBackground));
         }
     }
     ```
 
 * **Step.3**
 
-    在Activity的`dispatchTouchEvent`和`onTouchEvent`中分发触摸事件，如果仅希望侧边触发，可以不用`onTouchEvent`
+    在Activity的`dispatchTouchEvent`和`onTouchEvent`中分发触摸事件，如果仅希望侧边触发，可不用`onTouchEvent`
     ```java
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if (mSwipeBackHelper != null) {
-            mSwipeBackHelper.dispatchTouchEvent(event);
+        if (mSwipeBackHelper != null && mSwipeBackHelper.dispatchTouchEvent(event)) {
+            return true;
         }
         return super.dispatchTouchEvent(event);
     }
@@ -105,41 +101,23 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 
 * **Tips.2**
 
-    因状态栏透明，输入法的adjustPan模式不会生效，建议设置为adjustResize
+    侧滑会导致`"android:windowBackground"`属性失效，因为需要透视到下层Activity。
 
 * **Tips.3**
 
-    因状态栏透明，布局会从屏幕顶端开始绘制，需自行调整paddingTop
-    ```java
-    //获取状态栏的高度
-    public int getStatusBarHeight() {
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        try {
-            return getResources().getDimensionPixelSize(resourceId);
-        } catch (Resources.NotFoundException e) {
-            return 0;
-        }
-    }
-    ```
+    侧滑的核心原理是利用反射转换窗口透明，这会影响到下层Activity的生命周期。如果你的Activity代码逻辑比较混乱，使用之前务必注意优化。
 
 * **Tips.4**
 
-    除栈底Activity（不支持侧滑）及关闭侧滑功能的Activity，一旦发生侧滑，`"android:windowBackground"`属性将会失效。因为需要透视到下层Activity
-
-* **Tips.5**
-
-    侧滑的核心原理是利用反射转换窗口透明，这会影响到下层Activity的生命周期。如果你的Activity代码逻辑比较混乱，使用之前务必进行逻辑优化。
-
-* **Tips.6**
-
     当顶层Activity方向与下层Activity方向不一致时侧滑会失效（下层方向未锁定除外），请关闭该层Activity侧滑功能。
-    示例场景：竖屏界面点击视频，进入横屏播放。
-
-* **Tips.6**
-
-    如需动态支持横竖屏切换（比如APP中有“支持横屏”开关），屏幕方向需指定为`behind`跟随栈底Activity方向，同时在onCreate中进行判断，若不支持横竖屏切换则锁定屏幕方向（因为经测试SDK21中`behind`无效）。
+    示例场景：强制竖屏界面A，跳转进入横屏播放界面B，此时侧滑会失败，应关闭界面B的侧滑功能。
 
 ## 版本记录
+
+*  **V1.1.0**   `2020/03/19`
+
+    1. 对功能解耦，移除状态栏相关操作，仅保留侧滑实现。
+    2. 逻辑优化。
 
 *  **V1.0.15**   `2019/04/15`
 
