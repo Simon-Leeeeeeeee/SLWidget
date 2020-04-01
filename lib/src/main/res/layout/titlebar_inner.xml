@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="RtlSymmetry">
+
+    <!--左侧导航键（返回/关闭）-->
+    <com.simonlee.widget.lib.widget.titlebar.ActionItemView
+        android:id="@id/titlebar_text_navi"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:drawableStart="@drawable/ic_titlebar_navi_back_white_24x24dp"
+        android:drawablePadding="1dp"
+        android:gravity="center"
+        android:lines="1"
+        android:paddingStart="15dp"
+        android:paddingTop="1dp"
+        android:paddingEnd="15dp"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!--大标题-->
+    <TextView
+        android:id="@id/titlebar_text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@android:color/black"
+        android:textSize="19sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@id/titlebar_text_subtitle"
+        app:layout_constraintLeft_toRightOf="@id/titlebar_text_navi"
+        app:layout_constraintRight_toLeftOf="@id/titlebar_layout_menus"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_goneMarginLeft="20dp"
+        app:layout_goneMarginRight="20dp"/>
+
+    <!--子标题-->
+    <TextView
+        android:id="@id/titlebar_text_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@android:color/black"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@id/titlebar_edit_search"
+        app:layout_constraintLeft_toRightOf="@id/titlebar_text_navi"
+        app:layout_constraintRight_toLeftOf="@id/titlebar_layout_menus"
+        app:layout_constraintTop_toBottomOf="@id/titlebar_text_title"
+        app:layout_goneMarginLeft="20dp"
+        app:layout_goneMarginRight="20dp"/>
+
+    <!--搜索输入框-->
+    <EditText
+        android:id="@id/titlebar_edit_search"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLines="1"
+        android:paddingStart="10dp"
+        android:paddingEnd="38dp"
+        android:textColor="@android:color/black"
+        android:textSize="19sp"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/titlebar_text_navi"
+        app:layout_constraintRight_toLeftOf="@id/titlebar_layout_menus"
+        app:layout_constraintTop_toBottomOf="@id/titlebar_text_subtitle"
+        app:layout_goneMarginLeft="15dp"
+        app:layout_goneMarginRight="15dp"/>
+
+    <!--输入框清除按钮-->
+    <ImageView
+        android:id="@id/titlebar_image_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:minWidth="38dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_titlebar_clear_18x18dp"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@id/titlebar_edit_search"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintLeft_toLeftOf="@id/titlebar_edit_search"
+        app:layout_constraintRight_toRightOf="@id/titlebar_edit_search"
+        app:layout_constraintTop_toTopOf="@id/titlebar_edit_search"/>
+
+    <!--这里的LinearLayout对应菜单列表，从menu中获取数据，进行填充-->
+    <LinearLayout
+        android:id="@id/titlebar_layout_menus"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:paddingStart="5dp"
+        android:paddingEnd="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+</merge>

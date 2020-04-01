@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--导航-->
+    <item name="titlebar_text_navi" type="id"/>
+
+    <!--标题-->
+    <item name="titlebar_text_title" type="id"/>
+    <!--子标题-->
+    <item name="titlebar_text_subtitle" type="id"/>
+
+    <!--搜索-->
+    <item name="titlebar_edit_search" type="id"/>
+    <!--清除-->
+    <item name="titlebar_image_clear" type="id"/>
+
+    <!--菜单-->
+    <item name="titlebar_layout_menus" type="id"/>
+
+</resources>

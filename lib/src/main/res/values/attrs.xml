@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <!--导航按钮图标-->
+    <attr name="naviIcon" format="color|reference"/>
+    <!--导航按钮文本-->
+    <attr name="naviText" format="string|reference"/>
+
+    <!--模式-->
+    <attr name="mode" format="enum">
+        <!--标题模式-->
+        <enum name="title" value="0"/>
+        <!--搜索模式-->
+        <enum name="search" value="1"/>
+    </attr>
+    <!--主题色-->
+    <attr name="primaryColor" format="reference|color"/>
+
+    <!--标题文本-->
+    <attr name="title_text" format="string|reference"/>
+    <!--子标题文本-->
+    <attr name="subtitle_text" format="string|reference"/>
+
+    <!--标题字色-->
+    <attr name="title_textColor" format="color|reference"/>
+    <!-- 标题对齐方式 -->
+    <attr name="title_gravity" format="enum">
+        <enum name="left" value="0"/>
+        <enum name="center" value="1"/>
+        <enum name="right" value="2"/>
+        <enum name="center_real" value="3"/>
+    </attr>
+
+    <!-- 搜索提示 -->
+    <attr name="search_hint" format="string|reference"/>
+    <!-- 搜索提示字色 -->
+    <attr name="search_hintColor" format="color|reference"/>
+    <!-- 搜索字色 -->
+    <attr name="search_textColor" format="color|reference"/>
+
+    <!-- TitleBar -->
+    <declare-styleable name="TitleBar">
+
+        <attr name="android:background"/>
+
+        <!--导航按钮图标-->
+        <attr name="naviIcon"/>
+        <!--导航按钮文本-->
+        <attr name="naviText"/>
+
+        <!--模式-->
+        <attr name="mode"/>
+        <!--主题色-->
+        <attr name="primaryColor"/>
+
+        <!--标题文本-->
+        <attr name="title_text"/>
+        <!--子标题文本-->
+        <attr name="subtitle_text"/>
+
+        <!--标题字色-->
+        <attr name="title_textColor"/>
+        <!-- 标题对齐方式 -->
+        <attr name="title_gravity"/>
+
+        <!-- 搜索提示 -->
+        <attr name="search_hint"/>
+        <!-- 搜索提示字色 -->
+        <attr name="search_hintColor"/>
+        <!-- 搜索字色 -->
+        <attr name="search_textColor"/>
+
+    </declare-styleable>
+
+</resources>
