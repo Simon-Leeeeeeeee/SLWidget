@@ -3,15 +3,13 @@ package cn.simonlee.widgetdemo.swipeback;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Switch;
+
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import java.util.Random;
 
-import cn.simonlee.widgetdemo.BaseActivity;
-import cn.simonlee.widgetdemo.MainActivity;
+import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -22,31 +20,33 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-27
  */
-public class SwipeBackActivity extends BaseActivity implements View.OnClickListener {
+public class SwipeBackActivity extends CommonActivity implements View.OnClickListener {
 
+    /**
+     * 页面编号
+     */
     public int mIndex;
+
+    /**
+     * 随机颜色值
+     */
     private int mRandomColor;
-    private Switch mSwitch_SupportLandscape;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            mRandomColor = savedInstanceState.getInt("randomColor", 0);
-        }
         super.onCreate(savedInstanceState);
+        //获取随机颜色值
+        mRandomColor = getRandomColor(savedInstanceState);
+        //设置布局
         setContentView(R.layout.activity_swipeback);
-
+        //页面编号
         mIndex = getIntent().getIntExtra("index", 1);
 
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
-            toolbar.setNavigationOnClickListener(this);
+        //设置标题
+        TitleBar titleBar = getTitleBar();
+        if (titleBar != null) {
+            titleBar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
         }
-        mSwitch_SupportLandscape = findViewById(R.id.swipeback_swicth_support_landscape);
-        boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
-        mSwitch_SupportLandscape.setChecked(supportLandscape);
-        mSwitch_SupportLandscape.setOnClickListener(this);
         findViewById(R.id.swipeback_rootlayout).setBackgroundColor(mRandomColor);
         findViewById(R.id.swipeback_btn_next).setOnClickListener(this);
     }
@@ -59,13 +59,23 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void supportSwipeBack(int color) {
-        if (mRandomColor == 0) {
+    private int getRandomColor(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            return savedInstanceState.getInt("randomColor", 0);
+        } else {
             Random random = new Random();
-            mRandomColor = Color.argb(255, random.nextInt(255), random.nextInt(255), random.nextInt(255));
+            return Color.argb(255, random.nextInt(255), random.nextInt(255), random.nextInt(255));
         }
-        super.supportSwipeBack(mRandomColor);
+    }
+
+    @Override
+    public View getContentBackgroundView() {
+        View contentBackgroundView = super.getContentBackgroundView();
+        if (contentBackgroundView != null) {
+            //统一背景View的颜色
+            contentBackgroundView.setBackgroundColor(mRandomColor);
+        }
+        return contentBackgroundView;
     }
 
     @Override
@@ -81,10 +91,7 @@ public class SwipeBackActivity extends BaseActivity implements View.OnClickListe
                 startActivity(intent);
                 break;
             }
-            case R.id.swipeback_swicth_support_landscape: {
-                boolean isChecked = mSwitch_SupportLandscape.isChecked();
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("landscape_support", isChecked).apply();
-                startActivity(new Intent(this, MainActivity.class));
+            default: {
                 break;
             }
         }

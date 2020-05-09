@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import com.simonlee.widget.lib.activity.BaseActivity;
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
-import cn.simonlee.widget.swipeback.SwipeBackHelper;
+import cn.simonlee.widgetdemo.swipeback.SwipeBack;
 
 /**
  * 公共Activity
@@ -26,7 +26,7 @@ public abstract class CommonActivity extends BaseActivity {
     /**
      * 侧滑工具
      */
-    private SwipeBackHelper mSwipeBackHelper;
+    private SwipeBack mSwipeBackHelper;
 
     /**
      * ContentLayout的背景View，用于遮挡输入法弹出时可能出现的黑色背景
@@ -37,7 +37,7 @@ public abstract class CommonActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //开启侧滑返回
-        mSwipeBackHelper = new SwipeBackHelper(this);
+        mSwipeBackHelper = new SwipeBack(this);
         //占用状态栏位置进行布局
         setStatusBarLayouted(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
