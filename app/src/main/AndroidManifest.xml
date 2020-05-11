@@ -3,9 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.simonlee.widgetdemo">
 
-    <uses-sdk tools:overrideLibrary="cn.simonlee.widget.swipeback" />
+    <!--注册私有广播权限-->
+    <permission
+        android:name="com.simonlee.widgetdemo.broadcast.permission"
+        android:protectionLevel="signature" />
+
+    <!--申请私有广播权限-->
+    <uses-permission android:name="com.simonlee.widgetdemo.broadcast.permission" />
 
     <application
+        android:name=".application.BaseApplication"
         android:allowBackup="true"
         android:fullBackupContent="@null"
         android:icon="@mipmap/ic_launcher"
@@ -15,7 +22,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".SplashActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullUser"
             android:theme="@style/SplashActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +32,7 @@
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullUser"
             android:theme="@style/BaseActivityTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
