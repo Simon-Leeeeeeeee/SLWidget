@@ -33,30 +33,32 @@ public class SwipeBackActivity extends CommonActivity implements View.OnClickLis
     private int mRandomColor;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //获取随机颜色值
-        mRandomColor = getRandomColor(savedInstanceState);
-        //设置布局
-        setContentView(R.layout.activity_swipeback);
-        //页面编号
-        mIndex = getIntent().getIntExtra("index", 1);
-
-        //设置标题
-        TitleBar titleBar = getTitleBar();
-        if (titleBar != null) {
-            titleBar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
-        }
-        findViewById(R.id.swipeback_rootlayout).setBackgroundColor(mRandomColor);
-        findViewById(R.id.swipeback_btn_next).setOnClickListener(this);
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState != null) {
             outState.putInt("randomColor", mRandomColor);
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //获取随机颜色值
+        mRandomColor = getRandomColor(savedInstanceState);
+        setContentView(R.layout.activity_swipeback);
+        initView();
+    }
+
+    private void initView() {
+        //页面编号
+        mIndex = getIntent().getIntExtra("index", 1);
+
+        //设置标题
+        TitleBar titleBar = getTitleBar();
+        titleBar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
+
+        findViewById(R.id.swipeback_rootlayout).setBackgroundColor(mRandomColor);
+        findViewById(R.id.swipeback_btn_next).setOnClickListener(this);
     }
 
     private int getRandomColor(Bundle savedInstanceState) {

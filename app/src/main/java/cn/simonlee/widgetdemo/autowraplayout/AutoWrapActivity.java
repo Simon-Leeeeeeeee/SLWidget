@@ -2,7 +2,6 @@ package cn.simonlee.widgetdemo.autowraplayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -11,12 +10,15 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import cn.simonlee.widget.autowraplayout.AutoWrapGridLayout;
-import cn.simonlee.widgetdemo.BaseActivity;
+import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -27,7 +29,7 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-26
  */
-public class AutoWrapActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener, CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class AutoWrapActivity extends CommonActivity implements SeekBar.OnSeekBarChangeListener, CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     private TextView mTextView_ParentWidth;
     private TextView mTextView_GridLineWidth;
@@ -41,16 +43,13 @@ public class AutoWrapActivity extends BaseActivity implements SeekBar.OnSeekBarC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_autowrap);
-
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.autowraplayout);
-            toolbar.setNavigationOnClickListener(this);
-        }
         initView();
     }
 
     private void initView() {
+        TitleBar titleBar = getTitleBar();
+        titleBar.setTitle(R.string.autowraplayout);
+
         mAutoWrapLayoutGroup = findViewById(R.id.autowrap_layout_group);
         mAutoWrapLayoutList.add((AutoWrapGridLayout) findViewById(R.id.autowrap_layout_grid1));
         mAutoWrapLayoutList.add((AutoWrapGridLayout) findViewById(R.id.autowrap_layout_grid2));
@@ -110,7 +109,7 @@ public class AutoWrapActivity extends BaseActivity implements SeekBar.OnSeekBarC
                     fullWidth = getWindow().getDecorView().getMeasuredWidth();
                 }
                 if (fullWidth > 0) {
-                    mTextView_ParentWidth.setText(progress + "%");
+                    mTextView_ParentWidth.setText(String.format(Locale.getDefault(), "%d%%", progress));
                     ViewGroup.LayoutParams lp = mAutoWrapLayoutGroup.getLayoutParams();
                     lp.width = fullWidth * progress / 100;
                     mAutoWrapLayoutGroup.setLayoutParams(lp);
@@ -121,7 +120,7 @@ public class AutoWrapActivity extends BaseActivity implements SeekBar.OnSeekBarC
             }
             case R.id.sb_gridlinewidth: {
                 progress++;
-                mTextView_GridLineWidth.setText(progress + "PX");
+                mTextView_GridLineWidth.setText(String.format(Locale.getDefault(), "%dPX", progress));
                 for (AutoWrapGridLayout autoWrapGridLayout : mAutoWrapLayoutList) {
                     autoWrapGridLayout.setGridLineWidth(progress);
                 }

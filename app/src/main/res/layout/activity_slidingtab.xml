@@ -6,8 +6,6 @@
     android:background="@color/colorWindowBackground"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_toolbar" />
-
     <cn.simonlee.widget.slidingtablayout.SlidingTabLayout
         android:id="@+id/slidingtab_layout"
         android:layout_width="match_parent"

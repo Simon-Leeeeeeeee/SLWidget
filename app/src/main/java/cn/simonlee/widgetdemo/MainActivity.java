@@ -1,13 +1,18 @@
 package cn.simonlee.widgetdemo;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.hardware.biometrics.BiometricPrompt;
+import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.os.CancellationSignal;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
+
+import com.simonlee.widget.lib.widget.titlebar.ActionItem;
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import cn.simonlee.widgetdemo.autowraplayout.AutoWrapActivity;
 import cn.simonlee.widgetdemo.badge.BadgeActivity;
@@ -24,19 +29,23 @@ import cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshActivity;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-18
  */
-public class MainActivity extends BaseActivity implements View.OnClickListener, Toolbar.OnMenuItemClickListener {
+public class MainActivity extends CommonActivity implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+    }
 
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setNavigationIcon(null);
-//            toolbar.inflateMenu(R.menu.menu_about);
-//            toolbar.setOnMenuItemClickListener(this);
-        }
+    private void initView() {
+        TitleBar titleBar = getTitleBar();
+        //设置标题
+        titleBar.setTitle(R.string.app_name);
+        //取消导航按钮
+        titleBar.setNaviVisibility(View.GONE);
+
+        //设置监听
         findViewById(R.id.main_layout_badgeview).setOnClickListener(this);
         findViewById(R.id.main_layout_scrollpicker).setOnClickListener(this);
         findViewById(R.id.main_layout_autowraplayout).setOnClickListener(this);
@@ -61,11 +70,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             }
             case R.id.main_layout_swipeback: {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    startActivity(new Intent(this, SwipeBackActivity.class));
-                } else {
-                    ToastHelper.showToast(this, R.string.swipeback_nonsupport, ToastHelper.LENGTH_SHORT);
-                }
+                startActivity(new Intent(this, SwipeBackActivity.class));
                 break;
             }
             case R.id.main_layout_swiperefreshlayout: {
@@ -80,29 +85,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             }
         }
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-//        AboutDialog aboutDialog = new AboutDialog();
-//        aboutDialog.show(getFragmentManager(), "AboutDialog");
-        return true;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        boolean supportLandscape = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("landscape_support", false);
-        if (!supportLandscape) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
 }

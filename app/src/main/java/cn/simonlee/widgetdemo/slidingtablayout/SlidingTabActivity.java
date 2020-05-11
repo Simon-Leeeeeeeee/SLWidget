@@ -2,11 +2,12 @@ package cn.simonlee.widgetdemo.slidingtablayout;
 
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
+
 import cn.simonlee.widget.slidingtablayout.SlidingTabLayout;
-import cn.simonlee.widgetdemo.BaseActivity;
+import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -17,7 +18,7 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-08-16
  */
-public class SlidingTabActivity extends BaseActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, SlidingTabLayout.OnTabClickListener {
+public class SlidingTabActivity extends CommonActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, SlidingTabLayout.OnTabClickListener {
 
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
@@ -30,11 +31,9 @@ public class SlidingTabActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initView() {
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.slidingtablayout);
-            toolbar.setNavigationOnClickListener(this);
-        }
+        TitleBar titleBar = getTitleBar();
+        titleBar.setTitle(R.string.slidingtablayout);
+
         mSlidingTabLayout = findViewById(R.id.slidingtab_layout);
         mSlidingTabLayout.setOnTabClickListener(this);
 
@@ -49,6 +48,9 @@ public class SlidingTabActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.base_toolbar_navigation: {
                 onBackPressed();
+                break;
+            }
+            default: {
                 break;
             }
         }

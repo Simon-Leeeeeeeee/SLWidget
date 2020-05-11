@@ -1,7 +1,6 @@
 package cn.simonlee.widgetdemo.badge;
 
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -12,9 +11,13 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
+
+import java.util.Locale;
+
 import cn.simonlee.widget.badgeview.Badge;
 import cn.simonlee.widget.badgeview.BadgeView;
-import cn.simonlee.widgetdemo.BaseActivity;
+import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -25,7 +28,7 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-19
  */
-public class BadgeActivity extends BaseActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
+public class BadgeActivity extends CommonActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
 
     private BadgeView mBadgeView;
     private BadgeImageView mBadgeImageView;
@@ -42,11 +45,12 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_badge);
 
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.badgeview);
-            toolbar.setNavigationOnClickListener(this);
-        }
+        initView();
+    }
+
+    private void initView() {
+        TitleBar titleBar = getTitleBar();
+        titleBar.setTitle(R.string.badgeview);
 
         mDensityDP = getResources().getDisplayMetrics().density;//DP密度
         mDensitySP = getResources().getDisplayMetrics().scaledDensity;//SP密度
@@ -97,13 +101,12 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.base_toolbar_navigation: {
-                onBackPressed();
-                break;
-            }
             case R.id.button_hide: {
                 mBadgeImageView.getBadge().setBadgeText(null);
                 mBadgeView.getBadge().setBadgeText(null);
+            }
+            default: {
+                break;
             }
         }
     }
@@ -113,45 +116,45 @@ public class BadgeActivity extends BaseActivity implements View.OnClickListener,
         switch (seekBar.getId()) {
             case R.id.sb_textsize: {
                 progress++;
-                mTextView_TextSize.setText(progress + "SP");
+                mTextView_TextSize.setText(String.format(Locale.getDefault(), "%dSP", progress));
                 mBadgeImageView.getBadge().setBadgeTextSize(progress * mDensitySP);
                 mBadgeView.getBadge().setBadgeTextSize(progress * mDensitySP);
                 break;
             }
             case R.id.sb_offsetx: {
                 progress -= 20;
-                mTextView_OffsetX.setText(progress + "DP");
+                mTextView_OffsetX.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mBadgeView.getBadge().setBadgeOffsetX(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgeOffsetX(progress * mDensityDP);
                 break;
             }
             case R.id.sb_offsety: {
                 progress -= 20;
-                mTextView_OffsetY.setText(progress + "DP");
+                mTextView_OffsetY.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mBadgeView.getBadge().setBadgeOffsetY(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgeOffsetY(progress * mDensityDP);
                 break;
             }
             case R.id.sb_paddingleft: {
-                mTextView_PaddingLeft.setText(progress + "DP");
+                mTextView_PaddingLeft.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mBadgeView.getBadge().setBadgePaddingLeft(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgePaddingLeft(progress * mDensityDP);
                 break;
             }
             case R.id.sb_paddingtop: {
-                mTextView_PaddingTop.setText(progress + "DP");
+                mTextView_PaddingTop.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mBadgeView.getBadge().setBadgePaddingTop(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgePaddingTop(progress * mDensityDP);
                 break;
             }
             case R.id.sb_paddingright: {
-                mTextView_PaddingRight.setText(progress + "DP");
+                mTextView_PaddingRight.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mBadgeView.getBadge().setBadgePaddingRight(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgePaddingRight(progress * mDensityDP);
                 break;
             }
             case R.id.sb_paddingbottom: {
-                mTextView_PaddingBottom.setText(progress + "DP");
+                mTextView_PaddingBottom.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mBadgeView.getBadge().setBadgePaddingBottom(progress * mDensityDP);
                 mBadgeImageView.getBadge().setBadgePaddingBottom(progress * mDensityDP);
                 break;

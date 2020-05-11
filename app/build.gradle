@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+
     defaultConfig {
         applicationId "cn.simonlee.widgetdemo"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 13
         versionName "1.0.13"
@@ -29,6 +29,7 @@ dependencies {
 //    implementation 'cn.simonlee.widget:slidingtablayout:1.0.3'
 //    implementation 'cn.simonlee.widget:swiperefreshlayout:1.0.13'
 
+    implementation project(':lib')
     implementation project(':badgeview')
     implementation project(':swipeback')
     implementation project(':scrollpicker')

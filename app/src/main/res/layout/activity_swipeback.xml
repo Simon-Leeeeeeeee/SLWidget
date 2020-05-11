@@ -7,8 +7,6 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_toolbar" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -92,34 +90,12 @@
         android:layout_height="1px"
         android:background="@color/gray" />
 
-    <LinearLayout
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp">
-
-        <Switch
-            android:id="@+id/swipeback_swicth_support_landscape"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/support_landscape"
-            android:textColor="@color/black" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:background="@color/gray" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hello_world" />
-
-    </LinearLayout>
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="@string/hello_world" />
 
     <Button
         android:id="@+id/swipeback_btn_next"

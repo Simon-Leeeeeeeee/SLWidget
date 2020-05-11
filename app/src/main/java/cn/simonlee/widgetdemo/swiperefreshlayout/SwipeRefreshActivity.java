@@ -6,7 +6,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import cn.simonlee.widgetdemo.BaseActivity;
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
+
+import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.BaseFragment;
 import cn.simonlee.widgetdemo.R;
 
@@ -18,7 +20,7 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-08-16
  */
-public class SwipeRefreshActivity extends BaseActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+public class SwipeRefreshActivity extends CommonActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private ViewPager mViewPager;
     private View mCurrentLable;
@@ -33,11 +35,8 @@ public class SwipeRefreshActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.swiperefreshlayout);
-            toolbar.setNavigationOnClickListener(this);
-        }
+        TitleBar titleBar = getTitleBar();
+        titleBar.setTitle(R.string.swiperefreshlayout);
 
         mViewPager = findViewById(R.id.swiperefresh_viewpager);
 

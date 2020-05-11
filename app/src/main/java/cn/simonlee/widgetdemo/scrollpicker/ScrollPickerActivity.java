@@ -3,7 +3,6 @@ package cn.simonlee.widgetdemo.scrollpicker;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
@@ -11,11 +10,14 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.simonlee.widget.lib.widget.titlebar.TitleBar;
+
 import java.text.DecimalFormat;
+import java.util.Locale;
 import java.util.Random;
 
 import cn.simonlee.widget.scrollpicker.ScrollPickerView;
-import cn.simonlee.widgetdemo.BaseActivity;
+import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -26,7 +28,7 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-05-22
  */
-public class ScrollPickerActivity extends BaseActivity implements ScrollPickerView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener, View.OnClickListener {
+public class ScrollPickerActivity extends CommonActivity implements ScrollPickerView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener, View.OnClickListener {
 
     private DatePickerAdapter mYearAdapter, mMonthAdapter, mDayAdapter, mHourAdapter, mMinAdapter;
     private ScrollPickerView mPicker_Year, mPicker_Month, mPicker_Day, mPicker_Hour, mPicker_Min;
@@ -46,11 +48,8 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
         mDensityDP = getResources().getDisplayMetrics().density;//DP密度
         mDensitySP = getResources().getDisplayMetrics().scaledDensity;//SP密度
 
-        Toolbar toolbar = getToolbar();
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.scrollpicker);
-            toolbar.setNavigationOnClickListener(this);
-        }
+        TitleBar titleBar = getTitleBar();
+        titleBar.setTitle(R.string.scrollpicker);
 
         initView();
 
@@ -173,7 +172,7 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
                 break;
             }
         }
-        mTextView_Result.setText(mSelectedYear + "-" + mSelectedMonth + "-" + mSelectedDay + " " + mSelectedHour + ":" + mSelectedMin);
+        mTextView_Result.setText(String.format(Locale.getDefault(), "%d-%d-%d %d:%d", mSelectedYear, mSelectedMonth, mSelectedDay, mSelectedHour, mSelectedMin));
     }
 
     private void resetMaxDay() {
@@ -237,7 +236,7 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
         switch (seekBar.getId()) {
             case R.id.sb_rows: {
                 progress += 3;
-                mTextView_TextRows.setText(progress + "行");
+                mTextView_TextRows.setText(String.format(Locale.getDefault(), "%d行", progress));
                 mPicker_Year.setTextRows(progress);
                 mPicker_Month.setTextRows(progress);
                 mPicker_Day.setTextRows(progress);
@@ -247,7 +246,7 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
             }
             case R.id.sb_spacing: {
                 progress -= 40;
-                mTextView_TextSpacing.setText(progress + "DP");
+                mTextView_TextSpacing.setText(String.format(Locale.getDefault(), "%dDP", progress));
                 mPicker_Year.setRowSpacing(progress * mDensityDP);
                 mPicker_Month.setRowSpacing(progress * mDensityDP);
                 mPicker_Day.setRowSpacing(progress * mDensityDP);
@@ -257,7 +256,7 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
             }
             case R.id.sb_textsize: {
                 progress++;
-                mTextView_TextSize.setText(progress + "SP");
+                mTextView_TextSize.setText(String.format(Locale.getDefault(), "%dSP", progress));
                 mPicker_Year.setTextSize(progress * mDensitySP);
                 mPicker_Month.setTextSize(progress * mDensitySP);
                 mPicker_Day.setTextSize(progress * mDensitySP);
@@ -267,7 +266,7 @@ public class ScrollPickerActivity extends BaseActivity implements ScrollPickerVi
             }
             case R.id.sb_textratio: {
                 float ratio = progress / 10F;
-                mTextView_TextRatio.setText(ratio + "倍");
+                mTextView_TextRatio.setText(String.format(Locale.getDefault(), "%s倍", ratio));
                 mPicker_Year.setTextRatio(ratio);
                 mPicker_Month.setTextRatio(ratio);
                 mPicker_Day.setTextRatio(ratio);
