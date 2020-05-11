@@ -15,7 +15,7 @@ import android.view.ViewGroup;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-05-25
  */
-public class BadgeView extends View {
+public class BadgeView extends View implements IBadge {
 
     private final Badge mBadge;
 
@@ -49,6 +49,7 @@ public class BadgeView extends View {
         mBadge.drawBadge(canvas);
     }
 
+    @Override
     public Badge getBadge() {
         return mBadge;
     }

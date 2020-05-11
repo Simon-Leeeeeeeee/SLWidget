@@ -16,16 +16,12 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * @author Simon Lee
- * @e-mail jmlixiaomeng@163.com
- * @github https://github.com/Simon-Leeeeeeeee/SLWidget
- * @createdTime 2018-05-29
+ * 自定义角标
  * <p>
  * 用法：
- * 1.自定义View，在构造方法中创建Badge实例;
- * 2.重写dispatchDraw(Canvas canvas)或onDraw(Canvas canvas)方法，调用Badge的drawBadge(canvas)方法;
- * 3.添加一个getBadge()方法，返回Badge实例。
- *
+ * 1.自定义View，实现IBadge接口；
+ * 2.在构造方法中创建Badge实例，在getBadge()方法中返回Badge实例；
+ * 3.重写{@link View#dispatchDraw(Canvas)}或{@link View#onDraw(Canvas)}方法，调用Badge的{@link #drawBadge(Canvas)}方法。
  * <p>
  * 自定义属性：
  * badge_gravity       对齐方式
@@ -44,8 +40,13 @@ import android.view.View;
  * badge_paddingTop    角标上边距
  * badge_paddingRight  角标右边距
  * badge_paddingBottom 角标下边距
+ *
+ * @author Simon Lee
+ * @e-mail jmlixiaomeng@163.com
+ * @github https://github.com/Simon-Leeeeeeeee/SLWidget
+ * @createdTime 2018-05-29
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess", "JavadocReference"})
 public class Badge {
 
     /**
@@ -261,11 +262,7 @@ public class Badge {
         if ((mBadgeText == null && badgeText != null) || (mBadgeText != null && !mBadgeText.equals(badgeText))) {
             mBadgeText = badgeText;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -289,11 +286,7 @@ public class Badge {
             mBadgeTextPaint.setTextSize(mBadgeTextSize);
             measureTextHeight();
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -306,11 +299,7 @@ public class Badge {
             mBadgeTextPaint.setFakeBoldText(mBoldTextEnable);
             measureTextHeight();
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -341,11 +330,7 @@ public class Badge {
             mBadgeOffsetX = offsetX;
             mBadgeOffsetY = offsetY;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -356,11 +341,7 @@ public class Badge {
         if (mBadgeOffsetX != offsetX) {
             mBadgeOffsetX = offsetX;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -371,11 +352,7 @@ public class Badge {
         if (mBadgeOffsetY != offsetY) {
             mBadgeOffsetY = offsetY;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -396,11 +373,7 @@ public class Badge {
             mBadgePaddingRight = paddingRight;
             mBadgePaddingBottom = paddingBottom;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -411,11 +384,7 @@ public class Badge {
         if (mBadgePaddingLeft != paddingLeft) {
             mBadgePaddingLeft = paddingLeft;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -426,11 +395,7 @@ public class Badge {
         if (mBadgePaddingTop != paddingTop) {
             mBadgePaddingTop = paddingTop;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -441,11 +406,7 @@ public class Badge {
         if (mBadgePaddingRight != paddingRight) {
             mBadgePaddingRight = paddingRight;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -456,11 +417,7 @@ public class Badge {
         if (mBadgePaddingBottom != paddingBottom) {
             mBadgePaddingBottom = paddingBottom;
             measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
-            }
+            invalidate();
         }
     }
 
@@ -474,26 +431,7 @@ public class Badge {
             mBadgeDotRadius = dotRadius;
             if (mBadgeText != null && mBadgeText.length() < 1) {
                 measureBackgroundBounds();
-                if (mTargetView instanceof BadgeView) {
-                    ((BadgeView) mTargetView).refreshBadge();
-                } else {
-                    mTargetView.invalidate();
-                }
-            }
-        }
-    }
-
-    /**
-     * 设置角标对齐方式
-     */
-    public void setBadgeGravity(int gravity) {
-        if (mBadgeGravity != gravity) {
-            mBadgeGravity = gravity;
-            measureBackgroundBounds();
-            if (mTargetView instanceof BadgeView) {
-                ((BadgeView) mTargetView).refreshBadge();
-            } else {
-                mTargetView.invalidate();
+                invalidate();
             }
         }
     }
@@ -503,6 +441,17 @@ public class Badge {
      */
     public int getBadgeGravity() {
         return mBadgeGravity;
+    }
+
+    /**
+     * 设置角标对齐方式
+     */
+    public void setBadgeGravity(int gravity) {
+        if (mBadgeGravity != gravity) {
+            mBadgeGravity = gravity;
+            measureBackgroundBounds();
+            invalidate();
+        }
     }
 
     /**
@@ -592,6 +541,17 @@ public class Badge {
      */
     int getBadgeHeight() {
         return mBadgeBackgroundBounds.height();
+    }
+
+    /**
+     * 重绘
+     */
+    public void invalidate() {
+        if (this.mTargetView instanceof BadgeView) {
+            ((BadgeView) this.mTargetView).refreshBadge();
+        } else {
+            this.mTargetView.invalidate();
+        }
     }
 
 }

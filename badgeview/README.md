@@ -29,7 +29,7 @@
 在module的`build.gradle`中添加如下代码
 ```
     dependencies {
-        implementation 'cn.simonlee.widget:badgeview:1.0.9'
+        implementation 'cn.simonlee.widget:badgeview:1.0.10'
     }
 ```
 
@@ -43,13 +43,13 @@
 
 * **Pattern.2**
 
-    1. 自定义View，在构造方法中创建Badge实例。
-    2. 重写`dispatchDraw(Canvas canvas)`或`onDraw(Canvas canvas)`方法，调用Badge的`drawBadge(Canvas canvas)`方法。
-    3. 通过`getBadge()`获取Badge对象进行操作。
+    1. 自定义View，实现IBadge接口。
+    2. 在构造方法中创建Badge实例，在`getBadge()`方法中返回Badge实例。
+    3. 重写`dispatchDraw(Canvas)`或`onDraw(Canvas)`方法，调用Badge的`drawBadge(Canvas)`方法。
 
     * **示例：一个带角标的ImageView**
         ```java
-        public class BadgeImageView extends AppCompatImageView {
+        public class BadgeImageView extends AppCompatImageView implements IBadge {
 
             private final Badge mBadge;
 
@@ -74,6 +74,7 @@
                 mBadge.drawBadge(canvas);
             }
 
+            @Override
             public Badge getBadge() {
                 return mBadge;
             }
@@ -177,6 +178,10 @@
     当角标文本为`null`时不显示角标，当长度为0时，显示一个小圆点。
 
 ## 版本记录
+
+*  **V1.0.10**   `2020/05/02`
+
+    1. 新增IBadge接口.
 
 *  **V1.0.9**   `2019/04/15`
 
