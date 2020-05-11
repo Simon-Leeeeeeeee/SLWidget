@@ -26,6 +26,7 @@
         <item name="colorPrimaryDark">@color/transparent</item>
         <item name="android:windowBackground">@drawable/bg_splash</item>
         <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <!-- window透明主题 -->
