@@ -20,37 +20,30 @@ public class DecelerateAnimator extends ValueAnimator {
 
     private final float DECELERATION_RATE = 2.358201815f;//Math.log(0.78) / Math.log(0.9)
     private final float INFLEXION = 0.35f; // Tension lines cross at (INFLEXION, 1)
-
-    /**
-     * 动摩擦系数
-     */
-    private float mFlingFriction;
-
-    /**
-     * 动摩擦系数倍率
-     */
-    private float mFlingFrictionRatio = 1F;
-
     /**
      * 物理系数
      */
     private final float mPhysicalCoeff;
-
     /**
      * 弹性系数
      */
     private final float mBounceCoeff;
-
     /**
      * 是否启用回弹效果
      */
     private final boolean isBouncing;
-
     /**
      * 估值器
      */
     private final DecelerateEvaluator mDecelerateEvaluator;
-
+    /**
+     * 动摩擦系数
+     */
+    private float mFlingFriction;
+    /**
+     * 动摩擦系数倍率
+     */
+    private float mFlingFrictionRatio = 1F;
     /**
      * 动画起始值
      */
@@ -503,6 +496,10 @@ public class DecelerateAnimator extends ValueAnimator {
         if (ratio > 0) {
             this.mFlingFrictionRatio = ratio;
         }
+    }
+
+    public float getFinalValue() {
+        return mFinalValue;
     }
 
     private class DecelerateEvaluator implements TypeEvaluator<Float> {
