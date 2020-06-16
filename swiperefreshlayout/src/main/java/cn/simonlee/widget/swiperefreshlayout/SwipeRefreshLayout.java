@@ -39,6 +39,11 @@ import java.util.List;
 public class SwipeRefreshLayout extends FrameLayout {
 
     /**
+     * 刷新状态：不可用
+     */
+    public static final int STATE_UNABLE = -1;
+
+    /**
      * 刷新状态：已关闭
      */
     public static final int STATE_CLOSE = 0;
@@ -545,31 +550,31 @@ public class SwipeRefreshLayout extends FrameLayout {
         final boolean isReady = isRefreshable && Math.abs(scrollY) >= mCurRefreshView.getHeight();
 
         switch (mRefreshState) {
+            case STATE_UNABLE: {// 当前状态不可用
+            }
             case STATE_CLOSE: {// 当前状态关闭
-                if (scrollY != 0) {
-                    changeRefreshState(isReady ? STATE_READY : STATE_OPEN);
-                }
-                break;
             }
             case STATE_OPEN: {// 当前状态打开
                 if (scrollY == 0) {
                     changeRefreshState(STATE_CLOSE);
+                } else if (!isRefreshable) {
+                    changeRefreshState(STATE_UNABLE);
                 } else if (!isFinalState) {
                     changeRefreshState(isReady ? STATE_READY : STATE_OPEN);
                 } else if (isReady) {
                     changeRefreshState(STATE_REFRESHING);
-                } else {
-                    changeRefreshState(STATE_CLOSE);
                 }
                 break;
             }
             case STATE_READY: {// 当前状态就绪
-                if (isFinalState && isRefreshable) {
+                if (!isRefreshable) {
+                    changeRefreshState(STATE_UNABLE);
+                } else if (isFinalState) {
                     changeRefreshState(STATE_REFRESHING);
                 } else if (scrollY == 0) {
                     changeRefreshState(STATE_CLOSE);
-                } else {
-                    changeRefreshState(isReady ? STATE_READY : STATE_OPEN);
+                } else if (!isReady) {
+                    changeRefreshState(STATE_OPEN);
                 }
                 break;
             }
