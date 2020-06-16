@@ -13,9 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.ScrollView;
 
 import java.util.ArrayList;
@@ -35,7 +33,7 @@ import java.util.List;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-08-16
  */
-@SuppressWarnings({"FieldCanBeLocal", "ClickableViewAccessibility", "JavadocReference", "BooleanMethodIsAlwaysInverted", "RedundantIfStatement", "unused"})
+@SuppressWarnings({"FieldCanBeLocal", "ClickableViewAccessibility", "BooleanMethodIsAlwaysInverted", "unused"})
 public class SwipeRefreshLayout extends FrameLayout {
 
     /**
@@ -97,6 +95,11 @@ public class SwipeRefreshLayout extends FrameLayout {
      * 刷新监听器
      */
     private OnRefreshListener mOnRefreshListener;
+
+    /**
+     * 标志是否根据滑动距离适配Child的Padding值
+     */
+    private boolean isFitChildPadding;
 
     /**
      * 标志顶部是否可以下拉
@@ -209,6 +212,9 @@ public class SwipeRefreshLayout extends FrameLayout {
      */
     private void initSwipeRefreshLayout(Context context, AttributeSet attributeSet) {
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.SwipeRefreshLayout);
+        //是否根据滑动距离适配Child的Padding值
+        this.isFitChildPadding = typedArray.getBoolean(R.styleable.SwipeRefreshLayout_swiperefresh_fitChildPadding, true);
+
         //顶部是否可用
         this.isHeaderEnabled = typedArray.getBoolean(R.styleable.SwipeRefreshLayout_swiperefresh_header_enabled, true);
         //底部是否可用
@@ -256,8 +262,6 @@ public class SwipeRefreshLayout extends FrameLayout {
         if (getChildView() != null) {
             throw new IllegalStateException("SwipeRefreshLayout can host only one direct child");
         }
-        //不显示childView的滑动越界阴影
-        child.setOverScrollMode(OVER_SCROLL_NEVER);
         super.addView(child, index, params);
     }
 
@@ -267,8 +271,6 @@ public class SwipeRefreshLayout extends FrameLayout {
         if (getChildView() != null) {
             throw new IllegalStateException("SwipeRefreshLayout can host only one direct child");
         }
-        //不显示childView的滑动越界阴影
-        child.setOverScrollMode(OVER_SCROLL_NEVER);
         return super.addViewInLayout(child, index, params, preventRequestLayout);
     }
 
@@ -292,7 +294,7 @@ public class SwipeRefreshLayout extends FrameLayout {
                 //清空集合
                 mTouchedChildren.clear();
                 //遍历所有被触摸到的child
-                listTouchedChildren(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + getScrollY(), isInScrollingContainer());
+                listTouchedChildren(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + getScrollY());
                 //正常下发触摸DOWN事件
                 super.dispatchTouchEvent(event);
                 if (isBeingRegressed) {//回归动画中
@@ -410,32 +412,26 @@ public class SwipeRefreshLayout extends FrameLayout {
     /**
      * 遍历所有被触摸到的child
      *
-     * @param view                   目标view
-     * @param localX                 触摸X坐标，相对目标view的父容器左顶点
-     * @param localY                 触摸Y坐标，相对目标view的父容器左顶点
-     * @param isInScrollingContainer 是否在一个可滑动容器中，这将使目标View在延时一定时间后被置为Pressed状态，参阅{@link View#isInScrollingContainer()}
+     * @param view   目标view
+     * @param localX 触摸X坐标，相对目标view的父容器左顶点
+     * @param localY 触摸Y坐标，相对目标view的父容器左顶点
      */
-    private void listTouchedChildren(View view, float localX, float localY, boolean isInScrollingContainer) {
+    private void listTouchedChildren(View view, float localX, float localY) {
         if (view == null || view.getVisibility() != VISIBLE || !pointInView(view, localX, localY)) {
             //不可见或者未触摸
             return;
         }
         //设置触摸监听，用于识别消费触摸事件的child
         view.setOnTouchListener(mChildOnTouchListener);
-        if (isInScrollingContainer) {
-            //如果被延时设置，则加入集合
-            mTouchedChildren.add(view);
-        }
+        mTouchedChildren.add(view);
         //递归集合child
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = ((ViewGroup) view);
             //更新相对触摸坐标
             localX += view.getScrollX() - view.getLeft();
             localY += view.getScrollY() - view.getTop();
-            //更新延时设置标志
-            isInScrollingContainer |= viewGroup.shouldDelayChildPressedState();
             for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                listTouchedChildren(viewGroup.getChildAt(index), localX, localY, isInScrollingContainer);
+                listTouchedChildren(viewGroup.getChildAt(index), localX, localY);
             }
         }
     }
@@ -519,8 +515,10 @@ public class SwipeRefreshLayout extends FrameLayout {
             //根据偏移量改变刷新状态
             resetRefreshState(isFinalState);
         }
-        //触摸移动中，根据偏移量指定刷新状态
-        adjustChildScrollPadding();
+
+        //根据滑动距离适配Child的Padding值
+        fitChildPadding();
+
         //通知刷新状态改变
         notifyOnRefresh();
     }
@@ -629,35 +627,43 @@ public class SwipeRefreshLayout extends FrameLayout {
     }
 
     /**
-     * 调整child的padding值。因为容器滑动后child会产生偏移，部分区域会滑出View区域导致不可见
+     * 调整child的Padding以适应Scroll
+     * <p>
+     * 因为容器滑动后child部分区域会溢出导致不可见
      */
-    protected void adjustChildScrollPadding() {
-        if (!hasVerticallyScrollChild()) {
+    private void fitChildPadding() {
+        if (!isFitChildPadding) {
             return;
         }
-        View child = getChildView();
         final int scrollY = getScrollY();
+        int paddingTop = 0;
+        int paddingBottom = 0;
+
         if (mRefreshState == STATE_REFRESHING) {
-            if (scrollY < 0) {//Header
-                int diff = scrollY + child.getPaddingBottom();
-                if (diff != 0) {
-                    child.setPadding(child.getPaddingLeft(), 0, child.getPaddingRight(), -scrollY);
-                }
-            } else {//Footer
-                int diff = scrollY - child.getPaddingTop();
-                if (diff != 0) {
-                    child.setPadding(child.getPaddingLeft(), scrollY, child.getPaddingRight(), 0);
-                    if (child instanceof ScrollView) {
-                        child.scrollBy(0, diff);
-                    }
-                }
+            if (scrollY < 0) {//下拉
+                paddingBottom = -scrollY;
+            } else {//上拉
+                paddingTop = scrollY;
             }
-        } else if (child.getPaddingTop() != 0 || child.getPaddingBottom() != 0) {
-            int diff = -child.getPaddingTop();
-            child.setPadding(child.getPaddingLeft(), 0, child.getPaddingRight(), 0);
-            if (child instanceof ScrollView) {
-                child.scrollBy(0, diff);
-            }
+        }
+        fitChildPadding(paddingTop, paddingBottom);
+    }
+
+    /**
+     * 调整child的padding以适应Scroll
+     * <p>
+     * 此方法可被重写
+     */
+    protected void fitChildPadding(int paddingTop, int paddingBottom) {
+        final View child = getChildView();
+        final int diffTop = paddingTop - child.getPaddingTop();
+        final int diffBottom = paddingBottom - child.getPaddingBottom();
+        if (diffTop == 0 && diffBottom == 0) {
+            return;
+        }
+        child.setPadding(child.getPaddingLeft(), paddingTop, child.getPaddingRight(), paddingBottom);
+        if (child instanceof ScrollView) {
+            child.scrollBy(0, diffTop);
         }
     }
 
@@ -748,57 +754,20 @@ public class SwipeRefreshLayout extends FrameLayout {
         }, delayMillis);
     }
 
+    /*==========以下是外部接口==========*/
+
     /**
-     * 判断自身是否会被延时设置按下状态
+     * 判断是否根据滑动距离适配Child的Padding值
      */
-    private boolean isInScrollingContainer() {
-        ViewParent parent = this;
-        while (parent instanceof ViewGroup) {
-            if (((ViewGroup) parent).shouldDelayChildPressedState()) {
-                return true;
-            }
-            parent = parent.getParent();
-        }
-        return false;
+    public boolean isFitChildPadding() {
+        return isFitChildPadding;
     }
 
     /**
-     * 判断childView是否支持垂直滑动
-     * <p>
-     * 该方法可以被子类重写，以适应某些特殊的自定义View
+     * 设置是否根据滑动距离适配Child的Padding值
      */
-    protected boolean hasVerticallyScrollChild() {
-        View view = getChildView();
-        if (view == null) {
-            return false;
-        }
-        if (view instanceof ScrollView) {
-            return true;
-        }
-        if (view instanceof ListView) {
-            return true;
-        }
-        try {
-            Class<?> RecyclerViewClass_v7 = Class.forName("android.support.v7.widget.RecyclerView");
-            if (RecyclerViewClass_v7.isInstance(view)) {
-                return true;
-            }
-        } catch (Exception ignored) {
-        }
-        try {
-            Class<?> RecyclerViewClass_x = Class.forName("androidx.recyclerview.widget.RecyclerView");
-            if (RecyclerViewClass_x.isInstance(view)) {
-                return true;
-            }
-        } catch (Exception ignored) {
-        }
-        if (view.canScrollVertically(1)) {
-            return true;
-        }
-        if (view.canScrollVertically(-1)) {
-            return true;
-        }
-        return false;
+    public void setFitChildPadding(boolean enable) {
+        isFitChildPadding = enable;
     }
 
     /**
@@ -807,8 +776,6 @@ public class SwipeRefreshLayout extends FrameLayout {
     public boolean isHeaderEnabled() {
         return isEnabled() && isHeaderEnabled && mHeaderRefreshView != null;
     }
-
-    /*==========以下是外部接口==========*/
 
     /**
      * 设置顶部是否可用（可以被拉开，但不一定可刷新）
