@@ -35,7 +35,7 @@ import java.util.List;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-08-16
  */
-@SuppressWarnings({"unused", "ClickableViewAccessibility", "BooleanMethodIsAlwaysInverted"})
+@SuppressWarnings({"FieldCanBeLocal", "ClickableViewAccessibility", "JavadocReference", "BooleanMethodIsAlwaysInverted", "RedundantIfStatement", "unused"})
 public class SwipeRefreshLayout extends FrameLayout {
 
     /**
@@ -134,11 +134,6 @@ public class SwipeRefreshLayout extends FrameLayout {
     private boolean isRegressAnimatorCanceled;
 
     /**
-     * 标记当Scroll时取消按压状态
-     */
-    private boolean needCancelPressedWhenScroll;
-
-    /**
      * 判断滑动事件的最小距离
      */
     private int mTouchSlop;
@@ -154,34 +149,40 @@ public class SwipeRefreshLayout extends FrameLayout {
     private float mDamping = 2F;
 
     /**
-     * 触摸事件的x,y坐标
+     * 触摸事件的x,y坐标，相对View自身的左顶点
      */
     private float mTouchDownX, mTouchDownY;
 
     /**
      * 上一个触摸事件的y坐标
      */
-    private float mPerTouchY;
-
-    /**
-     * 触摸拖动的总偏移量
-     */
-    private float mTotalOffsetY;
+    private float mPrevY;
 
     /**
      * 标志是否垂直触摸移动（手指在屏幕上拖动）
      */
-    private boolean isMoveAction;
+    private boolean isBeingMoved;
 
     /**
-     * 标志ACTION_DOWN事件中是否触摸到ChildView
+     * ACTION_DOWN事件中所有被触摸到的child集合
      */
-    private boolean isTouchChild;
+    private List<View> mTouchedChildren = new ArrayList<>();
 
     /**
-     * 被延时设置按下状态的View集合。在ACTION_DOWN事件中被赋值，在ScrollTo中被取消选中状态
+     * 当前触摸事件的消费者
      */
-    private List<View> mDelayPressedChildren = new ArrayList<>();
+    private View mCurConsumer;
+
+    /**
+     * 所有child触摸事件监听
+     */
+    private OnTouchListener mChildOnTouchListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            mCurConsumer = view;
+            return false;
+        }
+    };
 
     public SwipeRefreshLayout(Context context) {
         super(context);
@@ -268,42 +269,38 @@ public class SwipeRefreshLayout extends FrameLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        //当不可用 或 没有childView 或 没有指定刷新 或 正在刷新中 或 正在结束刷新，不干预触摸事件。
-        if ((!isHeaderEnabled() && !isFooterEnabled()) || getChildView() == null || mRefreshState == STATE_REFRESHING || mRefreshState == STATE_REFRESH_COMPLETE) {
-            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                mDelayPressedChildren.clear();
-                needCancelPressedWhenScroll = true;
-            }
+        if (getChildView() == null) {
             return super.dispatchTouchEvent(event);
         }
+        //是否在动画中
+        final boolean isBeingRegressed = mRegressAnimator != null && mRegressAnimator.isStarted();
+        //是否为锁定状态
+        final boolean isLockedState = mRefreshState == STATE_REFRESHING || mRefreshState == STATE_REFRESH_COMPLETE;
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
+                isBeingMoved = false;
                 //记录触摸点
                 recordTouchPointer(event, event.getActionIndex());
+                //当前事件消费者置空
+                mCurConsumer = null;
                 //清空集合
-                mDelayPressedChildren.clear();
-                //集合所有被延时设置按下状态的View，包括自身
-                collectDelayPressedView(this, mTouchDownX + getLeft(), mTouchDownY + getTop(), isInScrollingContainer());
-                //标志是否触摸到了ChildView
-                isTouchChild = pointInView(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + getScrollY());
-                //取消回归动画
-                if (mRegressAnimator != null && mRegressAnimator.isStarted()) {
-                    mRegressAnimator.cancel();
-                    isMoveAction = true;
-                    //计算总偏移量
-                    mTotalOffsetY = getScrollY() * mDamping;
-                    super.dispatchTouchEvent(event);
-                    for (View child : mDelayPressedChildren) {
-                        child.cancelLongPress();
+                mTouchedChildren.clear();
+                //遍历所有被触摸到的child
+                listTouchedChildren(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + getScrollY(), isInScrollingContainer());
+                //正常下发触摸DOWN事件
+                super.dispatchTouchEvent(event);
+                if (isBeingRegressed) {//回归动画中
+                    isBeingMoved = true;
+                    //取消Pressed状态
+                    cancelPressedState();
+                    //如果非锁定状态则取消回归动画
+                    if (!isLockedState) {
+                        mRegressAnimator.cancel();
                     }
-                    setPressed(false);
-                    return true;
                 }
-                //标志当Scroll时需要取消按压状态
-                needCancelPressedWhenScroll = true;
-                //标志未发生移动
-                isMoveAction = false;
-                break;
+                //事件已下发，直接返回true
+                return true;
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
                 //重新记录触摸点
@@ -326,30 +323,31 @@ public class SwipeRefreshLayout extends FrameLayout {
                 for (int index = 0; index < event.getPointerCount(); index++) {
                     if (event.getPointerId(index) == mTouchPointerId) {
                         //当前触摸事件Y坐标
-                        float curY = event.getY(index);
-                        if (isMoveAction) {//已经开始位移
-                            if (getScrollY() == 0) {//重置总偏移量
-                                mTotalOffsetY = mPerTouchY - curY;
-                            } else {//累加总偏移量
-                                mTotalOffsetY += mPerTouchY - curY;
+                        final float curY = event.getY(index);
+                        if (!isBeingRegressed) {//未在回归动画中
+                            if (isBeingMoved && !isLockedState) {//已满足拖拽，且非锁定状态
+                                //计算Y轴滚动偏移量
+                                float offsetY = (mPrevY - curY) / mDamping + getScrollY();
+                                //四舍五入转int
+                                int scrollY = (int) (offsetY + (offsetY < 0 ? -0.5F : 0.5F));
+                                //判断是否可以拉开刷新
+                                if (!canScrollRefresh(scrollY)) {
+                                    scrollToRefresh(0, false, false);
+                                } else {
+                                    scrollToRefresh(scrollY, false, false);
+                                    //记录当前触摸事件Y坐标
+                                    mPrevY = curY;
+                                    //移动事件发生，拦截MOVE事件
+                                    return true;
+                                }
+                            } else if (!isBeingMoved && Math.abs(mTouchDownY - curY) > mTouchSlop) {
+                                isBeingMoved = true;
+                                //复制一次MOVE事件进行下发，使得下次MOVE事件到来时，可以准确回调消费触摸事件的child
+                                super.dispatchTouchEvent(MotionEvent.obtain(event));
                             }
-                            //记录当前触摸事件Y坐标
-                            mPerTouchY = curY;
-                            //计算Y轴滚动偏移量
-                            int scrollY = (int) (mTotalOffsetY / mDamping + (mTotalOffsetY < 0 ? -0.5F : 0.5F));
-                            //判断是否可以拉开刷新
-                            if (!canScrollRefresh(scrollY)) {
-                                scrollToRefresh(0, false, false);
-                            } else {
-                                scrollToRefresh(scrollY, false, false);
-                                return true;
-                            }
-                        } else if (Math.abs(mTouchDownY - curY) >= mTouchSlop) {//判断即将发生位移
-                            //更新标志
-                            isMoveAction = true;
-                            //记录当前触摸事件Y坐标
-                            mPerTouchY = curY;
                         }
+                        //记录当前触摸事件Y坐标
+                        mPrevY = curY;
                         break;
                     }
                 }
@@ -357,25 +355,30 @@ public class SwipeRefreshLayout extends FrameLayout {
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                isMoveAction = false;
-                int scrollY = getScrollY();
-                //判断是否可以拉开刷新
-                if (!canScrollRefresh(scrollY)) {
-                    scrollToRefresh(0, false, true);
-                } else {
-                    scrollToRefresh(scrollY, false, false);
-                    int endValue = 0;
-                    if (isHeaderRefreshable() && scrollY <= -mHeaderRefreshView.getHeight()) {
-                        endValue = isHeaderRefreshFolded() ? 0 : -mHeaderRefreshView.getHeight();
-                    } else if (isFooterRefreshable() && scrollY >= mFooterRefreshView.getHeight()) {
-                        endValue = isFooterRefreshFolded() ? 0 : mFooterRefreshView.getHeight();
+                //非动画中，非锁定状态，已满足拖拽
+                if (!isBeingRegressed && !isLockedState && isBeingMoved) {
+                    isBeingMoved = false;
+                    int scrollY = getScrollY();
+                    //判断是否可以拉开刷新
+                    if (!canScrollRefresh(scrollY)) {
+                        scrollToRefresh(0, false, true);
+                    } else {
+                        scrollToRefresh(scrollY, false, false);
+                        int endValue = 0;
+                        if (isHeaderRefreshable() && scrollY <= -mHeaderRefreshView.getHeight()) {
+                            endValue = isHeaderRefreshFolded() ? 0 : -mHeaderRefreshView.getHeight();
+                        } else if (isFooterRefreshable() && scrollY >= mFooterRefreshView.getHeight()) {
+                            endValue = isFooterRefreshFolded() ? 0 : mFooterRefreshView.getHeight();
+                        }
+                        //开始动画
+                        startRegressAnimator(endValue);
+                        //复制一次CANCEL事件进行下发
+                        MotionEvent cancelEvent = MotionEvent.obtain(event);
+                        cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
+                        super.dispatchTouchEvent(cancelEvent);
+                        //拦截UP事件
+                        return true;
                     }
-                    startRegressAnimator(endValue);
-                    //下发一个取消事件给子View
-                    MotionEvent cancelEvent = MotionEvent.obtain(event);
-                    cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
-                    super.dispatchTouchEvent(cancelEvent);
-                    return true;
                 }
                 break;
             }
@@ -385,13 +388,72 @@ public class SwipeRefreshLayout extends FrameLayout {
     }
 
     /**
+     * 取消Pressed状态
+     */
+    private void cancelPressedState() {
+        cancelLongPress();
+        setPressed(false);
+        //取消childPressed状态
+        for (View child : mTouchedChildren) {
+            child.cancelLongPress();
+            child.setPressed(false);
+        }
+        //清空集合
+        mTouchedChildren.clear();
+    }
+
+    /**
+     * 遍历所有被触摸到的child
+     *
+     * @param view                   目标view
+     * @param localX                 触摸X坐标，相对目标view的父容器左顶点
+     * @param localY                 触摸Y坐标，相对目标view的父容器左顶点
+     * @param isInScrollingContainer 是否在一个可滑动容器中，这将使目标View在延时一定时间后被置为Pressed状态，参阅{@link View#isInScrollingContainer()}
+     */
+    private void listTouchedChildren(View view, float localX, float localY, boolean isInScrollingContainer) {
+        if (view == null || view.getVisibility() != VISIBLE || !pointInView(view, localX, localY)) {
+            //不可见或者未触摸
+            return;
+        }
+        //设置触摸监听，用于识别消费触摸事件的child
+        view.setOnTouchListener(mChildOnTouchListener);
+        if (isInScrollingContainer) {
+            //如果被延时设置，则加入集合
+            mTouchedChildren.add(view);
+        }
+        //递归集合child
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = ((ViewGroup) view);
+            //更新相对触摸坐标
+            localX += view.getScrollX() - view.getLeft();
+            localY += view.getScrollY() - view.getTop();
+            //更新延时设置标志
+            isInScrollingContainer |= viewGroup.shouldDelayChildPressedState();
+            for (int index = 0; index < viewGroup.getChildCount(); index++) {
+                listTouchedChildren(viewGroup.getChildAt(index), localX, localY, isInScrollingContainer);
+            }
+        }
+    }
+
+    /**
+     * 判断坐标是否落在目标view上
+     *
+     * @param view   目标view
+     * @param localX X坐标，相对目标view的父容器
+     * @param localY Y坐标，相对目标view的父容器
+     */
+    private boolean pointInView(View view, float localX, float localY) {
+        return view != null && localX >= view.getLeft() && localY >= view.getTop() && localX < view.getRight() && localY < view.getBottom();
+    }
+
+    /**
      * 记录触摸坐标及ID
      */
     private void recordTouchPointer(MotionEvent event, int actionIndex) {
-        //记录触摸坐标
+        //记录触摸坐标，相对View自身的左顶点
         mTouchDownX = event.getX(actionIndex);
         mTouchDownY = event.getY(actionIndex);
-        mPerTouchY = mTouchDownY;
+        mPrevY = mTouchDownY;
         //记录触摸ID
         mTouchPointerId = event.getPointerId(actionIndex);
     }
@@ -417,14 +479,22 @@ public class SwipeRefreshLayout extends FrameLayout {
         if (scrollY == 0) {
             return false;
         }
-        if (getScrollY() == 0) {//当前未滚动
-            if (!isTouchChild || !canScrollChildVertically(scrollY)) {//child不可滚动
-                //判断是否可以展开
-                return scrollY < 0 ? isHeaderEnabled() : isFooterEnabled();
-            }
+        if (getScrollY() == 0 && !canConsumeVerticallyScroll(scrollY)) {
+            return scrollY < 0 ? isHeaderEnabled() : isFooterEnabled();
         }
         //滚动变向则不展开
         return scrollY * getScrollY() > 0;
+    }
+
+    /**
+     * 判断下拉或者上滑事件是否可被child消费
+     * <p>
+     * 该方法可以被子类重写，以适应某些特殊的自定义View
+     *
+     * @param direction 负值表示为下拉动作，否则为上拉
+     */
+    protected boolean canConsumeVerticallyScroll(int direction) {
+        return mCurConsumer != null && mCurConsumer.canScrollVertically(direction);
     }
 
     /**
@@ -547,15 +617,8 @@ public class SwipeRefreshLayout extends FrameLayout {
 
     @Override
     public void scrollTo(int x, int y) {
-        if (needCancelPressedWhenScroll) {
-            needCancelPressedWhenScroll = false;
-            //取消所有被延时设置按下状态的View的延时设置
-            for (View child : mDelayPressedChildren) {
-                child.cancelLongPress();
-            }
-            mDelayPressedChildren.clear();
-            //设置为未按下状态
-            setPressed(false);
+        if (!mTouchedChildren.isEmpty()) {
+            cancelPressedState();
         }
         super.scrollTo(x, y);
     }
@@ -695,52 +758,7 @@ public class SwipeRefreshLayout extends FrameLayout {
     }
 
     /**
-     * 判断坐标是否落在目标view上
-     *
-     * @param view   目标view
-     * @param localX X坐标，相对目标view的父容器
-     * @param localY Y坐标，相对目标view的父容器
-     */
-    private boolean pointInView(View view, float localX, float localY) {
-        return view != null && localX >= view.getLeft() && localY >= view.getTop() && localX < view.getRight() && localY < view.getBottom();
-    }
-
-    /**
-     * 递归集合所有被延时设置按下状态的View
-     *
-     * @param view              目标view
-     * @param touchDownX        按下时的X坐标，相对目标view的父容器
-     * @param touchDownY        按下时的Y坐标，相对目标view的父容器
-     * @param delayPressedState 是否被延时设置
-     */
-    private void collectDelayPressedView(View view, float touchDownX, float touchDownY, boolean delayPressedState) {
-        //判断view是否可见
-        if (view != null && view.getVisibility() == VISIBLE) {
-            //判断触摸点是否在view上
-            if (pointInView(view, touchDownX, touchDownY)) {
-                if (delayPressedState) {
-                    //如果被延时设置，则加入集合
-                    mDelayPressedChildren.add(view);
-                }
-                //判断是否含有childView
-                if (view instanceof ViewGroup) {
-                    ViewGroup viewGroup = ((ViewGroup) view);
-                    //校正childView相对触摸坐标
-                    touchDownX += view.getScrollX() - view.getLeft();
-                    touchDownY += view.getScrollY() - view.getTop();
-                    //更新延时设置标志
-                    delayPressedState |= viewGroup.shouldDelayChildPressedState();
-                    for (int index = 0; index < viewGroup.getChildCount(); index++) {
-                        //递归集合childView
-                        collectDelayPressedView(viewGroup.getChildAt(index), touchDownX, touchDownY, delayPressedState);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 判断childView是否可以滑动
+     * 判断childView是否支持垂直滑动
      * <p>
      * 该方法可以被子类重写，以适应某些特殊的自定义View
      */
@@ -776,18 +794,6 @@ public class SwipeRefreshLayout extends FrameLayout {
             return true;
         }
         return false;
-    }
-
-    /**
-     * 判断childView是否可以下拉或者上滑
-     * <p>
-     * 该方法可以被子类重写，以适应某些特殊的自定义View
-     *
-     * @param direction 负值表示为下拉动作，否则为上拉
-     */
-    protected boolean canScrollChildVertically(int direction) {
-        View view = getChildView();
-        return view != null && view.canScrollVertically(direction);
     }
 
     /**
