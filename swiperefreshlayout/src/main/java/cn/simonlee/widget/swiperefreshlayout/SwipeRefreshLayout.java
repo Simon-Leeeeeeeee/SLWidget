@@ -33,7 +33,7 @@ import java.util.List;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-08-16
  */
-@SuppressWarnings({"FieldCanBeLocal", "ClickableViewAccessibility", "BooleanMethodIsAlwaysInverted", "unused"})
+@SuppressWarnings({"FieldCanBeLocal", "ClickableViewAccessibility", "unused"})
 public class SwipeRefreshLayout extends FrameLayout {
 
     /**
@@ -279,6 +279,7 @@ public class SwipeRefreshLayout extends FrameLayout {
         if (getChildView() == null) {
             return super.dispatchTouchEvent(event);
         }
+        final int scrollY = getScrollY();
         //是否在动画中
         final boolean isBeingRegressed = mRegressAnimator != null && mRegressAnimator.isStarted();
         //是否为锁定状态
@@ -294,26 +295,40 @@ public class SwipeRefreshLayout extends FrameLayout {
                 //清空集合
                 mTouchedChildren.clear();
                 //遍历所有被触摸到的child
-                listTouchedChildren(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + getScrollY());
-                //正常下发触摸DOWN事件
-                super.dispatchTouchEvent(event);
-                if (isBeingRegressed) {//回归动画中
-                    isBeingMoved = true;
-                    //取消Pressed状态
-                    cancelPressedState();
-                    //如果非锁定状态则取消回归动画
-                    if (!isLockedState) {
+                listTouchedChildren(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + scrollY);
+                if (!isLockedState) {//非锁定状态
+                    if (isBeingRegressed) {//回归动画中
                         mRegressAnimator.cancel();
                     }
+                    if (scrollY != 0) {
+                        isBeingMoved = true;
+                        //1. 下发触摸DOWN事件
+                        super.dispatchTouchEvent(event);
+                        //2. 下发校正偏移量的MOVE事件
+                        event.setAction(MotionEvent.ACTION_MOVE);
+                        event.offsetLocation(0, scrollY);
+                        super.dispatchTouchEvent(MotionEvent.obtain(event));
+                        //偏移量校正距离未触发滑动
+                        if (scrollY <= mTouchSlop) {
+                            //3. 下发触发滑动的MOVE事件
+                            final float offset = (mTouchSlop + 1) * Math.signum(scrollY);
+                            event.offsetLocation(0, offset);
+                            super.dispatchTouchEvent(MotionEvent.obtain(event));
+                            //4. 下发校正偏移量的MOVE事件
+                            event.offsetLocation(0, -offset);
+                            super.dispatchTouchEvent(MotionEvent.obtain(event));
+                        }
+                        //事件已下发，直接返回true
+                        return true;
+                    }
                 }
-                //事件已下发，直接返回true
-                return true;
+                break;
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
                 //重新记录触摸点
                 recordTouchPointer(event, event.getActionIndex());
                 //校正触摸坐标，使ScrollY为0时，子View重新接收到触摸事件，Move距离为0
-                event.offsetLocation(0, getScrollY());
+                event.offsetLocation(0, scrollY);
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
@@ -323,7 +338,7 @@ public class SwipeRefreshLayout extends FrameLayout {
                     recordNextTouchPointer(event, actionIndex);
                 }
                 //校正触摸坐标，使ScrollY为0时，子View重新接收到触摸事件，Move距离为0
-                event.offsetLocation(0, getScrollY());
+                event.offsetLocation(0, scrollY);
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -331,25 +346,31 @@ public class SwipeRefreshLayout extends FrameLayout {
                     if (event.getPointerId(index) == mTouchPointerId) {
                         //当前触摸事件Y坐标
                         final float curY = event.getY(index);
-                        if (!isBeingRegressed) {//未在回归动画中
-                            if (isBeingMoved && !isLockedState) {//已满足拖拽，且非锁定状态
-                                //计算Y轴滚动偏移量
-                                float offsetY = (mPrevY - curY) / mDamping + getScrollY();
-                                //四舍五入转int
-                                int scrollY = (int) (offsetY + (offsetY < 0 ? -0.5F : 0.5F));
-                                //判断是否可以拉开刷新
-                                if (!canScrollRefresh(scrollY)) {
-                                    scrollToRefresh(0, false, false);
-                                } else {
-                                    scrollToRefresh(scrollY, false, false);
-                                    //记录当前触摸事件Y坐标
-                                    mPrevY = curY;
-                                    //移动事件发生，拦截MOVE事件
-                                    return true;
+                        //非动画中
+                        if (!isBeingRegressed) {
+                            //已发生滑动
+                            if (isBeingMoved) {
+                                //非锁定状态
+                                if (!isLockedState) {
+                                    //计算Y轴滚动偏移量
+                                    float offsetY = (mPrevY - curY) / mDamping + scrollY;
+                                    //四舍五入
+                                    int scrollTo = (int) (offsetY + (offsetY < 0 ? -0.5F : 0.5F));
+                                    //判断是否可以拉开刷新
+                                    if (canScrollRefresh(scrollTo)) {
+                                        //拉开刷新
+                                        scrollToRefresh(scrollTo, false, false);
+                                        //记录当前触摸事件Y坐标
+                                        mPrevY = curY;
+                                        //拦截MOVE事件
+                                        return true;
+                                    } else {
+                                        scrollToRefresh(0, false, false);
+                                    }
                                 }
-                            } else if (!isBeingMoved && Math.abs(mTouchDownY - curY) > mTouchSlop) {
+                            } else if (Math.abs(mTouchDownY - curY) > mTouchSlop) {//距离足够触发滑动
                                 isBeingMoved = true;
-                                //复制一次MOVE事件进行下发，使得下次MOVE事件到来时，可以准确回调消费触摸事件的child
+                                //复制MOVE事件下发，产生滑动事件消费者
                                 super.dispatchTouchEvent(MotionEvent.obtain(event));
                             }
                         }
@@ -362,10 +383,9 @@ public class SwipeRefreshLayout extends FrameLayout {
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                //非动画中，非锁定状态，已满足拖拽
-                if (!isBeingRegressed && !isLockedState && isBeingMoved) {
+                //非动画中，非锁定状态，已发生滑动
+                if (!isBeingRegressed && isBeingMoved && !isLockedState) {
                     isBeingMoved = false;
-                    int scrollY = getScrollY();
                     //判断是否可以拉开刷新
                     if (!canScrollRefresh(scrollY)) {
                         scrollToRefresh(0, false, true);
@@ -379,12 +399,8 @@ public class SwipeRefreshLayout extends FrameLayout {
                         }
                         //开始动画
                         startRegressAnimator(endValue);
-                        //复制一次CANCEL事件进行下发
-                        MotionEvent cancelEvent = MotionEvent.obtain(event);
-                        cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
-                        super.dispatchTouchEvent(cancelEvent);
-                        //拦截UP事件
-                        return true;
+                        //UP事件转为CANCEL事件下发
+                        event.setAction(MotionEvent.ACTION_CANCEL);
                     }
                 }
                 break;
@@ -392,21 +408,6 @@ public class SwipeRefreshLayout extends FrameLayout {
         }
         super.dispatchTouchEvent(event);
         return true;
-    }
-
-    /**
-     * 取消Pressed状态
-     */
-    private void cancelPressedState() {
-        cancelLongPress();
-        setPressed(false);
-        //取消childPressed状态
-        for (View child : mTouchedChildren) {
-            child.cancelLongPress();
-            child.setPressed(false);
-        }
-        //清空集合
-        mTouchedChildren.clear();
     }
 
     /**
@@ -474,17 +475,21 @@ public class SwipeRefreshLayout extends FrameLayout {
     /**
      * 判断是否可以拉开刷新
      *
-     * @param scrollY Y轴偏移量
+     * @param scrollTo Y轴偏移量
      */
-    private boolean canScrollRefresh(int scrollY) {
-        if (scrollY == 0) {
+    private boolean canScrollRefresh(int scrollTo) {
+        if (scrollTo == 0) {
             return false;
         }
-        if (getScrollY() == 0 && !canConsumeVerticallyScroll(scrollY)) {
-            return scrollY < 0 ? isHeaderEnabled() : isFooterEnabled();
+        if (getScrollY() == 0) {
+            if (canConsumeVerticallyScroll(scrollTo)) {
+                return false;
+            } else {
+                return scrollTo < 0 ? isHeaderEnabled() : isFooterEnabled();
+            }
         }
         //滚动变向则不展开
-        return scrollY * getScrollY() > 0;
+        return scrollTo * getScrollY() > 0;
     }
 
     /**
@@ -627,6 +632,21 @@ public class SwipeRefreshLayout extends FrameLayout {
     }
 
     /**
+     * 取消Pressed状态
+     */
+    private void cancelPressedState() {
+        cancelLongPress();
+        setPressed(false);
+        //取消childPressed状态
+        for (View child : mTouchedChildren) {
+            child.cancelLongPress();
+            child.setPressed(false);
+        }
+        //清空集合
+        mTouchedChildren.clear();
+    }
+
+    /**
      * 调整child的Padding以适应Scroll
      * <p>
      * 因为容器滑动后child部分区域会溢出导致不可见
@@ -639,7 +659,9 @@ public class SwipeRefreshLayout extends FrameLayout {
         int paddingTop = 0;
         int paddingBottom = 0;
 
-        if (mRefreshState == STATE_REFRESHING) {
+        //是否在动画中
+        final boolean isBeingRegressed = mRegressAnimator != null && mRegressAnimator.isStarted();
+        if (mRefreshState == STATE_REFRESHING && !isBeingRegressed) {
             if (scrollY < 0) {//下拉
                 paddingBottom = -scrollY;
             } else {//上拉
