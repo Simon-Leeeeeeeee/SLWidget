@@ -172,6 +172,11 @@ public class SwipeRefreshLayout extends FrameLayout {
     private boolean isBeingMoved;
 
     /**
+     * 标志是否拦截了触摸事件
+     */
+    private boolean isTouchEventIntercepted;
+
+    /**
      * ACTION_DOWN事件中所有被触摸到的child集合
      */
     private List<View> mTouchedChildren = new ArrayList<>();
@@ -288,6 +293,7 @@ public class SwipeRefreshLayout extends FrameLayout {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
                 isBeingMoved = false;
+                isTouchEventIntercepted = false;
                 //记录触摸点
                 recordTouchPointer(event, event.getActionIndex());
                 //当前事件消费者置空
@@ -297,42 +303,28 @@ public class SwipeRefreshLayout extends FrameLayout {
                 //遍历所有被触摸到的child
                 listTouchedChildren(getChildView(), mTouchDownX + getScrollX(), mTouchDownY + scrollY);
                 if (!isLockedState) {//非锁定状态
-                    if (isBeingRegressed) {//回归动画中
-                        mRegressAnimator.cancel();
+                    if (isBeingRegressed) {
+                        mRegressAnimator.cancel();//取消动画
                     }
                     if (scrollY != 0) {
-                        isBeingMoved = true;
-                        //1. 下发触摸DOWN事件
-                        super.dispatchTouchEvent(event);
-                        //2. 下发校正偏移量的MOVE事件
-                        event.setAction(MotionEvent.ACTION_MOVE);
-                        event.offsetLocation(0, scrollY);
-                        super.dispatchTouchEvent(MotionEvent.obtain(event));
-                        //偏移量校正距离未触发滑动
-                        if (scrollY <= mTouchSlop) {
-                            //3. 下发触发滑动的MOVE事件
-                            final float offset = (mTouchSlop + 1) * Math.signum(scrollY);
-                            event.offsetLocation(0, offset);
-                            super.dispatchTouchEvent(MotionEvent.obtain(event));
-                            //4. 下发校正偏移量的MOVE事件
-                            event.offsetLocation(0, -offset);
-                            super.dispatchTouchEvent(MotionEvent.obtain(event));
-                        }
-                        //事件已下发，直接返回true
-                        return true;
+                        isBeingMoved = true;//标志已滑动
+                        isTouchEventIntercepted = true;//拦截触摸事件
                     }
                 }
                 break;
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
-                //重新记录触摸点
-                recordTouchPointer(event, event.getActionIndex());
+                //已滑动才替换触摸点
+                if (isBeingMoved) {
+                    //重新记录触摸点
+                    recordTouchPointer(event, event.getActionIndex());
+                }
                 //校正触摸坐标，使ScrollY为0时，子View重新接收到触摸事件，Move距离为0
                 event.offsetLocation(0, scrollY);
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
-                int actionIndex = event.getActionIndex();
+                final int actionIndex = event.getActionIndex();
                 if (event.getPointerId(actionIndex) == mTouchPointerId) {
                     //记录下一个触摸点
                     recordNextTouchPointer(event, actionIndex);
@@ -346,26 +338,25 @@ public class SwipeRefreshLayout extends FrameLayout {
                     if (event.getPointerId(index) == mTouchPointerId) {
                         //当前触摸事件Y坐标
                         final float curY = event.getY(index);
-                        //非动画中
-                        if (!isBeingRegressed) {
-                            //已发生滑动
-                            if (isBeingMoved) {
-                                //非锁定状态
-                                if (!isLockedState) {
-                                    //计算Y轴滚动偏移量
-                                    float offsetY = (mPrevY - curY) / mDamping + scrollY;
+                        if (!isBeingRegressed) {//非动画中
+                            if (isBeingMoved) {//已发生滑动
+                                if (!isLockedState) {//非锁定状态
+                                    float offsetY = (mPrevY - curY) / mDamping + scrollY;//偏移量
                                     //四舍五入
                                     int scrollTo = (int) (offsetY + (offsetY < 0 ? -0.5F : 0.5F));
-                                    //判断是否可以拉开刷新
-                                    if (canScrollRefresh(scrollTo)) {
-                                        //拉开刷新
-                                        scrollToRefresh(scrollTo, false, false);
+                                    if (canScrollRefresh(scrollTo)) {//判断是否可以拉开刷新
+                                        scrollToRefresh(scrollTo, false, false);//刷新
                                         //记录当前触摸事件Y坐标
                                         mPrevY = curY;
                                         //拦截MOVE事件
                                         return true;
                                     } else {
                                         scrollToRefresh(0, false, false);
+                                        if (isTouchEventIntercepted) {
+                                            //模拟Touch事件下发，使child能相应后续MOVE事件
+                                            isTouchEventIntercepted = false;
+                                            imitateTouchEvent(event, (int) Math.signum(scrollY));
+                                        }
                                     }
                                 }
                             } else if (Math.abs(mTouchDownY - curY) > mTouchSlop) {//距离足够触发滑动
@@ -406,8 +397,57 @@ public class SwipeRefreshLayout extends FrameLayout {
                 break;
             }
         }
-        super.dispatchTouchEvent(event);
+        if (!isTouchEventIntercepted) {
+            super.dispatchTouchEvent(event);
+        }
         return true;
+    }
+
+    /**
+     * 模拟Touch事件下发
+     */
+    private void imitateTouchEvent(MotionEvent event, int sign) {
+        //下发一个模拟DOWN事件使Child获取焦点，再下发两个模拟MOVE事件使Child处于滑动状态
+        event.setAction(MotionEvent.ACTION_DOWN);
+        super.dispatchTouchEvent(MotionEvent.obtain(event));
+        final float offset = (mTouchSlop + 1) * sign;
+        event.offsetLocation(0, offset);
+        event.setAction(MotionEvent.ACTION_MOVE);
+        super.dispatchTouchEvent(MotionEvent.obtain(event));
+        event.setAction(MotionEvent.ACTION_MOVE);
+        event.offsetLocation(0, -offset);
+        super.dispatchTouchEvent(MotionEvent.obtain(event));
+
+        final int pointerCount = event.getPointerCount();
+        //多指触摸，连续下发多个模拟ACTION_POINTER_DOWN事件
+        if (pointerCount > 1) {
+            final long downTime = event.getDownTime();
+            final long eventTime = event.getEventTime();
+            final int metaState = event.getMetaState();
+            final int buttonState = event.getButtonState();
+            final float xPrecision = event.getXPrecision();
+            final float yPrecision = event.getYPrecision();
+            final int deviceId = event.getDeviceId();
+            final int edgeFlags = event.getEdgeFlags();
+            final int source = event.getSource();
+            final int flags = event.getFlags();
+            MotionEvent.PointerCoords[] pointerCoords = new MotionEvent.PointerCoords[pointerCount];
+            MotionEvent.PointerProperties[] pointerProperties = new MotionEvent.PointerProperties[pointerCount];
+            for (int index = 0; index < pointerCount; index++) {
+                MotionEvent.PointerCoords outPointerCoords = new MotionEvent.PointerCoords();
+                event.getPointerCoords(index, outPointerCoords);
+                pointerCoords[index] = outPointerCoords;
+                MotionEvent.PointerProperties outPointerProperties = new MotionEvent.PointerProperties();
+                event.getPointerProperties(index, outPointerProperties);
+                pointerProperties[index] = outPointerProperties;
+            }
+            for (int index = 1; index < pointerCount; index++) {
+                int action = MotionEvent.ACTION_POINTER_DOWN + (pointerProperties[index].id << MotionEvent.ACTION_POINTER_INDEX_SHIFT);
+                MotionEvent obtainEvent = MotionEvent.obtain(downTime, eventTime, action, index + 1, pointerProperties,
+                        pointerCoords, metaState, buttonState, xPrecision, yPrecision, deviceId, edgeFlags, source, flags);
+                super.dispatchTouchEvent(obtainEvent);
+            }
+        }
     }
 
     /**
