@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,9 +96,27 @@ public class SwipeRefreshLayout extends FrameLayout {
     private OnRefreshListener mOnRefreshListener;
 
     /**
+     * 此标志仅适用一种场景：在DOWN事件后，MOVE滑动前，多指触摸的处理
+     * <p>
+     * true：切换触摸ID，后续MOVE事件响应最后按下的手指。例：child为ListView
+     * <p>
+     * false：不切换触摸ID，后续MOVE事件响应最初按下的手指。例：child为ScrollView
+     */
+    private boolean isAdaptPointerDown;
+
+    /**
      * 标志是否根据滑动距离适配Child的Padding值
+     * <p>
+     * 当child为可滑动时建议开启，例：ListView、ScrollView
      */
     private boolean isFitChildPadding;
+
+    /**
+     * 滑动距离适配Child的Padding值的同时，是否适配Child的Scroll值，详见{@link #fitChildPadding(int, int)}
+     * <p>
+     * 当child设置PaddingTop会导致顶端item变化时，建议开启，例：ScrollView
+     */
+    private boolean isFitChildScroll;
 
     /**
      * 标志顶部是否可以下拉
@@ -217,8 +234,15 @@ public class SwipeRefreshLayout extends FrameLayout {
      */
     private void initSwipeRefreshLayout(Context context, AttributeSet attributeSet) {
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.SwipeRefreshLayout);
+
+        //是否根据滑动距离适配Child的Padding值
+        this.isAdaptPointerDown = typedArray.getBoolean(R.styleable.SwipeRefreshLayout_swiperefresh_adaptPointerDown, true);
+
         //是否根据滑动距离适配Child的Padding值
         this.isFitChildPadding = typedArray.getBoolean(R.styleable.SwipeRefreshLayout_swiperefresh_fitChildPadding, true);
+
+        //根据滑动距离适配Child的Padding值的同时，是否适配Child的Scroll值
+        this.isFitChildScroll = typedArray.getBoolean(R.styleable.SwipeRefreshLayout_swiperefresh_fitChildScroll, true);
 
         //顶部是否可用
         this.isHeaderEnabled = typedArray.getBoolean(R.styleable.SwipeRefreshLayout_swiperefresh_header_enabled, true);
@@ -314,8 +338,8 @@ public class SwipeRefreshLayout extends FrameLayout {
                 break;
             }
             case MotionEvent.ACTION_POINTER_DOWN: {
-                //已滑动才替换触摸点
-                if (isBeingMoved) {
+                //已滑动，或者适配多指按下为true
+                if (isBeingMoved || isAdaptPointerDown) {
                     //重新记录触摸点
                     recordTouchPointer(event, event.getActionIndex());
                 }
@@ -724,7 +748,7 @@ public class SwipeRefreshLayout extends FrameLayout {
             return;
         }
         child.setPadding(child.getPaddingLeft(), paddingTop, child.getPaddingRight(), paddingBottom);
-        if (child instanceof ScrollView) {
+        if (isFitChildScroll) {
             child.scrollBy(0, diffTop);
         }
     }
@@ -819,6 +843,28 @@ public class SwipeRefreshLayout extends FrameLayout {
     /*==========以下是外部接口==========*/
 
     /**
+     * 判断：在DOWN事件后，MOVE滑动前，多指触摸的处理
+     * <p>
+     * true：切换触摸ID，后续MOVE事件响应最后按下的手指。例：child为ListView
+     * <p>
+     * false：不切换触摸ID，后续MOVE事件响应最初按下的手指。例：child为ScrollView
+     */
+    public boolean isAdaptPointerDown() {
+        return isAdaptPointerDown;
+    }
+
+    /**
+     * 设置：在DOWN事件后，MOVE滑动前，多指触摸的处理
+     * <p>
+     * true：切换触摸ID，后续MOVE事件响应最后按下的手指。例：child为ListView
+     * <p>
+     * false：不切换触摸ID，后续MOVE事件响应最初按下的手指。例：child为ScrollView
+     */
+    public void setAdaptPointerDown(boolean enable) {
+        isAdaptPointerDown = enable;
+    }
+
+    /**
      * 判断是否根据滑动距离适配Child的Padding值
      */
     public boolean isFitChildPadding() {
@@ -830,6 +876,20 @@ public class SwipeRefreshLayout extends FrameLayout {
      */
     public void setFitChildPadding(boolean enable) {
         isFitChildPadding = enable;
+    }
+
+    /**
+     * 滑动距离适配Child的Padding值的同时，是否适配Child的Scroll值，详见{@link #fitChildPadding(int, int)}
+     */
+    public boolean isFitChildScroll() {
+        return isFitChildScroll;
+    }
+
+    /**
+     * 滑动距离适配Child的Padding值的同时，是否适配Child的Scroll值，详见{@link #fitChildPadding(int, int)}
+     */
+    public void setFitChildScroll(boolean enable) {
+        isFitChildScroll = enable;
     }
 
     /**

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--在DOWN事件后，MOVE滑动前，多指触摸的适配处理-->
+    <attr name="swiperefresh_adaptPointerDown" format="boolean" />
+
     <!--是否根据滑动距离适配Child的Padding值-->
     <attr name="swiperefresh_fitChildPadding" format="boolean" />
+
+    <!--根据滑动距离适配Child的Padding值的同时，是否适配Child的Scroll值-->
+    <attr name="swiperefresh_fitChildScroll" format="boolean" />
 
     <!--顶部是否可用-->
     <attr name="swiperefresh_header_enabled" format="boolean" />
@@ -26,8 +32,14 @@
 
     <declare-styleable name="SwipeRefreshLayout">
 
+        <!--在DOWN事件后，MOVE滑动前，多指触摸的适配处理-->
+        <attr name="swiperefresh_adaptPointerDown" />
+
         <!--是否根据滑动距离适配Child的Padding值-->
         <attr name="swiperefresh_fitChildPadding" />
+
+        <!--根据滑动距离适配Child的Padding值的同时，是否适配Child的Scroll值-->
+        <attr name="swiperefresh_fitChildScroll" />
 
         <!--顶部是否可用-->
         <attr name="swiperefresh_header_enabled" />
