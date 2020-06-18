@@ -91,6 +91,38 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         return mContentLayout;
     }
 
+    /**
+     * 返回ContentView
+     */
+    public View getContentView() {
+        FrameLayout contentLayout = getContentLayout();
+        if (contentLayout != null) {
+            return getContentLayout().getChildAt(0);
+        }
+        return null;
+    }
+
+    @Override
+    public void setContentView(View view) {
+        super.setContentView(view);
+        //插入TitleBar
+        insertTitleBar();
+    }
+
+    @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        super.setContentView(layoutResID);
+        //插入TitleBar
+        insertTitleBar();
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        super.setContentView(view, params);
+        //插入TitleBar
+        insertTitleBar();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +159,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
                 //修复输入法的adjustResize模式
                 fixInputSoftAdjustResize(inputSoftHeight);
                 //修正TitleBar的高度和paddingTop以适应状态栏变化
-                adjustTitleBarHeight();
+                fitTitleBarHeight();
                 //当开启SystemUI常隐，且当前输入法已隐藏，采用post方式来再次隐藏SystemUI
                 if (isSystemUIAlwaysHidded() && getContentLayout().getPaddingBottom() <= getRealNavigationBarHeight()) {
                     view.post(new Runnable() {
@@ -208,25 +240,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         return mWaterMark;
     }
 
-    @Override
-    public void setContentView(View view) {
-        super.setContentView(view);
-        //插入TitleBar
-        insertTitleBar();
-    }
-
-    @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        super.setContentView(layoutResID);
-        //插入TitleBar
-        insertTitleBar();
-    }
-
-    @Override
-    public void setContentView(View view, ViewGroup.LayoutParams params) {
-        super.setContentView(view, params);
-        //插入TitleBar
-        insertTitleBar();
+    /**
+     * 获取TitleBar
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends View> T getTitleBar() {
+        return (T) mTitleBar;
     }
 
     /**
@@ -256,14 +275,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     }
 
     /**
-     * 获取TitleBar
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends View> T getTitleBar() {
-        return (T) mTitleBar;
-    }
-
-    /**
      * 移除TitleBar，并返回实例
      */
     @SuppressWarnings("unchecked")
@@ -275,7 +286,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
             ((ViewGroup) titleBar.getParent()).removeViewInLayout(titleBar);
         }
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
         return (T) titleBar;
     }
 
@@ -289,15 +300,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //添加到ContentLayout
         getContentLayout().addView(mTitleBar);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
-     * 修正TitleBar的高度和paddingTop以适应状态栏变化，修正ContentView的TopMargin以适应TitleBar高度变化
+     * 修正TitleBar的高度和paddingTop以适应状态栏变化，修正ContentView的上边距以适应TitleBar高度变化
      */
-    protected void adjustTitleBarHeight() {
-        int contentViewMarginTop = 0;
-        if (mTitleBar != null && mTitleBar.getParent() != null) {
+    protected void fitTitleBarHeight() {
+        int titleBarHeight = 0;
+        if (mTitleBar != null && mTitleBar.getParent() != null && mTitleBar.getVisibility() != View.GONE) {
             int paddingTop = 0;
             //如果【布局占用 且 （未隐藏状态栏  或  异形屏已支持）】
             if ((isStatusBarLayouted() || isNavigationBarLayouted())//布局占用状态栏或导航栏位置
@@ -311,7 +322,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
                 mTitleBar.setPadding(0, paddingTop, 0, 0);
             }
             //指定TitleBar高度为PaddingTop加上ActionBar的高度
-            final int titleBarHeight = paddingTop + getActionBarSize();
+            titleBarHeight = paddingTop + getActionBarSize();
             //获取TitleBar布局参数
             ViewGroup.LayoutParams titleBarLayoutParams = mTitleBar.getLayoutParams();
             //指定TitleBar布局宽高
@@ -322,23 +333,28 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
                 titleBarLayoutParams.height = titleBarHeight;
                 mTitleBar.setLayoutParams(titleBarLayoutParams);
             }
-            if (mTitleBar.getVisibility() != View.GONE) {
-                //指定ContentView的TopMargin，防止与TitleBar重叠
-                contentViewMarginTop = titleBarHeight;
-            }
         }
-        //调整水印上边距，避免水印绘制在TitleBar之上
-        if (getWaterMark() != null) {
-            mWaterMark.setDrawPaddingTop(contentViewMarginTop);
-        }
-        //调整ContentView的TopMargin，避免与TitleBar重叠
-        View contentView = getContentLayout().getChildAt(0);
+        //调整ContentView的上边距
+        resizeContentViewTopMargin(titleBarHeight);
+    }
+
+    /**
+     * 调整ContentView的TopMargin，避免与TitleBar重叠
+     *
+     * @param titleBarHeight TitleBar高度
+     */
+    protected void resizeContentViewTopMargin(int titleBarHeight) {
+        View contentView = getContentView();
         if (contentView != null) {
             FrameLayout.LayoutParams contentViewLayoutParams = (FrameLayout.LayoutParams) contentView.getLayoutParams();
-            if (contentViewLayoutParams.topMargin != contentViewMarginTop) {
-                contentViewLayoutParams.topMargin = contentViewMarginTop;
+            if (contentViewLayoutParams.topMargin != titleBarHeight) {
+                contentViewLayoutParams.topMargin = titleBarHeight;
                 contentView.setLayoutParams(contentViewLayoutParams);
             }
+        }
+        //调整水印上边距，使与ContentView上部对齐
+        if (getWaterMark() != null) {
+            getWaterMark().setDrawPaddingTop(titleBarHeight);
         }
     }
 
@@ -483,7 +499,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //生效
         getDecorView().setSystemUiVisibility(visibility);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
@@ -519,7 +535,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //生效
         getDecorView().setSystemUiVisibility(visibility);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
@@ -555,7 +571,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //生效
         getDecorView().setSystemUiVisibility(visibility);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
@@ -583,7 +599,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //生效
         getDecorView().setSystemUiVisibility(visibility);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
@@ -611,7 +627,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //生效
         getDecorView().setSystemUiVisibility(visibility);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
@@ -641,7 +657,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
         //生效
         getDecorView().setSystemUiVisibility(visibility);
         //校正TitleBar高度
-        adjustTitleBarHeight();
+        fitTitleBarHeight();
     }
 
     /**
