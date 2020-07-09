@@ -242,11 +242,14 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
 
         //未设置背景时，默认与状态栏同色
         if (!typedArray.hasValue(R.styleable.TitleBar_android_background)) {
-            TypedValue typedValue = new TypedValue();
-            context.getTheme().resolveAttribute(android.R.attr.statusBarColor, typedValue, true);
-            if ((typedValue.type & TypedValue.TYPE_FIRST_COLOR_INT) == TypedValue.TYPE_FIRST_COLOR_INT && typedValue.data != Color.TRANSPARENT) {
-                setBackgroundColor(typedValue.data);
+            int[] colorAattrs = new int[]{android.R.attr.statusBarColor, android.R.attr.colorPrimary};
+            TypedArray colorTypedArray = context.getTheme().obtainStyledAttributes(colorAattrs);
+            int color = colorTypedArray.getColor(0, Color.TRANSPARENT);//android.R.attr.statusBarColor
+            if (color == Color.TRANSPARENT) {
+                color = colorTypedArray.getColor(1, Color.TRANSPARENT);//android.R.attr.colorPrimary
             }
+            setBackgroundColor(color);
+            colorTypedArray.recycle();
         }
 
         //获取主题色，默认白色
@@ -262,6 +265,8 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
         }
 
         typedArray.recycle();
+        //设置底部阴影效果
+        setElevation(4 * context.getResources().getDisplayMetrics().density);
     }
 
     @Override
@@ -335,7 +340,7 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
     }
 
     /**
-     * 设置TitleBar主题色，注意不包含搜索框文本颜色，及搜索框提示文本颜色
+     * 设置TitleBar主题色，注意不包含搜索框提示文本颜色
      */
     public void setPrimaryColor(@ColorInt int primaryColor) {
         if (mPrimaryColor == primaryColor) {
@@ -353,6 +358,7 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
         setTitleColor(mPrimaryColor);
 
         if (mSearchEditText != null) {
+            mSearchEditText.setTextColor(mPrimaryColor);
             mSearchEditText.setBackgroundTintList(mPrimaryColorTint);//主题色
         }
 
@@ -478,15 +484,21 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
     public void setSubTitle(CharSequence subTitle) {
         if (mSubTitleTextView != null) {
             mSubTitleTextView.setText(subTitle);
+            if (mTitleTextView != null && mTitleTextView.getVisibility() == VISIBLE) {
+                setVisibility(mSubTitleTextView, TextUtils.isEmpty(mSubTitleTextView.getText()) ? GONE : VISIBLE);
+            }
         }
     }
 
     /**
-     * 设置标题文本
+     * 设置子标题文本
      */
     public void setSubTitle(@StringRes int resId) {
         if (mSubTitleTextView != null) {
             mSubTitleTextView.setText(resId);
+            if (mTitleTextView != null && mTitleTextView.getVisibility() == VISIBLE) {
+                setVisibility(mSubTitleTextView, TextUtils.isEmpty(mSubTitleTextView.getText()) ? GONE : VISIBLE);
+            }
         }
     }
 
@@ -634,6 +646,13 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
         setVisibility(mActionItemLayout, GONE);
     }
 
+    @Override
+    public void onClick(View v) {
+        if (mOnActionItemClickListener != null && v instanceof ActionItemView) {
+            mOnActionItemClickListener.onActionItemClick(((ActionItemView) v).getAcionItem());
+        }
+    }
+
     /**
      * 操作菜单点击监听
      */
@@ -642,13 +661,6 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
          * 操作菜单点击回调
          */
         void onActionItemClick(ActionItem actionItem);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (mOnActionItemClickListener != null && v instanceof ActionItemView) {
-            mOnActionItemClickListener.onActionItemClick(((ActionItemView) v).getAcionItem());
-        }
     }
 
     @IntDef({VISIBLE, INVISIBLE, GONE})

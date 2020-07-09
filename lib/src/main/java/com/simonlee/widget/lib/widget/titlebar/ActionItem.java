@@ -28,14 +28,14 @@ public class ActionItem {
     int titleResId;
 
     /**
-     * item的标题文本
-     */
-    CharSequence title;
-
-    /**
      * item的图标资源id
      */
     int iconResId;
+
+    /**
+     * item的标题文本
+     */
+    CharSequence title;
 
     /**
      * item的图标
@@ -104,25 +104,13 @@ public class ActionItem {
     }
 
     /**
-     * 设置标题
+     * item是否已被添加
      */
-    public void setTitle(@StringRes int titleRes) {
+    public boolean isAdded() {
         if (actionItemView != null) {
-            actionItemView.setText(titleRes);
+            return actionItemView.getParent() != null;
         }
-        this.title = null;
-        this.titleResId = titleRes;
-    }
-
-    /**
-     * 设置标题
-     */
-    public void setTitle(CharSequence title) {
-        if (actionItemView != null) {
-            actionItemView.setText(title);
-        }
-        this.title = title;
-        this.titleResId = 0;
+        return false;
     }
 
     /**
@@ -159,5 +147,27 @@ public class ActionItem {
         } else {
             return "String resource ID #0x" + Integer.toHexString(titleResId);
         }
+    }
+
+    /**
+     * 设置标题
+     */
+    public void setTitle(@StringRes int titleRes) {
+        if (actionItemView != null) {
+            actionItemView.setText(titleRes);
+        }
+        this.title = null;
+        this.titleResId = titleRes;
+    }
+
+    /**
+     * 设置标题
+     */
+    public void setTitle(CharSequence title) {
+        if (actionItemView != null) {
+            actionItemView.setText(title);
+        }
+        this.title = title;
+        this.titleResId = 0;
     }
 }
