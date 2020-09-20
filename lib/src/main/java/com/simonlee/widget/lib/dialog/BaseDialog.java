@@ -59,14 +59,11 @@ public abstract class BaseDialog extends DialogFragment {
     /**
      * 标志Dialog是否被取消
      * <p>
-     * 包括三种情形：返回键取消、点击Dialog外部区域取消、调用{@link Dialog#cancel()}取消
+     * 若为true，{@link DialogResultListener#onDialogResult(int, int, Bundle)}回调的resultCode将会强制为{@link #CODE_CANCEL}
+     * <p>
+     * 包括三种情形：返回键取消、点击Dialog外部区域取消、调用{@link #cancel()}取消
      */
     private boolean isCanceled = false;
-
-    /**
-     * 标志对话框是否被销毁重建
-     */
-    private boolean isStateSaved = false;
 
     /**
      * 标志是否可以点击外部区域取消对话框
@@ -88,28 +85,8 @@ public abstract class BaseDialog extends DialogFragment {
      */
     private Bundle mResultBundle;
 
-    /**
-     * 对话框回调监听
-     * <p>
-     * 建议通过Activity或Fragment实现此接口进行回调，参见{@link #getDialogResultListener()}
-     * <p>
-     * 不建议Dialog直接持有DialogResultListener对象，因为Dialog一旦被销毁重建，持有的DialogResultListener对象为null
-     */
-    public interface DialogResultListener {
-
-        /**
-         * 回调结果接口
-         *
-         * @param requestCode 对话框请求码
-         * @param resultCode  返回结果码，若Dialog被取消，该值为{@link #CODE_CANCEL}
-         * @param data        返回数据
-         */
-        void onDialogResult(int requestCode, int resultCode, Bundle data);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        isStateSaved = false;
         setStyle(DialogFragment.STYLE_NO_TITLE, R.style.BaseDialogTheme);
         super.onCreate(savedInstanceState);
         //当dialog被销毁重建时需要恢复数据
@@ -127,7 +104,6 @@ public abstract class BaseDialog extends DialogFragment {
      */
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        isStateSaved = true;
         super.onSaveInstanceState(outState);
         if (this.mRequestCode != 0) {
             outState.putInt("baseDialog:requestCode", this.mRequestCode);
@@ -197,9 +173,16 @@ public abstract class BaseDialog extends DialogFragment {
     }
 
     /**
-     * 当Dialog被取消时触发
+     * 取消Dialog
+     */
+    public void cancel() {
+        getDialog().cancel();
+    }
+
+    /**
+     * 当Dialog被取消时触发，{@link DialogResultListener#onDialogResult(int, int, Bundle)}回调的resultCode将会强制为{@link #CODE_CANCEL}
      * <p>
-     * 包括三种情形：返回键取消、点击Dialog外部区域取消、调用{@link Dialog#cancel()}取消
+     * 包括三种情形：返回键取消、点击Dialog外部区域取消、调用{@link #cancel()}取消
      */
     @Override
     public void onCancel(DialogInterface dialog) {
@@ -213,17 +196,25 @@ public abstract class BaseDialog extends DialogFragment {
      * <p>
      * 包括三种情形：
      * <p>
-     * 1. Dialog被取消，先调用{@link #onCancel(DialogInterface)}，后调用onDismiss
+     * 1. Dialog被隐藏
      * <p>
-     * 2. Dialog销毁重建，先调用{@link #onSaveInstanceState(Bundle)}，后调用onDismiss
+     * {@link #onDismiss(DialogInterface)} -> {@link #onStop()}
+     * -> {@link #onDestroyView()} -> {@link #onDestroy()} -> {@link #onDetach()}
      * <p>
-     * 3. 调用{@link #dismiss()}或{@link #dismissAllowingStateLoss()}后触发
+     * 2. Dialog被取消
+     * <p>
+     * {@link #onCancel(DialogInterface)} -> {@link #onDismiss(DialogInterface)} -> {@link #onStop()}
+     * -> {@link #onDestroyView()} -> {@link #onDestroy()} -> {@link #onDetach()}
+     * <p>
+     * 3. Dialog被销毁重建
+     * <p>
+     * {@link #onStop()} -> {@link #onSaveInstanceState(Bundle)}
+     * -> {@link #onDestroyView()} -> {@link #onDestroy()} -> {@link #onDetach()} -> {@link #onDismiss(DialogInterface)}
      */
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        //非销毁重建，回调结果
-        if (!isStateSaved) {
+        if (isAdded()) {//回调结果
             callbackResult();
         }
     }
@@ -239,7 +230,7 @@ public abstract class BaseDialog extends DialogFragment {
         }
         //回调结果浅复制
         Bundle result = mResultBundle == null ? null : new Bundle(mResultBundle);
-        //对话框回调，当对话框被取消时，结果代码强制为RESULTCODE_CANCEL
+        //对话框回调，当对话框被取消时，结果代码强制为CODE_CANCEL
         dialogResultListener.onDialogResult(mRequestCode, isCanceled ? CODE_CANCEL : mResultCode, result);
     }
 
@@ -353,15 +344,6 @@ public abstract class BaseDialog extends DialogFragment {
     }
 
     /**
-     * 设置对话框请求代码
-     * <p>
-     * 若requestCode不为0，Dialog结束时一定会回调，具体逻辑详见{@link #callbackResult()}
-     */
-    public final void setRequestCode(int requestCode) {
-        this.mRequestCode = requestCode;
-    }
-
-    /**
      * 返回对话框结果代码
      */
     public int getResultCode() {
@@ -375,6 +357,15 @@ public abstract class BaseDialog extends DialogFragment {
         return mRequestCode;
     }
 
+    /**
+     * 设置对话框请求代码
+     * <p>
+     * 若requestCode不为0，Dialog结束时一定会回调，具体逻辑详见{@link #callbackResult()}
+     */
+    public final void setRequestCode(int requestCode) {
+        this.mRequestCode = requestCode;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //PermissionManager代理权限请求后的返回处理
@@ -382,6 +373,25 @@ public abstract class BaseDialog extends DialogFragment {
             //PermissionManager未处理该回调，则调用父类方法
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    /**
+     * 对话框回调监听
+     * <p>
+     * 建议通过Activity或Fragment实现此接口进行回调，参见{@link #getDialogResultListener()}
+     * <p>
+     * 不建议Dialog直接持有DialogResultListener对象，因为Dialog一旦被销毁重建，持有的DialogResultListener对象为null
+     */
+    public interface DialogResultListener {
+
+        /**
+         * 回调结果接口
+         *
+         * @param requestCode 对话框请求码
+         * @param resultCode  返回结果码，若Dialog被取消，该值为{@link #CODE_CANCEL}
+         * @param data        返回数据
+         */
+        void onDialogResult(int requestCode, int resultCode, Bundle data);
     }
 
 }

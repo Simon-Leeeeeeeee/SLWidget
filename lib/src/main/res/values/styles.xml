@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <style name="BaseDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <!--窗口背景：透明-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+</resources>
