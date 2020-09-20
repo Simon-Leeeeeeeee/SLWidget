@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
@@ -35,21 +34,19 @@ import java.lang.reflect.Proxy;
  * <p>
  * 1. 仅支持SDK19(Android4.4)及以上
  * <p>
- * 2. 沉浸式状态栏需自行处理
- * <p>
- * 3. SDK21(Android5.0)以下必须在style中设置以下属性，否则{@link #convertToTranslucent()}无效
+ * 2. SDK21(Android5.0)以下必须在style中设置以下属性，否则{@link #convertToTranslucent()}无效
  * <p>
  * {@code <item name="android:windowIsTranslucent">true</item>}
  * <p>
- * 4. Window背景将会被置为transparent，由R.id.content的Parent来代替实现Window背景，详见{@link #getDecorView()}
+ * 3. Window背景将会被置为transparent，由SwipeBackView来代替实现Window背景，详见{@link #getSwipeBackView()}
  * <p>
- * 5. 侧滑会引起下层Activity生命周期变化，务必留意可能因此导致的问题
+ * 4. 侧滑会引起下层Activity生命周期变化，务必留意可能因此导致的问题
  * <p>
  * (a) onDestory -> onCreat -> onStart -> (onResume -> onPause) -> onStop
  * <p>
  * (b) onRestart -> onStart -> (onResume -> onPause) -> onStop
  * <p>
- * 6. 当顶层Activity方向与下层Activity方向不一致时侧滑会失效（下层方向未锁定除外），建议关闭该层Activity侧滑功能
+ * 5. 当顶层Activity方向与下层Activity方向不一致时侧滑会失效（下层方向未锁定除外），建议关闭该Activity侧滑功能
  * <p>
  * 示例场景：视频APP的横屏播放页面和下层竖屏页面
  *
@@ -262,8 +259,8 @@ public class SwipeBackHelper {
                 }
                 //起始触摸点距离满足侧滑
                 else if (mStartX < mSwipeBackEnableDistance) {
-                    convertToTranslucent();//通过反射将窗口转为透明
                     prepareSwipeViews();//预备侧滑操作相关的视图
+                    convertToTranslucent();//通过反射将窗口转为透明
                 }
                 break;
             }
@@ -360,8 +357,8 @@ public class SwipeBackHelper {
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
-                convertToTranslucent();//通过反射将窗口转为透明
                 prepareSwipeViews();//预备侧滑操作相关的视图
+                convertToTranslucent();//通过反射将窗口转为透明
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -436,12 +433,14 @@ public class SwipeBackHelper {
         View shadowView = getShadowView();
         if (shadowView != null) {
             //设置阴影视图的偏移量
-            shadowView.setTranslationX(offsetX - shadowView.getWidth());
+            shadowView.setTranslationX(offsetX - getSwipeBackView().getWidth());
             if (shadowView.getBackground() != null) {
                 int alpha = (int) ((1F - 1F * offsetX / shadowView.getWidth()) * 255);
                 //设置阴影视图的背景透明度
                 shadowView.getBackground().setAlpha(Math.max(0, Math.min(255, alpha)));
             }
+            //只有侧滑时才显示阴影视图
+            shadowView.setVisibility(offsetX == 0 ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -593,15 +592,14 @@ public class SwipeBackHelper {
     public ViewGroup getSwipeBackView() {
         if (mSwipeBackView == null) {
             ViewParent view = getDecorView().findViewById(Window.ID_ANDROID_CONTENT);
+            //向上递归找到DecorView的child
             while (view.getParent() != getDecorView()) {
                 view = view.getParent();
             }
             mSwipeBackView = (ViewGroup) view;
 
             //1. 将窗口背景设置给SwipeBackView
-            TypedArray typedArray = getActivity().getTheme().obtainStyledAttributes(new int[]{android.R.attr.windowBackground});
-            mSwipeBackView.setBackground(typedArray.getDrawable(0));
-            typedArray.recycle();
+            mSwipeBackView.setBackground(getDecorView().getBackground());
 
             //2. 将窗口设为透明
             getActivity().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
