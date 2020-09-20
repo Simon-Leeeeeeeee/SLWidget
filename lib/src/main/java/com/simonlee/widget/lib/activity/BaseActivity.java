@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ContentFrameLayout;
@@ -23,7 +22,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import com.simonlee.widget.lib.NotchDisplayMode;
+import com.simonlee.widget.lib.annotation.ImmersiveFlag;
+import com.simonlee.widget.lib.annotation.NotchDisplayMode;
 import com.simonlee.widget.lib.dialog.BaseDialog;
 import com.simonlee.widget.lib.permission.PermissionManager;
 import com.simonlee.widget.lib.widget.watermark.WaterMarkContentFrameLayout;
@@ -42,6 +42,39 @@ import cn.simonlee.widget.watermark.WaterMark;
 public abstract class BaseActivity extends AppCompatActivity implements BaseDialog.DialogResultListener {
 
     /**
+     * 被SystemUI占据的区域，如状态栏、导航栏、全面屏手势指示器等。取值与SystemUI是否被隐藏无关
+     * <p>
+     * 注意：
+     * <p>
+     * 这里的left、top、right、bottom，指的是距离对应窗口边界的值
+     */
+    private Rect mSystemUIRect = new Rect();
+
+    /**
+     * 被SystemWindow占据的区域，除了被SystemUI（状态栏、导航栏、全面屏手势指示器等）实际占据的区域外，还包含了异形屏凹槽区域占据的区域
+     * <p>
+     * 注意：
+     * <p>
+     * 这里的left、top、right、bottom，指的是距离对应窗口边界的值
+     * <p>
+     * 特例：
+     * <p>
+     * 1. 窗口模式时，不包含异形屏凹槽区域
+     * <p>
+     * 2. 通过{@link WindowManager.LayoutParams#FLAG_FULLSCREEN}实现全屏时，不包含软键盘区域
+     */
+    private Rect mSystemWindowRect = new Rect();
+
+    /**
+     * 被异形屏凹槽占据的区域
+     * <p>
+     * 注意：
+     * <p>
+     * 这里的left、top、right、bottom，指的是距离对应窗口边界的值
+     */
+    private Rect mDisplayCutoutRect = new Rect();
+
+    /**
      * 根布局
      */
     private ViewGroup mDecorView;
@@ -57,41 +90,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     private WaterMark mWaterMark;
 
     /**
-     * 被SystemUI占据的区域，如状态栏、导航栏、全面屏手势指示器。取值与SystemUI是否被隐藏无关
-     * <p>
-     * 注意：
-     * <p>
-     * 这里的left、top、right、bottom，指的是距离对应边界的高度
-     */
-    private Rect mSystemUIRect = new Rect();
-
-    /**
-     * 被SystemWindow占据的区域，除了SystemUI，还包含了异形屏凹槽区域、软件盘弹出区域。取值以实际占用为准，即SystemUI被隐藏时将会被排除
-     * <p>
-     * 注意：
-     * <p>
-     * 这里的left、top、right、bottom，指的是距离对应边界的高度
-     * <p>
-     * 特例：
-     * <p>
-     * 窗口模式时，不包含异形屏凹槽区域
-     */
-    private Rect mSystemWindowRect = new Rect();
-
-    /**
-     * 被异形屏凹槽占据的区域
-     * <p>
-     * 注意：
-     * <p>
-     * 这里的left、top、right、bottom，指的是距离对应边界的高度
-     */
-    private Rect mDisplayCutoutRect = new Rect();
-
-    /**
      * 返回Activity实例，尽可能用getActivity()来代替this的使用
      */
-    @SuppressWarnings("unchecked")
     public <T extends BaseActivity> T getActivity() {
+        //noinspection unchecked
         return (T) BaseActivity.this;
     }
 
@@ -106,7 +108,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     }
 
     /**
-     * 返回ContentView的父容器（R.id.content）
+     * 返回ContentView的父容器 (R.id.content)
+     * <p>
+     * 在Activity中是一个{@link FrameLayout}，在AppCompatActivity中是一个{@link ContentFrameLayout}
      */
     public FrameLayout getContentParent() {
         return getDecorView().findViewById(Window.ID_ANDROID_CONTENT);
@@ -115,56 +119,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //设置窗口变化监听
-        setWindowInsetsListener();
-    }
-
-    /**
-     * 设置窗口变化监听，用于异形屏、状态栏、导航栏、全屏、软件盘等适配
-     */
-    private void setWindowInsetsListener() {
-        // 监听窗口变化
-        getDecorView().setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
-                mSystemUIRect.set(insets.getStableInsetLeft(), insets.getStableInsetTop(), insets.getStableInsetRight(), insets.getStableInsetBottom());
-                mSystemWindowRect.set(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                    DisplayCutout cutout = insets.getDisplayCutout();
-                    if (cutout != null) {
-                        mDisplayCutoutRect.set(cutout.getSafeInsetLeft(), cutout.getSafeInsetTop(), cutout.getSafeInsetRight(), cutout.getSafeInsetBottom());
-                    } else {
-                        mDisplayCutoutRect.setEmpty();
-                    }
-                }
-                return view.onApplyWindowInsets(insets);
-            }
-        });
-        // 监听布局变化
-        getDecorView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(final View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                //注意窗口变化回调放在这里的原因：窗口变化的回调不够频繁，避免布局变化时不能很好适配
-                onApplyWindowInsets(computeWindowInsetsLeft(), computeWindowInsetsTop(), computeWindowInsetsRight(), computeWindowInsetsBottom());
-            }
-        });
-    }
-
-    /**
-     * 窗口变化回调，用于异形屏、状态栏、导航栏、全屏、软件盘等适配
-     *
-     * @param left   左侧安全距离，导航栏（横屏）、异形屏凹槽等
-     * @param top    顶部安全距离，状态栏、异形屏凹槽等
-     * @param right  右侧安全距离，导航栏（横屏）、异形屏凹槽等
-     * @param bottom 底部安全距离，导航栏（竖屏）、全面屏手势指示器、异形屏凹槽等
-     */
-    protected void onApplyWindowInsets(int left, int top, int right, int bottom) {
-        //插入TitleBar
-        insertTitleBar();
-        //修正TitleBar的高度和Padding值以适应窗口变化
-        resizeTitleBar(left, top, right);
-        //修正ContentParent的Padding值以适应窗口变化
-        resizeContentParent(left, top, right, bottom);
+        // 监听窗口变化，用于实现布局适配
+        setOnApplyWindowInsetsListener();
     }
 
     /**
@@ -194,8 +150,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     /**
      * 获取TitleBar
      */
-    @SuppressWarnings("unchecked")
     public <T extends View> T getTitleBar() {
+        //noinspection unchecked
         return (T) mTitleBar;
     }
 
@@ -226,7 +182,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     /**
      * 移除TitleBar，并返回实例
      */
-    @SuppressWarnings("unchecked")
     public <T extends View> T removeTitleBar() {
         final View titleBar = getTitleBar();
         this.mTitleBar = null;
@@ -234,115 +189,222 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
             //移除原TitleBar
             ((ViewGroup) titleBar.getParent()).removeViewInLayout(titleBar);
         }
+        //noinspection unchecked
         return (T) titleBar;
     }
 
     /**
-     * 将TitleBar插入到布局中，这里插入的是DecorView的孙View，介于DecorView与ContentParent之间的一个FrameLayout
+     * 将TitleBar插入到布局中，这里插入的是DecorView的孙View，介于DecorView与ContentParent之间的FrameLayout
      * <p>
-     * AppCompatActivity的结构：DecorView - LinearLayout - FrameLayout - FitWindowsFrameLayout/FitWindowsLinearLayout - ContentParent
+     * Activity的结构：DecorView - LinearLayout - FrameLayout(R.id.content)
+     * <p>
+     * AppCompatActivity的结构：DecorView - LinearLayout - FrameLayout - FitWindowsFrameLayout/FitWindowsLinearLayout/ActionBarOverlayLayout - ContentFrameLayout(R.id.content)
+     * <p>
+     * 注意：
+     * <p>
+     * 窗口模式下会在DecorView - LinearLayout之间多出一层DecorCaptionView
      */
     protected void insertTitleBar() {
         if (mTitleBar == null || mTitleBar.getParent() != null) {
             return;
         }
-        FrameLayout subDecorView = (FrameLayout) getContentParent().getParent().getParent();
-        //Activity的结构：DecorView - LinearLayout - ContentParent，这里要避免将TitleBar插入DecorView中
-        if (subDecorView != getDecorView()) {
+        ViewGroup subDecorView = (ViewGroup) getContentParent().getParent().getParent();
+        //这里要避免将TitleBar插入DecorView中
+        if ((subDecorView instanceof FrameLayout) && subDecorView != getDecorView()) {
             //插入TitleBar
             subDecorView.addView(mTitleBar);
         }
     }
 
     /**
+     * 监听窗口变化，用于实现布局适配
+     */
+    private void setOnApplyWindowInsetsListener() {
+        //设置WindowInsets监听
+        getDecorView().setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
+                mSystemUIRect.set(
+                        insets.getStableInsetLeft(), insets.getStableInsetTop(),
+                        insets.getStableInsetRight(), insets.getStableInsetBottom());
+                mSystemWindowRect.set(
+                        insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                        insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    DisplayCutout cutout = insets.getDisplayCutout();
+                    if (cutout == null) {
+                        mDisplayCutoutRect.setEmpty();
+                    } else {
+                        mDisplayCutoutRect.set(
+                                cutout.getSafeInsetLeft(), cutout.getSafeInsetTop(),
+                                cutout.getSafeInsetRight(), cutout.getSafeInsetBottom());
+                    }
+                }
+                return view.onApplyWindowInsets(insets);
+            }
+        });
+        //设置LayoutChange监听
+        getDecorView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(final View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                //插入TitleBar
+                insertTitleBar();
+                //窗口适配，任何布局变化都进行处理
+                onApplyWindowInsets(computeWindowInsetsLeft(), computeWindowInsetsTop(), computeWindowInsetsRight(), computeWindowInsetsBottom());
+            }
+        });
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        //窗口适配，页面切回时可能页面异常
+        onApplyWindowInsets(computeWindowInsetsLeft(), computeWindowInsetsTop(), computeWindowInsetsRight(), computeWindowInsetsBottom());
+    }
+
+    /**
+     * 窗口适配，根据异形屏、状态栏、导航栏、全屏、设备朝向等适配
+     *
+     * @param safeLeft   左侧安全距离，导航栏（横屏）、异形屏凹槽等
+     * @param safeTop    顶部安全距离，状态栏、异形屏凹槽等
+     * @param safeRight  右侧安全距离，导航栏（横屏）、异形屏凹槽等
+     * @param safeBottom 底部安全距离，导航栏（竖屏）、全面屏手势指示器、异形屏凹槽等
+     */
+    protected void onApplyWindowInsets(int safeLeft, int safeTop, int safeRight, int safeBottom) {
+        int titleBarHeight = 0;
+
+        //修正TitleBar的高度和Padding值以适应窗口变化
+        resizeTitleBar(safeLeft, safeTop, safeRight);
+
+        //获取TitleBar高度
+        if (mTitleBar != null && mTitleBar.getParent() != null && mTitleBar.getVisibility() != View.GONE) {
+            titleBarHeight = mTitleBar.getLayoutParams().height;
+        }
+
+        //校正WaterMark顶部安全距离，防止与标题栏/状态栏重叠
+        int waterMarkSafeTop = titleBarHeight > 0 ? titleBarHeight : (isFullScreen() || isStatusBarHidded() ? 0 : safeTop);
+        //修正WaterMark的Padding值以适应窗口变化
+        resizeWaterMark(safeLeft, waterMarkSafeTop, safeRight, safeBottom);
+
+        //校正ContentParent顶部安全距离
+        int contentSafeTop = titleBarHeight > 0 ? titleBarHeight : safeTop;
+        //修正ContentParent的Padding值以适应窗口变化
+        resizeContentParent(safeLeft, contentSafeTop, safeRight, safeBottom);
+    }
+
+    /**
      * 修正TitleBar的高度和Padding值以适应窗口变化
      */
-    protected void resizeTitleBar(int paddingLeft, int paddingTop, int paddingRight) {
+    protected void resizeTitleBar(int safeLeft, int safeTop, int safeRight) {
         if (mTitleBar != null && mTitleBar.getParent() != null && mTitleBar.getVisibility() != View.GONE) {
-            if (paddingTop != mTitleBar.getPaddingTop() || paddingLeft != mTitleBar.getPaddingLeft() || paddingRight != mTitleBar.getPaddingRight()) {
-                mTitleBar.setPadding(paddingLeft, paddingTop, paddingRight, 0);
+            if (safeTop != mTitleBar.getPaddingTop() || safeLeft != mTitleBar.getPaddingLeft() || safeRight != mTitleBar.getPaddingRight()) {
+                mTitleBar.setPadding(safeLeft, safeTop, safeRight, 0);
             }
             //指定TitleBar高度为PaddingTop加上ActionBar的高度
-            int titleBarHeight = paddingTop + getActionBarSize();
+            int titleBarHeight = safeTop + getActionBarSize();
             //获取TitleBar布局参数
             ViewGroup.LayoutParams titleBarLayoutParams = mTitleBar.getLayoutParams();
             //指定TitleBar布局宽高
             if (titleBarLayoutParams == null) {
                 titleBarLayoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, titleBarHeight);
+                mTitleBar.setLayoutParams(titleBarLayoutParams);
             } else if (titleBarLayoutParams.height != titleBarHeight) {
                 titleBarLayoutParams.height = titleBarHeight;
+                mTitleBar.setLayoutParams(titleBarLayoutParams);
             }
-            mTitleBar.setLayoutParams(titleBarLayoutParams);
         }
+    }
+
+    /**
+     * 修正WaterMark的Padding值以适应窗口变化
+     */
+    protected void resizeWaterMark(int safeLeft, int safeTop, int safeRight, int safeBottom) {
+        getWaterMark().setDrawPaddingTop(safeTop);//非全屏避免水印覆盖状态栏
     }
 
     /**
      * 修正ContentParent的Padding值以适应窗口变化
      */
-    protected void resizeContentParent(int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
-        if (mTitleBar != null && mTitleBar.getParent() != null && mTitleBar.getVisibility() != View.GONE) {
-            //调整paddingTop为titleBar的高度，避免与TitleBar重叠
-            paddingTop = mTitleBar.getLayoutParams().height;
-        }
-        //调整水印上边距
-        if (getWaterMark() != null) {
-            getWaterMark().setDrawPaddingTop(paddingTop);
-        }
-        //调整ContentParent的padding值
+    protected void resizeContentParent(int safeLeft, int safeTop, int safeRight, int safeBottom) {
+        //调整ContentParent的Padding值
         FrameLayout contentParent = getContentParent();
-        if (contentParent != null
-                && (paddingLeft != contentParent.getPaddingLeft()
-                || paddingTop != contentParent.getPaddingTop()
-                || paddingRight != contentParent.getPaddingRight()
-                || paddingBottom != contentParent.getPaddingBottom())) {
-            contentParent.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+        if (contentParent instanceof ContentFrameLayout
+                && (safeLeft != contentParent.getPaddingLeft()
+                || safeTop != contentParent.getPaddingTop()
+                || safeRight != contentParent.getPaddingRight()
+                || safeBottom != contentParent.getPaddingBottom())) {
+            contentParent.setPadding(safeLeft, safeTop, safeRight, safeBottom);
         }
     }
 
     /**
-     * 根据异形屏、状态栏、导航栏、全屏、软件盘等适配，计算出左边距安全距离
+     * 根据异形屏、状态栏、导航栏、全屏、设备朝向等适配，计算出距离左边窗口边界的安全距离
      */
-    protected int computeWindowInsetsLeft() {
+    public int computeWindowInsetsLeft() {
         if (isNavigationBarLayouted()) {
+            if (isNavigationBarHidded()) {
+                return mDisplayCutoutRect.left;
+            }
             return mSystemWindowRect.left;
-        } else if (isStatusBarLayouted() && isSupportNotchDisplay()) {
-            return mSystemWindowRect.left;
+        } else if (isStatusBarLayouted()) {
+            return mDisplayCutoutRect.left;
         }
         return 0;
     }
 
     /**
-     * 根据异形屏、状态栏、导航栏、全屏、软件盘等适配，计算出上边距安全距离
+     * 根据异形屏、状态栏、导航栏、全屏、设备朝向等适配，计算出距离上边窗口边界的安全距离
      */
-    protected int computeWindowInsetsTop() {
+    public int computeWindowInsetsTop() {
         if (isStatusBarLayouted() || isNavigationBarLayouted()) {
+            if (isStatusBarHidded()) {
+                return mDisplayCutoutRect.top;
+            }
             return mSystemWindowRect.top;
         }
         return 0;
     }
 
     /**
-     * 根据异形屏、状态栏、导航栏、全屏、软件盘等适配，计算出右边距安全距离
+     * 根据异形屏、状态栏、导航栏、全屏、设备朝向等适配，计算出距离右边窗口边界的安全距离
      */
-    protected int computeWindowInsetsRight() {
+    public int computeWindowInsetsRight() {
         if (isNavigationBarLayouted()) {
+            if (isNavigationBarHidded()) {
+                return mDisplayCutoutRect.right;
+            }
             return mSystemWindowRect.right;
-        } else if (isStatusBarLayouted() && isSupportNotchDisplay()) {
-            return mSystemWindowRect.right;
+        } else if (isStatusBarLayouted()) {
+            return mDisplayCutoutRect.right;
         }
         return 0;
     }
 
     /**
-     * 根据异形屏、状态栏、导航栏、全屏、软件盘等适配，计算出下边距安全距离
+     * 根据异形屏、状态栏、导航栏、全屏、设备朝向等适配，计算出距离下边窗口边界的安全距离
      */
-    protected int computeWindowInsetsBottom() {
+    public int computeWindowInsetsBottom() {
         if (isNavigationBarLayouted()) {
+            if (isNavigationBarHidded()) {
+                return mDisplayCutoutRect.bottom;
+            }
             return mSystemWindowRect.bottom;
-        } else if (isStatusBarLayouted()) {
-            return mSystemWindowRect.bottom - mSystemUIRect.bottom;
+        } else if (isStatusBarLayouted() && isNavigationBarHidded()) {
+            return mDisplayCutoutRect.bottom;
         }
         return 0;
+    }
+
+    /**
+     * 获取ActionBarSize属性，用于设置TitleBar高度
+     */
+    public int getActionBarSize() {
+        TypedArray values = obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
+        try {
+            return values.getDimensionPixelSize(0, 0);//第一个参数数组索引，第二个参数 默认值
+        } finally {
+            values.recycle();
+        }
     }
 
     /**
@@ -483,7 +545,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
      * <p>
      * 1. 若布局占用导航栏位置，状态栏位置也会被布局占用
      * <p>
-     * 2. 横屏时，导航栏可能在视图底部（全屏指示器），也可能在试图侧边（虚拟按键），不建议占用
+     * 2. 横屏时，导航栏可能在视图底部（全屏指示器），也可能在试图侧边（虚拟按键）
      *
      * @param layouted 是否占用导航栏位置进行布局
      */
@@ -506,6 +568,171 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     }
 
     /**
+     * 状态栏是否被隐藏
+     */
+    public boolean isStatusBarHidded() {
+        return (getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
+    }
+
+    /**
+     * 导航栏是否被隐藏
+     */
+    public boolean isNavigationBarHidded() {
+        return (getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0;
+    }
+
+    /**
+     * 显示状态栏
+     * <p>
+     * 注意：若设置了窗口全屏{@link #setFullScreen(boolean)}，需要取消全屏，否则状态栏不会显示
+     */
+    public void showStatusBar() {
+        //窗口模式下不允许设置
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindowMode()) {
+            return;
+        }
+        int visibility = getDecorView().getSystemUiVisibility();
+        //取消FLAG
+        visibility &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+        //生效
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    /**
+     * 显示导航栏
+     */
+    public void showNavigationBar() {
+        //窗口模式下不允许设置
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindowMode()) {
+            return;
+        }
+        int visibility = getDecorView().getSystemUiVisibility();
+        //取消FLAG
+        visibility &= ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        //生效
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    /**
+     * 隐藏状态栏
+     * <p>
+     * 注意：
+     * <p>
+     * 1. 无法避免在【页面切换、弹出软键盘】时失效
+     * <p>
+     * 2. Flag与StableLayout都将会同步影响导航栏的隐藏控制
+     *
+     * @param flag         控制状态栏/导航栏的隐藏状态将会在何种情况下失效
+     *                     <p>
+     *                     FLAG_NONE：当【页面切换、软键盘弹出、下拉状态栏】时失效，若同时隐藏导航栏，当【任意触摸】即失效
+     *                     <p>
+     *                     FLAG_IMMERSIVE：当【页面切换、软键盘弹出、下拉状态栏】时失效，若同时隐藏导航栏，当【上滑导航栏】也会失效
+     *                     <p>
+     *                     FLAG_IMMERSIVE_STICKY：当【页面切换、软键盘弹出】时失效
+     *                     <p><br/>
+     * @param stableLayout 是否保持页面布局，若为true，当状态栏/导航栏隐藏时不会入侵该区域
+     */
+    public void hideStatusBar(@ImmersiveFlag int flag, boolean stableLayout) {
+        //窗口模式下不允许设置
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindowMode()) {
+            return;
+        }
+        if (stableLayout) {
+            flag |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        }
+        int visibility = getDecorView().getSystemUiVisibility();
+        //先清除FLAG
+        visibility &= ~(View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        //再设置FLAG
+        visibility |= (View.SYSTEM_UI_FLAG_FULLSCREEN | flag);
+        //生效
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    /**
+     * 隐藏导航栏
+     * <p>
+     * 注意：
+     * <p>
+     * 1. 无法避免在【页面切换、弹出软键盘】时失效
+     * <p>
+     * 2. Flag与StableLayout都将会同步影响状态栏的隐藏控制
+     *
+     * @param flag         控制导航栏/状态栏的隐藏状态将会在何种情况下失效
+     *                     <p>
+     *                     FLAG_NONE：当【任意触摸】即失效
+     *                     <p>
+     *                     FLAG_IMMERSIVE：当【页面切换、软键盘弹出、上滑导航栏】时失效，若同时隐藏状态栏，【下拉状态栏】也失效
+     *                     <p>
+     *                     FLAG_IMMERSIVE_STICKY：当【页面切换、软键盘弹出】时失效
+     *                     <p><br/>
+     * @param stableLayout 是否保持页面布局，若为true，当导航栏/状态栏隐藏时不会入侵该区域
+     */
+    public void hideNavigationBar(@ImmersiveFlag int flag, boolean stableLayout) {
+        //窗口模式下不允许设置
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindowMode()) {
+            return;
+        }
+        if (stableLayout) {
+            flag |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        }
+        int visibility = getDecorView().getSystemUiVisibility();
+        //先清除FLAG
+        visibility &= ~(View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        //再设置FLAG
+        visibility |= (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | flag);
+        //生效
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    /**
+     * 是否设置全屏显示
+     */
+    public boolean isFullScreen() {
+        return (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
+
+    /**
+     * 设置全屏显示
+     * <p>
+     * 注意：
+     * <p>
+     * 状态栏将被隐藏，但导航栏不会
+     */
+    public void setFullScreen(boolean enable) {
+        //窗口模式下不允许设置
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindowMode()) {
+            return;
+        }
+        if (enable == isFullScreen()) {
+            return;
+        }
+        if (enable) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+    }
+
+    /**
+     * 获取异形屏适配模式
+     *
+     * @return <p>
+     * MODE_DEFAULT：默认，非全屏可使用凹槽区域，全屏不可使用
+     * <p>
+     * MODE_SHORT_EDGES：适配异形屏，全屏、非全屏均可使用凹槽区域
+     * <p>
+     * MODE_NEVER：不适配异形屏，不可使用凹槽区域
+     */
+    public @NotchDisplayMode
+    int getNotchDisplayMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams attributes = getWindow().getAttributes();
+            return attributes.layoutInDisplayCutoutMode;
+        } else return NotchDisplayMode.MODE_DEFAULT;
+    }
+
+    /**
      * 设置异形屏适配模式
      * <p>
      * MODE_DEFAULT：默认，非全屏可使用凹槽区域，全屏不可使用
@@ -522,52 +749,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseDial
     }
 
     /**
-     * 是否已适配异形屏
-     */
-    public boolean isSupportNotchDisplay() {
-        //判断Android P
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            WindowManager.LayoutParams attributes = getWindow().getAttributes();
-            return attributes.layoutInDisplayCutoutMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-        }
-        return false;
-    }
-
-    /**
-     * 返回异形屏缺口，非异形屏返回null
-     */
-    @Nullable
-    public DisplayCutout getDisplayCutout() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            WindowInsets windowInsets = getDecorView().getRootWindowInsets();
-            return windowInsets != null ? windowInsets.getDisplayCutout() : null;
-        }
-        return null;
-    }
-
-    /**
-     * 获取ActionBarSize属性，用于设置TitleBar高度
-     */
-    public int getActionBarSize() {
-        TypedArray values = obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-        try {
-            return values.getDimensionPixelSize(0, 0);//第一个参数数组索引，第二个参数 默认值
-        } finally {
-            values.recycle();
-        }
-    }
-
-    /**
      * 隐藏软键盘
      */
     public void hideInputSoft() {
-        View currentFocus = getDecorView().findFocus();
-        if (currentFocus == null) {
-            currentFocus = getCurrentFocus();
-        }
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
-            inputMethodManager.hideSoftInputFromWindow((currentFocus == null ? getDecorView() : currentFocus).getWindowToken(), 0);
+            inputMethodManager.hideSoftInputFromWindow(getDecorView().getWindowToken(), 0);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.simonlee.widget.lib;
+package com.simonlee.widget.lib.annotation;
 
 import android.os.Build;
 import android.support.annotation.IntDef;
@@ -8,11 +8,13 @@ import android.view.WindowManager;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static com.simonlee.widget.lib.NotchDisplayMode.MODE_DEFAULT;
-import static com.simonlee.widget.lib.NotchDisplayMode.MODE_SHORT_EDGES;
-import static com.simonlee.widget.lib.NotchDisplayMode.MODE_NEVER;
+import static com.simonlee.widget.lib.annotation.NotchDisplayMode.MODE_DEFAULT;
+import static com.simonlee.widget.lib.annotation.NotchDisplayMode.MODE_SHORT_EDGES;
+import static com.simonlee.widget.lib.annotation.NotchDisplayMode.MODE_NEVER;
 
 /**
+ * 异形屏适配标记
+ *
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
