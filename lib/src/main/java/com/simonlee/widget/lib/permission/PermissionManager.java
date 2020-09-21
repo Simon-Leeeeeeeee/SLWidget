@@ -107,7 +107,7 @@ public class PermissionManager {
         Context context = activity != null ? activity : fragment.requireContext();
         List<String> ungrantedPermissions = new ArrayList<>();//未授权的权限列表
         for (String permission : callback.getRequestPermissions()) {
-            if (PermissionChecker.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (PermissionChecker.checkSelfPermission(context, permission) != PermissionChecker.PERMISSION_GRANTED) {
                 //未授权
                 ungrantedPermissions.add(permission);
             }

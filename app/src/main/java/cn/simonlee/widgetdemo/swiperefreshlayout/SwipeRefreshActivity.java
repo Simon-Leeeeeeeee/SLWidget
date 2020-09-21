@@ -7,12 +7,12 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.simonlee.widget.lib.fragment.FragmentDispatcher;
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.fragment.BaseFragment;
 import cn.simonlee.widgetdemo.R;
+import cn.simonlee.widgetdemo.fragment.FragmentDispatcher;
 
 /**
  * 刷新页面

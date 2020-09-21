@@ -10,11 +10,10 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import com.simonlee.widget.lib.fragment.FragmentDispatcher;
-
 import cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout;
 import cn.simonlee.widgetdemo.fragment.BaseFragment;
 import cn.simonlee.widgetdemo.R;
+import cn.simonlee.widgetdemo.fragment.FragmentDispatcher;
 
 /**
  * 下拉刷新的Fragment
