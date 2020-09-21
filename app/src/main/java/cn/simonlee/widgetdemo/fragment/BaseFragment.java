@@ -1,4 +1,4 @@
-package cn.simonlee.widgetdemo;
+package cn.simonlee.widgetdemo.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,11 +7,12 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import cn.simonlee.widgetdemo.R;
 
 /**
  * Fragment基类
@@ -24,8 +25,6 @@ import android.view.ViewParent;
 @SuppressWarnings("unused")
 public abstract class BaseFragment extends Fragment {
 
-    private Toolbar mToolbar;
-
     private int mLayoutResID = View.NO_ID;
 
     public final void setContentView(@LayoutRes int layoutResID) {
@@ -36,7 +35,7 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (getView() != null) {
             ViewParent parent = getView().getParent();
-            if (parent != null && parent instanceof ViewGroup) {
+            if (parent instanceof ViewGroup) {
                 ((ViewGroup) parent).removeView(getView());
             }
             return getView();
@@ -45,13 +44,6 @@ public abstract class BaseFragment extends Fragment {
         } else {
             return super.onCreateView(inflater, container, savedInstanceState);
         }
-    }
-
-    public final Toolbar getToolBar() {
-        if (mToolbar == null && getActivity() != null) {
-            mToolbar = getActivity().findViewById(R.id.base_toolbar);
-        }
-        return mToolbar;
     }
 
     @SuppressWarnings("ConstantConditions")

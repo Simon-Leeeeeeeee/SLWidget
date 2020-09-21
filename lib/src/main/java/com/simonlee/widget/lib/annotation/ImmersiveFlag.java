@@ -16,7 +16,7 @@ import static com.simonlee.widget.lib.annotation.ImmersiveFlag.FLAG_IMMERSIVE_ST
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
- * @createdTime 2020/7/19
+ * @createdTime 2020-07-19
  */
 
 @IntDef({FLAG_NONE, FLAG_IMMERSIVE, FLAG_IMMERSIVE_STICKY})

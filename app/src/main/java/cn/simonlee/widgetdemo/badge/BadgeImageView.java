@@ -6,6 +6,7 @@ import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
 import cn.simonlee.widget.badgeview.Badge;
+import cn.simonlee.widget.badgeview.IBadge;
 
 /**
  * 带角标的ImageView
@@ -15,7 +16,7 @@ import cn.simonlee.widget.badgeview.Badge;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-07-19
  */
-public class BadgeImageView extends AppCompatImageView {
+public class BadgeImageView extends AppCompatImageView implements IBadge {
 
     private final Badge mBadge;
 
@@ -40,6 +41,7 @@ public class BadgeImageView extends AppCompatImageView {
         mBadge.drawBadge(canvas);
     }
 
+    @Override
     public Badge getBadge() {
         return mBadge;
     }

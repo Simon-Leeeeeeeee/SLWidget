@@ -15,7 +15,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout;
-import cn.simonlee.widgetdemo.BaseFragment;
+import cn.simonlee.widgetdemo.fragment.BaseFragment;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -28,8 +28,6 @@ import cn.simonlee.widgetdemo.R;
  */
 @SuppressWarnings("InflateParams")
 public class SwipeRefreshFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, SwipeRefreshLayout.OnRefreshListener {
-
-    private Animation mRotateAnimation;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private AlertDialog.Builder mAlertDialogBuilder;
@@ -80,11 +78,6 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
         findViewById(R.id.swiperefresh_pullup_refresh).setOnClickListener(this);
         findViewById(R.id.swiperefresh_pulldown_refresh).setOnClickListener(this);
         findViewById(R.id.swiperefresh_refresh_complete).setOnClickListener(this);
-
-        mRotateAnimation = new RotateAnimation(0F, 360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5F);
-        mRotateAnimation.setRepeatCount(-1);
-        mRotateAnimation.setDuration(1000);
-        mRotateAnimation.setInterpolator(new LinearInterpolator());
     }
 
     @Override

@@ -18,7 +18,7 @@ import static com.simonlee.widget.lib.annotation.NotchDisplayMode.MODE_NEVER;
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
- * @createdTime 2020/7/19
+ * @createdTime 2020-07-19
  */
 
 @RequiresApi(api = Build.VERSION_CODES.P)

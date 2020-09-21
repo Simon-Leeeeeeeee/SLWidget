@@ -2,6 +2,8 @@ package cn.simonlee.widgetdemo.swipeback;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -56,8 +58,9 @@ public class SwipeBackActivity extends CommonActivity implements View.OnClickLis
         //设置标题
         TitleBar titleBar = getTitleBar();
         titleBar.setTitle(getText(R.string.swipeback) + "-" + mIndex);
+        //更改窗口背景色
+        getWindow().setBackgroundDrawable(new ColorDrawable(mRandomColor));
 
-        findViewById(R.id.swipeback_rootlayout).setBackgroundColor(mRandomColor);
         findViewById(R.id.swipeback_btn_next).setOnClickListener(this);
     }
 
@@ -71,22 +74,8 @@ public class SwipeBackActivity extends CommonActivity implements View.OnClickLis
     }
 
     @Override
-    public View getContentBackgroundView() {
-        View contentBackgroundView = super.getContentBackgroundView();
-        if (contentBackgroundView != null) {
-            //统一背景View的颜色
-            contentBackgroundView.setBackgroundColor(mRandomColor);
-        }
-        return contentBackgroundView;
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.base_toolbar_navigation: {
-                onBackPressed();
-                break;
-            }
             case R.id.swipeback_btn_next: {
                 Intent intent = new Intent(this, SwipeBackActivity.class);
                 intent.putExtra("index", mIndex + 1);

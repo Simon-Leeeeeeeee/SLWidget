@@ -11,9 +11,10 @@ import java.util.LinkedList;
 /**
  * Activity管理类，通过注册Activity生命周期监听来实现
  *
- * @author 李小萌
+ * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
- * @createdTime 2019/10/15
+ * @github https://github.com/Simon-Leeeeeeeee/SLWidget
+ * @createdTime 2019-10-15
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ActivityHolder {

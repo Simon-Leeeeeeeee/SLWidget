@@ -59,7 +59,7 @@ public class SwipeBack extends SwipeBackHelper implements Handler.Callback {
     }
 
     @Override
-    protected void markTranslucentCompleted(boolean completed) {
+    protected void setTranslucentCompleted(boolean completed) {
         //窗口转为透明，且延时任务开启
         if (completed && startTime > 0) {
             //计算转换耗时，移除延时任务
@@ -67,14 +67,14 @@ public class SwipeBack extends SwipeBackHelper implements Handler.Callback {
             startTime = 0;
             mHandler.removeMessages(0);
         }
-        super.markTranslucentCompleted(completed);
+        super.setTranslucentCompleted(completed);
     }
 
     @Override
     public boolean handleMessage(Message msg) {
         if (startTime > 0) {
             //强制标记转换完成
-            super.markTranslucentCompleted(true);
+            super.setTranslucentCompleted(true);
         }
         return true;
     }

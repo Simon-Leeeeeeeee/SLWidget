@@ -1,14 +1,7 @@
 package cn.simonlee.widgetdemo;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.biometrics.BiometricPrompt;
-import android.hardware.fingerprint.FingerprintManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.CancellationSignal;
-import android.support.annotation.RequiresApi;
-import android.util.Log;
 import android.view.View;
 
 import com.simonlee.widget.lib.widget.titlebar.ActionItem;

@@ -25,7 +25,7 @@
             app:scrollpicker_spacing="-5dp"
             app:scrollpicker_textColor_center="@color/black_light_lv3"
             app:scrollpicker_textColor_outside="@color/gray_light_lv4"
-            app:scrollpicker_textFormat="2018"
+            app:scrollpicker_textFormat="0000"
             app:scrollpicker_textRatio="1.8"
             app:scrollpicker_textSize="18sp" />
 
@@ -45,7 +45,7 @@
             app:scrollpicker_spacing="-5dp"
             app:scrollpicker_textColor_center="@color/black_light_lv3"
             app:scrollpicker_textColor_outside="@color/gray_light_lv4"
-            app:scrollpicker_textFormat="12"
+            app:scrollpicker_textFormat="00"
             app:scrollpicker_textRatio="1.8"
             app:scrollpicker_textSize="18sp" />
 
@@ -65,7 +65,7 @@
             app:scrollpicker_spacing="-5dp"
             app:scrollpicker_textColor_center="@color/black_light_lv3"
             app:scrollpicker_textColor_outside="@color/gray_light_lv4"
-            app:scrollpicker_textFormat="31"
+            app:scrollpicker_textFormat="00"
             app:scrollpicker_textRatio="1.8"
             app:scrollpicker_textSize="18sp" />
 
@@ -79,7 +79,7 @@
             app:scrollpicker_spacing="-5dp"
             app:scrollpicker_textColor_center="@color/black_light_lv3"
             app:scrollpicker_textColor_outside="@color/gray_light_lv4"
-            app:scrollpicker_textFormat="24"
+            app:scrollpicker_textFormat="00"
             app:scrollpicker_textRatio="1.8"
             app:scrollpicker_textSize="18sp" />
 
@@ -99,7 +99,7 @@
             app:scrollpicker_spacing="-5dp"
             app:scrollpicker_textColor_center="@color/black_light_lv3"
             app:scrollpicker_textColor_outside="@color/gray_light_lv4"
-            app:scrollpicker_textFormat="59"
+            app:scrollpicker_textFormat="00"
             app:scrollpicker_textRatio="1.8"
             app:scrollpicker_textSize="18sp" />
 
@@ -126,8 +126,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorWindowBackground">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"

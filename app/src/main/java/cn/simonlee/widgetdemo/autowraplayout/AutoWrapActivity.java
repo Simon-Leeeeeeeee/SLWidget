@@ -83,10 +83,6 @@ public class AutoWrapActivity extends CommonActivity implements SeekBar.OnSeekBa
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.base_toolbar_navigation: {
-                onBackPressed();
-                break;
-            }
             case R.id.btn_gridlinecolor: {
                 if (mRandom == null) {
                     mRandom = new Random();

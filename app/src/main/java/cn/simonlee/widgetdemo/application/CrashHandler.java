@@ -32,9 +32,10 @@ import java.util.Locale;
 /**
  * 未捕获异常处理
  *
- * @author 李小萌
+ * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
- * @createdTime 2019/10/25
+ * @github https://github.com/Simon-Leeeeeeeee/SLWidget
+ * @createdTime 2019-10-25
  */
 @SuppressWarnings("WeakerAccess")
 public class CrashHandler extends UncaughtExceptionHandler {

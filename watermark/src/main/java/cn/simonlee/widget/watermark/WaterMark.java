@@ -44,7 +44,7 @@ import android.view.View;
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
- * @createdTime 2019/6/15
+ * @createdTime 2019-06-15
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class WaterMark {

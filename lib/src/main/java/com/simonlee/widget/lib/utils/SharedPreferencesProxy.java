@@ -22,7 +22,7 @@ import java.util.Set;
 @SuppressWarnings({"unused", "WeakerAccess", "RedundantSuppression"})
 public class SharedPreferencesProxy {
 
-    private SharedPreferences mSharedPreferences;
+    private final SharedPreferences mSharedPreferences;
 
     private SharedPreferences.Editor mEditor;
 
@@ -81,6 +81,13 @@ public class SharedPreferencesProxy {
 
     public void unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    public SharedPreferences.Editor edit() {
+        if (mEditor == null) {
+            mEditor = mSharedPreferences.edit();
+        }
+        return mEditor;
     }
 
     public SharedPreferences.Editor putString(String key, @Nullable String value) {

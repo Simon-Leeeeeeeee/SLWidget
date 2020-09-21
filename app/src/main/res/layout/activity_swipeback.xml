@@ -3,7 +3,6 @@
     android:id="@+id/swipeback_rootlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorWindowBackground"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 

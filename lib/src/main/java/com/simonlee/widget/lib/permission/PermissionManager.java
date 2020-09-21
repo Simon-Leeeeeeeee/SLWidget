@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,7 +40,7 @@ public class PermissionManager {
         //未授权的权限列表
         List<String> ungrantedPermissions = new ArrayList<>();
         for (String permission : permissions) {
-            if (PermissionChecker.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (PermissionChecker.checkSelfPermission(context, permission) != PermissionChecker.PERMISSION_GRANTED) {
                 //未授权
                 ungrantedPermissions.add(permission);
             }
@@ -181,7 +180,7 @@ public class PermissionManager {
             rejectedPermissions = new ArrayList<>();
             for (int i = 0; i < permissions.length; i++) {
                 if (i < grantResults.length) {
-                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    if (grantResults[i] != PermissionChecker.PERMISSION_GRANTED) {
                         rejectedPermissions.add(permissions[i]);
                     }
                 } else {
@@ -262,6 +261,10 @@ public class PermissionManager {
         }
 
         @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
+
+        @Override
         public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         }
 
@@ -284,18 +287,14 @@ public class PermissionManager {
 
         @Override
         public void onActivityStopped(Activity activity) {
-            if (activity.isFinishing()) {
-                Callback.removeCallBack(mKey);
-                mApplication.unregisterActivityLifecycleCallbacks(this);
-            }
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
         }
 
         @Override
         public void onActivityDestroyed(Activity activity) {
+            if (activity.isFinishing()) {
+                Callback.removeCallBack(mKey);
+                mApplication.unregisterActivityLifecycleCallbacks(this);
+            }
         }
     }
 
@@ -310,6 +309,18 @@ public class PermissionManager {
         private static HashMap<Integer, Callback> mCallBackMap = new HashMap<>();
 
         private static volatile int keyIndex;
+
+        /**
+         * 请求的权限数组
+         */
+        private final String[] mRequestPermissions;
+
+        /**
+         * @param requestPermissions 请求的权限数组
+         */
+        public Callback(@NonNull String[] requestPermissions) {
+            this.mRequestPermissions = requestPermissions;
+        }
 
         /**
          * 临时保存CallBack对象到HashMap中，并返回对应Key值
@@ -343,18 +354,6 @@ public class PermissionManager {
          */
         private synchronized static void clearCallbackMap() {
             mCallBackMap.clear();
-        }
-
-        /**
-         * 请求的权限数组
-         */
-        private final String[] mRequestPermissions;
-
-        /**
-         * @param requestPermissions 请求的权限数组
-         */
-        public Callback(@NonNull String[] requestPermissions) {
-            this.mRequestPermissions = requestPermissions;
         }
 
         /**

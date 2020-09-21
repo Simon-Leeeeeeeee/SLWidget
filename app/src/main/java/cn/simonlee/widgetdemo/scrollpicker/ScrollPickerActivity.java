@@ -93,10 +93,6 @@ public class ScrollPickerActivity extends CommonActivity implements ScrollPicker
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.base_toolbar_navigation: {
-                onBackPressed();
-                break;
-            }
             case R.id.btn_color_center: {
                 if (mRandom == null) {
                     mRandom = new Random();
@@ -168,7 +164,7 @@ public class ScrollPickerActivity extends CommonActivity implements ScrollPicker
                 break;
             }
             case R.id.datepicker_minute: {
-                mSelectedMin = mHourAdapter.getDate(position);
+                mSelectedMin = mMinAdapter.getDate(position);
                 break;
             }
         }

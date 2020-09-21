@@ -3,13 +3,12 @@ package cn.simonlee.widgetdemo.swiperefreshlayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import cn.simonlee.widgetdemo.CommonActivity;
-import cn.simonlee.widgetdemo.BaseFragment;
+import cn.simonlee.widgetdemo.fragment.BaseFragment;
 import cn.simonlee.widgetdemo.R;
 
 /**
@@ -67,10 +66,6 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.base_toolbar_navigation: {
-                onBackPressed();
-                break;
-            }
             case R.id.swiperefreshlayout_table_button: {
                 mViewPager.setCurrentItem(0);
                 break;

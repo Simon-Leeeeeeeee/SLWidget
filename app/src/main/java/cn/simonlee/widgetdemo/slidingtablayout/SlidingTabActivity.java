@@ -18,7 +18,7 @@ import cn.simonlee.widgetdemo.R;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2018-08-16
  */
-public class SlidingTabActivity extends CommonActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, SlidingTabLayout.OnTabClickListener {
+public class SlidingTabActivity extends CommonActivity implements ViewPager.OnPageChangeListener, SlidingTabLayout.OnTabClickListener {
 
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
@@ -41,19 +41,6 @@ public class SlidingTabActivity extends CommonActivity implements View.OnClickLi
 
         mViewPager.setAdapter(new SimpleViewPagerAdapter(10));
         mViewPager.addOnPageChangeListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.base_toolbar_navigation: {
-                onBackPressed();
-                break;
-            }
-            default: {
-                break;
-            }
-        }
     }
 
     @Override
