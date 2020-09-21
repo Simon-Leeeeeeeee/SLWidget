@@ -648,8 +648,14 @@ public class TitleBar extends ConstraintLayout implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (mOnActionItemClickListener != null && v instanceof ActionItemView) {
-            mOnActionItemClickListener.onActionItemClick(((ActionItemView) v).getAcionItem());
+        ActionItem actionItem = (v instanceof ActionItemView) ? ((ActionItemView) v).getActionItem() : null;
+        if (actionItem == null) {
+            return;
+        }
+        if (actionItem.onClickListener != null) {
+            actionItem.onClickListener.onClick(v);
+        } else if (mOnActionItemClickListener != null) {
+            mOnActionItemClickListener.onActionItemClick(actionItem);
         }
     }
 

@@ -24,6 +24,11 @@ import android.view.ViewGroup;
 public class ActionItemView extends AppCompatTextView {
 
     /**
+     * 绑定的ActionItem
+     */
+    private final ActionItem mActionItem;
+
+    /**
      * 设定的的DrawablePadding值
      * <p>
      * 仅当文本和图片均存在时，才使该padding生效，目的：使item的padding始终保持一致，以提升用户体验
@@ -39,11 +44,6 @@ public class ActionItemView extends AppCompatTextView {
      * 左侧Icon
      */
     private Drawable mIcon;
-
-    /**
-     * 绑定的ActionItem
-     */
-    private final ActionItem mActionItem;
 
     /**
      * 补充的padding值
@@ -86,10 +86,12 @@ public class ActionItemView extends AppCompatTextView {
         setGravity(Gravity.CENTER);
         //布局属性，宽自适应，高填满
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
         //水波纹点击效果
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true);
         setBackgroundResource(typedValue.resourceId);
+
         float density_dp = context.getResources().getDisplayMetrics().density;
         //设置padding为7dp
         int dp7 = (int) (density_dp * 7 + 0.5F);
@@ -97,14 +99,17 @@ public class ActionItemView extends AppCompatTextView {
         //设置drawablePadding为1dp
         int dp1 = (int) (density_dp + 0.5F);
         setCompoundDrawablePadding(dp1);
+
         //指定id
         setId(actionItem.id);
+
         //设置标题
         if (actionItem.title != null) {
             setText(actionItem.title);
         } else if (actionItem.titleResId != 0) {
             setText(actionItem.titleResId);
         }
+
         //设置左侧图标
         if (actionItem.icon != null) {
             setCompoundDrawablesWithIntrinsicBounds(actionItem.icon, null, null, null);
@@ -116,7 +121,7 @@ public class ActionItemView extends AppCompatTextView {
     /**
      * 获取对应的ActionItem
      */
-    protected ActionItem getAcionItem() {
+    protected ActionItem getActionItem() {
         return mActionItem;
     }
 

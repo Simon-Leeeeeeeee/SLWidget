@@ -3,6 +3,7 @@ package com.simonlee.widget.lib.widget.titlebar;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.view.View;
 
@@ -48,6 +49,11 @@ public class ActionItem {
     ActionItemView actionItemView;
 
     /**
+     * 点击事件
+     */
+    View.OnClickListener onClickListener;
+
+    /**
      * 构造方法
      *
      * @param titleResId 标题资源id
@@ -64,10 +70,28 @@ public class ActionItem {
      * @param titleResId 标题资源id
      * @param iconResId  图标资源id
      */
-    public ActionItem(int id, @StringRes int titleResId, @DrawableRes int iconResId) {
+    public ActionItem(@IdRes int id, @StringRes int titleResId, @DrawableRes int iconResId) {
         this.id = id;
         this.titleResId = titleResId;
         this.iconResId = iconResId;
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param title 标题文本
+     */
+    public ActionItem(CharSequence title) {
+        this(View.NO_ID, title, null);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param icon 图标
+     */
+    public ActionItem(Drawable icon) {
+        this(View.NO_ID, null, icon);
     }
 
     /**
@@ -85,9 +109,29 @@ public class ActionItem {
      *
      * @param id    item的id
      * @param title 标题文本
+     */
+    public ActionItem(@IdRes int id, CharSequence title) {
+        this(id, title, null);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param id   item的id
+     * @param icon 图标
+     */
+    public ActionItem(@IdRes int id, Drawable icon) {
+        this(id, null, icon);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param id    item的id
+     * @param title 标题文本
      * @param icon  图标
      */
-    public ActionItem(int id, CharSequence title, Drawable icon) {
+    public ActionItem(@IdRes int id, CharSequence title, Drawable icon) {
         this.id = id;
         this.title = title;
         this.icon = icon;
@@ -170,4 +214,9 @@ public class ActionItem {
         this.title = title;
         this.titleResId = 0;
     }
+
+    public void setOnClickListener(View.OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
 }
