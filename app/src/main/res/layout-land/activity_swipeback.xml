@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeback_rootlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,26 +29,61 @@
                 android:textSize="20sp" />
 
         </LinearLayout>
+
     </ScrollView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/gray" />
-
-    <EditText
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/swipeback_layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="@string/hello_world" />
+        android:paddingHorizontal="15dp">
 
-    <Button
-        android:id="@+id/swipeback_btn_next"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="15dp"
-        android:text="@string/next" />
+        <View
+            android:id="@id/anchor_1"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/gray"
+            app:layout_constraintBottom_toTopOf="@id/swipeback_et_hello"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/swipeback_et_hello"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:hint="@string/hello_world"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="none"
+            android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@id/swipeback_btn_next"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/swipeback_btn_emoji"
+            app:layout_constraintTop_toBottomOf="@id/anchor_1" />
+
+        <Button
+            android:id="@+id/swipeback_btn_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Emoji"
+            app:layout_constraintBottom_toBottomOf="@id/swipeback_et_hello"
+            app:layout_constraintLeft_toRightOf="@id/swipeback_et_hello"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/swipeback_et_hello" />
+
+        <Button
+            android:id="@+id/swipeback_btn_next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/next"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/swipeback_et_hello" />
+
+    </android.support.constraint.ConstraintLayout>
+
 </LinearLayout>
