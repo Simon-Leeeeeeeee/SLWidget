@@ -1,7 +1,8 @@
 <resources>
 
+    <!-- 窗口透明样式 -->
     <style name="BaseActivityTheme.TransparentWindow" parent="BaseActivityTheme">
-        <item name="android:windowBackground">@color/transparent</item>
+        <!--窗口不透明-->
         <item name="android:windowIsTranslucent">false</item>
     </style>
 

@@ -9,6 +9,15 @@
     <color name="colorWindowBackground">#F4F4F4</color>
 
     <color name="transparent">#00000000</color>
+    <color name="transparent_90">#1A000000</color>
+    <color name="transparent_80">#33000000</color>
+    <color name="transparent_70">#4D000000</color>
+    <color name="transparent_60">#66000000</color>
+    <color name="transparent_50">#80000000</color>
+    <color name="transparent_40">#99000000</color>
+    <color name="transparent_30">#B3000000</color>
+    <color name="transparent_20">#CC000000</color>
+    <color name="transparent_10">#E6000000</color>
 
     <color name="white">#FFFFFF</color>
 
@@ -18,21 +27,26 @@
     <color name="black_light_lv3">#4A4A4A</color>
     <color name="black_light_lv4">#4D4D4D</color>
     <color name="black_light_lv6">#888888</color>
+    <color name="black_light_lv7">#999999</color>
+    <color name="black_light_lv8">#AAAAAA</color>
     <color name="black_light_lv9">#BBBBBB</color>
 
     <color name="red">#FF0000</color>
 
     <color name="purple">#A020F0</color>
 
-    <color name="blue">#0076FF</color>
-    <color name="blue_light_lv1">#0076FF</color>
-    <color name="blue_light_lv2">#00B3FF</color>
-    <color name="blue_light_lv3">#36C0FA</color>
-    <color name="blue_light_lv4">#41C6FE</color>
-    <color name="blue_light_lv9">#C5DFFF</color>
-    <color name="blue_light_lv10">#ECF9FF</color>
+    <color name="blue">#007FFF</color>
+    <color name="blue_light_lv1">#0C7FFF</color>
+    <color name="blue_light_lv2">#188BFF</color>
+    <color name="blue_light_lv3">#2497FF</color>
+    <color name="blue_light_lv4">#30A3FF</color>
+    <color name="blue_light_lv5">#3CAFFF</color>
+    <color name="blue_light_lv6">#48BBFF</color>
+    <color name="blue_light_lv7">#54C7FF</color>
+    <color name="blue_light_lv8">#60C6FF</color>
+    <color name="blue_light_lv9">#6CD3FF</color>
+    <color name="blue_light_lv10">#78DFFF</color>
 
-    <color name="grayxx">#AA888888</color>
     <color name="gray">#888888</color>
     <color name="gray_light_lv0">#8F8E94</color>
     <color name="gray_light_lv1">#999999</color>

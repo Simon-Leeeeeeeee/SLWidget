@@ -33,35 +33,28 @@
             android:name=".MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="fullUser"
-            android:theme="@style/BaseActivityTheme"
-            android:windowSoftInputMode="adjustResize" />
+            android:theme="@style/BaseActivityTheme" />
         <activity
             android:name=".badge.BadgeActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="behind" />
         <activity
             android:name=".scrollpicker.ScrollPickerActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="behind" />
         <activity
             android:name=".autowraplayout.AutoWrapActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="behind" />
         <activity
             android:name=".swipeback.SwipeBackActivity"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="behind" />
         <activity
             android:name=".swiperefreshlayout.SwipeRefreshActivity"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="behind" />
         <activity
             android:name=".slidingtablayout.SlidingTabActivity"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="behind" />
     </application>
 
 </manifest>

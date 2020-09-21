@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="base_toolbar" type="id" />
-    <item name="base_toolbar_navigation" type="id" />
-
     <item name="resid_ignore" type="id" />
+    <item name="anchor_1" type="id" />
+    <item name="anchor_2" type="id" />
+    <item name="anchor_3" type="id" />
+    <item name="anchor_4" type="id" />
+    <item name="anchor_5" type="id" />
+    <item name="anchor_6" type="id" />
+    <item name="anchor_7" type="id" />
+    <item name="anchor_8" type="id" />
+    <item name="anchor_9" type="id" />
 </resources>

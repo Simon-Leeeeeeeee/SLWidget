@@ -1,7 +1,6 @@
 package cn.simonlee.widgetdemo;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,10 +22,6 @@ public class SplashActivity extends BaseActivity implements Handler.Callback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            //全面屏适配
-            supportNotchDisplay(true);
-        }
         mHandler = new Handler(this);
     }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BaseActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <!--状态栏颜色-->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!--光标、进度条等颜色-->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--ActionMode样式-->
+        <item name="actionModeStyle">@style/ActionModeStyle</item>
+        <!--ActionMode关闭按钮样式-->
+        <item name="actionModeCloseButtonStyle">@style/ActionModeCloseButtonStyle</item>
+        <!--ActionMode浮动-->
+        <item name="windowActionModeOverlay">false</item>
+        <!--窗口背景色-->
+        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <!--窗口动画样式-->
+        <item name="android:windowAnimationStyle">@style/WindowAnimationStyle</item>
+        <!--兼容异形屏-->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+
+</resources>
