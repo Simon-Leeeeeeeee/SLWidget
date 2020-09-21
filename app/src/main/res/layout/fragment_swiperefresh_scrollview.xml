@@ -6,15 +6,20 @@
     android:orientation="vertical"
     android:paddingBottom="20dp">
 
-    <cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout
+    <ImageView
+        android:id="@+id/swiperefresh_iv_top"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/blue_light_lv6" />
+
+    <cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshLayout
         android:id="@+id/swiperefreshfragment_swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:swiperefresh_footer_layout="@layout/layout_refresh_footer"
-        app:swiperefresh_header_layout="@layout/layout_refresh_header">
+        app:swiperefresh_adaptPointerDown="false">
 
-    <ScrollView
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none">
@@ -117,7 +122,7 @@
             </LinearLayout>
         </ScrollView>
 
-    </cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout>
+    </cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshLayout>
 
     <View
         android:layout_width="match_parent"
@@ -129,8 +134,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:paddingTop="14dp"
+        android:paddingRight="10dp"
         android:text="@string/pulldown"
         android:textColor="@color/black" />
 
@@ -182,8 +187,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:paddingTop="4dp"
+        android:paddingRight="10dp"
         android:text="@string/pullup"
         android:textColor="@color/black" />
 

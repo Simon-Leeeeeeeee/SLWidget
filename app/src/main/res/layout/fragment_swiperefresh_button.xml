@@ -6,13 +6,18 @@
     android:orientation="vertical"
     android:paddingBottom="20dp">
 
-    <cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout
+    <ImageView
+        android:id="@+id/swiperefresh_iv_top"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorAccent" />
+
+    <cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshLayout
         android:id="@+id/swiperefreshfragment_swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:swiperefresh_footer_layout="@layout/layout_refresh_footer"
-        app:swiperefresh_header_layout="@layout/layout_refresh_header">
+        app:swiperefresh_fitChildPadding="false">
 
         <Button
             android:layout_width="match_parent"
@@ -20,7 +25,7 @@
             android:background="@drawable/bg_card_select_white_gray"
             android:text="@string/swiperefreshlayout_introduction" />
 
-    </cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout>
+    </cn.simonlee.widgetdemo.swiperefreshlayout.SwipeRefreshLayout>
 
     <View
         android:layout_width="match_parent"

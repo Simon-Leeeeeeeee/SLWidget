@@ -1,10 +1,13 @@
 package cn.simonlee.widgetdemo.swiperefreshlayout;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.simonlee.widget.lib.fragment.FragmentDispatcher;
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import cn.simonlee.widgetdemo.CommonActivity;
@@ -25,6 +28,7 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
     private View mCurrentLable;
     private View mLable_Button, mLable_ScrollView, mLable_ViewPager;
     private SwipeRefreshPagerAdapter mSwipeRefreshPagerAdapter;
+    private ViewGroup mLayout_Lable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,7 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
     private void initView() {
         TitleBar titleBar = getTitleBar();
         titleBar.setTitle(R.string.swiperefreshlayout);
+        titleBar.setBackgroundColor(Color.TRANSPARENT);
 
         mViewPager = findViewById(R.id.swiperefresh_viewpager);
 
@@ -43,9 +48,11 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
         mViewPager.setAdapter(mSwipeRefreshPagerAdapter);
         mViewPager.addOnPageChangeListener(this);
 
-        mLable_Button = findViewById(R.id.swiperefreshlayout_table_button);
-        mLable_ScrollView = findViewById(R.id.swiperefreshlayout_table_scrollview);
-        mLable_ViewPager = findViewById(R.id.swiperefreshlayout_table_viewpager);
+        mLayout_Lable = findViewById(R.id.swiperefreshlayout_layout_lable);
+
+        mLable_Button = findViewById(R.id.swiperefreshlayout_lable_button);
+        mLable_ScrollView = findViewById(R.id.swiperefreshlayout_lable_scrollview);
+        mLable_ViewPager = findViewById(R.id.swiperefreshlayout_lable_viewpager);
 
         mLable_Button.setOnClickListener(this);
         mLable_ScrollView.setOnClickListener(this);
@@ -53,6 +60,13 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
 
         mCurrentLable = mLable_Button;
         mCurrentLable.setSelected(true);
+    }
+
+    @Override
+    protected void resizeContentParent(int safeLeft, int safeTop, int safeRight, int safeBottom) {
+        super.resizeContentParent(safeLeft, 0, safeRight, 0);
+        mLayout_Lable.setPadding(0, 0, 0, safeBottom);
+        FragmentDispatcher.dispatchTitleBarHeightResized(getSupportFragmentManager(), safeTop);
     }
 
     @Override
@@ -66,15 +80,15 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.swiperefreshlayout_table_button: {
+            case R.id.swiperefreshlayout_lable_button: {
                 mViewPager.setCurrentItem(0);
                 break;
             }
-            case R.id.swiperefreshlayout_table_scrollview: {
+            case R.id.swiperefreshlayout_lable_scrollview: {
                 mViewPager.setCurrentItem(1);
                 break;
             }
-            case R.id.swiperefreshlayout_table_viewpager: {
+            case R.id.swiperefreshlayout_lable_viewpager: {
                 mViewPager.setCurrentItem(2);
                 break;
             }

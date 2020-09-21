@@ -6,13 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.ScrollView;
 import android.widget.Switch;
-import android.widget.TextView;
+
+import com.simonlee.widget.lib.fragment.FragmentDispatcher;
 
 import cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout;
 import cn.simonlee.widgetdemo.fragment.BaseFragment;
@@ -27,7 +25,8 @@ import cn.simonlee.widgetdemo.R;
  * @createdTime 2017-08-24
  */
 @SuppressWarnings("InflateParams")
-public class SwipeRefreshFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, SwipeRefreshLayout.OnRefreshListener {
+public class SwipeRefreshFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener
+        , SwipeRefreshLayout.OnRefreshListener, FragmentDispatcher.OnTitleBarHeightResizedInterface {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private AlertDialog.Builder mAlertDialogBuilder;
@@ -46,6 +45,19 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
         super.onViewCreated(view, savedInstanceState);
         if (getUserVisibleHint()) {
             initView();
+        }
+    }
+
+    @Override
+    public void onTitleBarHeightResized(int titleBarHeight) {
+        View contentView = findViewById(R.id.swiperefresh_iv_top);
+        if (contentView != null) {
+            ViewGroup.LayoutParams lp = contentView.getLayoutParams();
+            if (lp == null) {
+                lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, titleBarHeight);
+            }
+            lp.height = titleBarHeight;
+            contentView.setLayoutParams(lp);
         }
     }
 
@@ -121,11 +133,11 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
                 break;
             }
             case R.id.swiperefresh_pulldown_refreshable: {
-                setHeaderRefreshable(mSwipeRefreshLayout.getHeaderRefreshView(), isChecked);
+                mSwipeRefreshLayout.setHeaderRefreshable(isChecked);
                 break;
             }
             case R.id.swiperefresh_pullup_refreshable: {
-                setFooterRefreshable(mSwipeRefreshLayout.getFooterRefreshView(), isChecked);
+                mSwipeRefreshLayout.setFooterRefreshable(isChecked);
                 break;
             }
             default: {
@@ -134,101 +146,20 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
         }
     }
 
-    private void setHeaderRefreshable(View refreshView, boolean enable) {
-        mSwipeRefreshLayout.setHeaderRefreshable(enable);
-        View loadingImage = refreshView.findViewById(R.id.refresh_image);
-        TextView loadingText = refreshView.findViewById(R.id.refresh_text);
-        loadingText.setText(enable ? R.string.pulldown_refresh : R.string.pulldown_norefresh);
-        loadingImage.setVisibility(enable ? View.VISIBLE : View.GONE);
-    }
-
-    private void setFooterRefreshable(View refreshView, boolean enable) {
-        mSwipeRefreshLayout.setFooterRefreshable(enable);
-        View loadingImage = refreshView.findViewById(R.id.refresh_image);
-        TextView loadingText = refreshView.findViewById(R.id.refresh_text);
-        loadingText.setText(enable ? R.string.pullup_refresh : R.string.pullup_norefresh);
-        loadingImage.setVisibility(enable ? View.VISIBLE : View.GONE);
+    @Override
+    public void onHeaderRefresh(SwipeRefreshLayout parent, boolean isChanged, int state, float offset) {
+        if (isChanged && state == SwipeRefreshLayout.STATE_REFRESHING) {
+            if (parent.isHeaderRefreshFolded()) {
+                showAlertDialog("正在加载中（顶部）");
+            }
+        }
     }
 
     @Override
-    public void onRefresh(SwipeRefreshLayout parent, View refreshView, float offsetY, int state, boolean isChanged, boolean isFinally) {
-        if (refreshView == parent.getHeaderRefreshView() && !parent.isHeaderRefreshable()) {
-            return;
-        }
-        if (refreshView == parent.getFooterRefreshView() && !parent.isFooterRefreshable()) {
-            return;
-        }
-        View loadingImage = refreshView.findViewById(R.id.refresh_image);
-        TextView loadingText = refreshView.findViewById(R.id.refresh_text);
-        switch (state) {
-            case SwipeRefreshLayout.STATE_CLOSE: {
-                if (isChanged) {
-                    loadingImage.clearAnimation();
-                }
-                break;
-            }
-            case SwipeRefreshLayout.STATE_OPEN: {
-                if (isChanged) {
-                    loadingText.setText(refreshView == parent.getHeaderRefreshView() ? R.string.pulldown_refresh : R.string.pullup_refresh);
-                }
-                loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
-                break;
-            }
-            case SwipeRefreshLayout.STATE_READY: {
-                if (isChanged) {
-                    loadingText.setText(R.string.release_refresh);
-                }
-                loadingImage.setRotation(-360 * Math.abs(offsetY) / refreshView.getHeight());
-                break;
-            }
-            case SwipeRefreshLayout.STATE_REFRESHING: {
-                if (refreshView == parent.getHeaderRefreshView()) {
-                    if (isChanged && !parent.isHeaderRefreshFolded()) {
-                        loadingText.setText("正在加载...");
-                        loadingImage.startAnimation(mRotateAnimation);
-                    }
-                    if (isFinally && parent.isHeaderRefreshFolded()) {
-                        showAlertDialog("正在加载中（顶部）");
-                    }
-                } else if (refreshView == parent.getFooterRefreshView()) {
-                    if (isChanged && !parent.isFooterRefreshFolded()) {
-                        loadingText.setText("正在加载...");
-                        loadingImage.startAnimation(mRotateAnimation);
-                    }
-                    if (isFinally && parent.isFooterRefreshFolded()) {
-                        showAlertDialog("正在加载中（底部）");
-                    }
-                }
-                break;
-            }
-            case SwipeRefreshLayout.STATE_REFRESH_COMPLETE: {
-                if (isChanged) {
-                    loadingText.setText("加载完成");
-                    loadingImage.clearAnimation();
-                    loadingImage.setRotation(0);
-                }
-                break;
-            }
-        }
-        View childView = parent.getChildView();
-        if (childView instanceof ScrollView) {
-            if (state == SwipeRefreshLayout.STATE_REFRESHING && Math.abs(offsetY) == refreshView.getHeight()) {
-                if (refreshView == parent.getHeaderRefreshView()) {
-                    int diff = refreshView.getHeight() - childView.getPaddingBottom();
-                    if (diff > 0) {
-                        childView.setPadding(0, 0, 0, refreshView.getHeight());
-                    }
-                } else {
-                    int diff = refreshView.getHeight() - childView.getPaddingTop();
-                    if (diff > 0) {
-                        childView.setPadding(0, diff, 0, 0);
-                        childView.scrollBy(0, diff);
-                    }
-                }
-            } else if (childView.getPaddingTop() != 0 || childView.getPaddingBottom() != 0) {
-                int diff = -childView.getPaddingTop();
-                childView.setPadding(0, 0, 0, 0);
-                childView.scrollBy(0, diff);
+    public void onFooterRefresh(SwipeRefreshLayout parent, boolean isChanged, int state, float offset) {
+        if (isChanged && state == SwipeRefreshLayout.STATE_REFRESHING) {
+            if (parent.isFooterRefreshFolded()) {
+                showAlertDialog("正在加载中（底部）");
             }
         }
     }
