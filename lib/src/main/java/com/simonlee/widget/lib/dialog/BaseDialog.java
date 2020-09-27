@@ -52,11 +52,6 @@ public abstract class BaseDialog extends DialogFragment {
     private View mContentView;
 
     /**
-     * 布局资源id
-     */
-    private int mLayoutResID = View.NO_ID;
-
-    /**
      * 标志Dialog是否被取消
      * <p>
      * 若为true，{@link DialogResultListener#onDialogResult(int, int, Bundle)}回调的resultCode将会强制为{@link #CODE_CANCEL}
@@ -84,6 +79,14 @@ public abstract class BaseDialog extends DialogFragment {
      * 隐藏对话框时回调的结果
      */
     private Bundle mResultBundle;
+
+    /**
+     * 返回DialogFragment实例，尽可能用getDialogFragment()来代替this的使用
+     */
+    public <T extends BaseDialog> T getDialogFragment() {
+        //noinspection unchecked
+        return (T) BaseDialog.this;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,37 +123,41 @@ public abstract class BaseDialog extends DialogFragment {
     }
 
     /**
-     * 设置布局，在{@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}之前调用
+     * 设置布局
      */
-    protected final void setContentView(@LayoutRes int layoutResID) {
-        this.mLayoutResID = layoutResID;
-        this.mContentView = null;
+    protected void setContentView(@LayoutRes int layoutResID) {
+        this.setContentView(LayoutInflater.from(requireContext()).inflate(layoutResID, null));
     }
 
     /**
-     * 设置布局，在{@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}之前调用
+     * 设置布局
      */
-    protected final void setContentView(View contentView) {
+    protected void setContentView(View contentView) {
         this.mContentView = contentView;
-        this.mLayoutResID = View.NO_ID;
+        if (getDialog() != null) {
+            getDialog().setContentView(mContentView);
+        }
+    }
+
+    /**
+     * 设置布局
+     */
+    protected void setContentView(View contentView, @NonNull ViewGroup.LayoutParams layoutParams) {
+        this.mContentView = contentView;
+        if (getDialog() != null) {
+            getDialog().setContentView(mContentView, layoutParams);
+        }
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //当dialog被销毁重建时，view可以直接复用，无需inflate操作
-        if (getView() != null) {
-            ViewParent parent = getView().getParent();
+        if (mContentView != null) {
+            ViewParent parent = mContentView.getParent();
             if (parent instanceof ViewGroup) {
-                ((ViewGroup) parent).removeView(getView());
+                ((ViewGroup) parent).removeView(mContentView);
             }
-            return getView();
-        } else if (mContentView != null) {
-            return mContentView;
-        } else if (mLayoutResID != View.NO_ID) {
-            return inflater.inflate(this.mLayoutResID, null);
-        } else {
-            return super.onCreateView(inflater, container, savedInstanceState);
         }
+        return mContentView;
     }
 
     @Override
@@ -161,15 +168,8 @@ public abstract class BaseDialog extends DialogFragment {
     }
 
     public final <T extends View> T findViewById(@IdRes int id) {
-        if (getView() == null) {
-            //noinspection unchecked
-            return (T) getNull();
-        }
-        return getView().findViewById(id);
-    }
-
-    private Object getNull() {
-        return null;
+        //noinspection ConstantConditions
+        return getDialog().getWindow().getDecorView().findViewById(id);
     }
 
     /**

@@ -52,17 +52,17 @@ public class PermissionManager {
      * 检查权限，并进行回调
      *
      * @param context  上下文
-     * @param callback 权限请求回调
+     * @param callback 权限请求回调。若权限全部允许将会回调{@link Callback#onPassed()}，否则回调{@link Callback#onFailed(String[])}
      */
     public static void checkPermission(@NonNull Context context, @NonNull Callback callback) {
         //检查权限
         List<String> ungrantedPermissions = checkPermission(context, callback.getRequestPermissions());
         if (ungrantedPermissions.isEmpty()) {
             //权限通过
-            callback.onRequestPassed();
+            callback.onPassed();
         } else {
             //权限失败
-            callback.onRequestFailed(ungrantedPermissions.toArray(new String[0]));
+            callback.onFailed(ungrantedPermissions.toArray(new String[0]));
         }
     }
 
@@ -74,7 +74,7 @@ public class PermissionManager {
      *
      * @param activity 用于请求权限，必须重写{@link Activity#onRequestPermissionsResult(int, String[], int[])}方法，
      *                 并确保一定会调用{@link #delegateRequestPermissionsResult(Activity, int, String[], int[])}
-     * @param callback 权限请求回调
+     * @param callback 权限请求回调。若权限全部允许将会回调{@link Callback#onPassed()}，否则回调{@link Callback#onRequestRejected(String[], boolean)}
      */
     public static void requestPermissions(@NonNull Activity activity, @NonNull Callback callback) {
         requestPermissions(activity, null, callback);
@@ -88,7 +88,7 @@ public class PermissionManager {
      *
      * @param activity 用于请求权限，必须重写{@link Fragment#onRequestPermissionsResult(int, String[], int[])}方法，
      *                 并确保一定会调用{@link #delegateRequestPermissionsResult(Fragment, int, String[], int[])}
-     * @param callback 权限请求回调
+     * @param callback 权限请求回调。若权限全部允许将会回调{@link Callback#onPassed()}，否则回调{@link Callback#onRequestRejected(String[], boolean)}
      */
     public static void requestPermissions(@NonNull Fragment fragment, @NonNull Callback callback) {
         requestPermissions(null, fragment, callback);
@@ -100,8 +100,8 @@ public class PermissionManager {
      * @param activity 通过Activity进行请求，应确保该Activity重写了{@link Activity#onRequestPermissionsResult(int, String[], int[])}方法，
      *                 并且一定会调用{@link #delegateRequestPermissionsResult(Activity, int, String[], int[])}
      * @param fragment 通过Fragment进行请求应确保该Fragment重写了{@link Fragment#onRequestPermissionsResult(int, String[], int[])}方法，
-     *                 *                 并且一定会调用{@link #delegateRequestPermissionsResult(Fragment, int, String[], int[])}
-     * @param callback 权限请求回调
+     *                 并且一定会调用{@link #delegateRequestPermissionsResult(Fragment, int, String[], int[])}
+     * @param callback 权限请求回调。若权限全部允许将会回调{@link Callback#onPassed()}，否则回调{@link Callback#onRequestRejected(String[], boolean)}
      */
     private static void requestPermissions(Activity activity, Fragment fragment, @NonNull Callback callback) {
         Context context = activity != null ? activity : fragment.requireContext();
@@ -128,44 +128,45 @@ public class PermissionManager {
             }
         } else {
             //权限正常，直接回调
-            callback.onRequestPassed();
+            callback.onPassed();
         }
     }
 
     /**
      * 代理请求权限的回调处理，必须重写{@link Activity#onRequestPermissionsResult(int, String[], int[])}方法，并确保一定会调用此方法
      *
-     * @param callBackKey  Callback的key值，应该是{@link Callback#keepCallBack(Callback)}返回的key值
+     * @param requestCode  请求代码，实际应为Callback的key值，详见{@link #requestPermissions(Activity, Callback)}
      * @param permissions  请求的权限列表
      * @param grantResults 返回的结果列表
      * @return 是否拦截处理了该权限请求回调
      */
-    public static boolean delegateRequestPermissionsResult(@NonNull Activity activity, int callBackKey, String[] permissions, int[] grantResults) {
-        return delegateRequestPermissionsResult(activity, null, callBackKey, permissions, grantResults);
+    public static boolean delegateRequestPermissionsResult(@NonNull Activity activity, int requestCode, String[] permissions, int[] grantResults) {
+        return delegateRequestPermissionsResult(activity, null, requestCode, permissions, grantResults);
     }
 
     /**
      * 代理请求权限的回调处理，必须重写{@link Fragment#onRequestPermissionsResult(int, String[], int[])}方法，并确保一定会调用此方法
      *
-     * @param callBackKey  Callback的key值，应该是{@link Callback#keepCallBack(Callback)}返回的key值
+     * @param requestCode  请求代码，实际应为Callback的key值，详见{@link #requestPermissions(Fragment, Callback)}
      * @param permissions  请求的权限列表
      * @param grantResults 返回的结果列表
      * @return 是否拦截处理了该权限请求回调
      */
-    public static boolean delegateRequestPermissionsResult(@NonNull Fragment fragment, int callBackKey, String[] permissions, int[] grantResults) {
-        return delegateRequestPermissionsResult(null, fragment, callBackKey, permissions, grantResults);
+    public static boolean delegateRequestPermissionsResult(@NonNull Fragment fragment, int requestCode, String[] permissions, int[] grantResults) {
+        return delegateRequestPermissionsResult(null, fragment, requestCode, permissions, grantResults);
     }
 
 
     /**
      * 代理请求权限的回调处理
      *
-     * @param callBackKey  Callback的key值，应该是{@link Callback#keepCallBack(Callback)}返回的key值
+     * @param callBackKey  Callback的key值，用于取回临时保存在静态HashMap中的Callback
      * @param permissions  请求的权限列表
      * @param grantResults 返回的结果列表
      * @return 是否拦截处理了该权限请求回调
      */
     private static boolean delegateRequestPermissionsResult(Activity activity, Fragment fragment, int callBackKey, String[] permissions, int[] grantResults) {
+        //通过key值取回Callback回调，若为null则返回false。因此只能代理通过requestPermissions方法进行的权限请求
         Callback callBack = Callback.removeCallBack(callBackKey);
         if (callBack == null) {
             return false;
@@ -190,7 +191,7 @@ public class PermissionManager {
         }
         if (rejectedPermissions.isEmpty()) {
             //权限获取成功
-            callBack.onRequestPassed();
+            callBack.onPassed();
         } else {
             //标记是否可以再次请求权限
             boolean canRequestAgain = true;
@@ -209,7 +210,7 @@ public class PermissionManager {
     }
 
     /**
-     * 跳转权限设置页面
+     * 跳转权限设置页面，但返回APP后不会进行回调
      * <p>
      * 建议在{@link Callback#onRequestRejected(String[])}方法中调用
      */
@@ -225,7 +226,9 @@ public class PermissionManager {
     /**
      * 跳转权限设置页面，并在返回APP后再次检查权限并回调
      * <p>
-     * 建议在{@link Callback#onRequestRejected(String[])}方法中调用
+     * 1. 建议在{@link Callback#onRequestRejected(String[])}方法中调用
+     * <p>
+     * 2. 权限全部允许将会回调{@link Callback#onPassed()}，否则回调{@link Callback#onFailed(String[])}
      */
     public static void startPermissionSettingActivity(@NonNull Context context, @NonNull Callback callBack) {
         Application application;
@@ -299,7 +302,7 @@ public class PermissionManager {
     }
 
     /**
-     * 权限请求回调
+     * 【检查、或请求】权限的回调接口
      */
     public static abstract class Callback {
 
@@ -311,12 +314,12 @@ public class PermissionManager {
         private static volatile int keyIndex;
 
         /**
-         * 请求的权限数组
+         * 【检查、或请求】的权限数组
          */
         private final String[] mRequestPermissions;
 
         /**
-         * @param requestPermissions 请求的权限数组
+         * @param requestPermissions 【检查、或请求】的权限数组
          */
         public Callback(@NonNull String[] requestPermissions) {
             this.mRequestPermissions = requestPermissions;
@@ -357,29 +360,37 @@ public class PermissionManager {
         }
 
         /**
-         * 返回请求的权限数组
+         * 返回【检查、或请求】的权限数组
          */
         protected String[] getRequestPermissions() {
             return mRequestPermissions;
         }
 
         /**
-         * 权限请求通过
+         * 权限授权通过：【检查、或请求】的权限已被全部允许
+         * <p>
+         * 此回调建议进行权限获取成功后要进行的操作，例如：开始录音
          */
-        public abstract void onRequestPassed();
+        public abstract void onPassed();
 
         /**
-         * 权限请求失败，用户拒绝再次请求权限，或拒绝跳转权限设置页面，或跳转设置页面后未勾选所需权限
+         * 权限授权失败：【检查】的权限部分或全部被阻止
          *
          * @param ungrantedPermissions 未授权的权限数组
          */
-        public abstract void onRequestFailed(@NonNull String[] ungrantedPermissions);
+        public abstract void onFailed(@NonNull String[] ungrantedPermissions);
 
         /**
-         * 权限请求被拒，建议弹窗说明为什么需要这些权限，并引导用户再次请求权限，或跳转权限设置页面
+         * 请求授权被拒：【请求】的权限部分或全部被用户拒绝
+         * <p>
+         * 建议弹窗说明权限申请的理由，然后
+         * <p>
+         * 1. 如果canRequestAgain为true，再次请求权限{@link #requestPermissions}
+         * <p>
+         * 2. 如果canRequestAgain为false，跳转权限设置页面{@link #startPermissionSettingActivity(Context, Callback)}
          *
          * @param rejectedPermissions 被拒绝的权限数组
-         * @param canRequestAgain     是否可以再次发起请求
+         * @param canRequestAgain     是否可以再次发起请求：如果请求的任一权限被勾选不再询问，此标志为false
          */
         public abstract void onRequestRejected(@NonNull String[] rejectedPermissions, boolean canRequestAgain);
 

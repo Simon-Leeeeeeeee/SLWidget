@@ -1,5 +1,6 @@
 package com.simonlee.widget.lib.utils;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -11,10 +12,12 @@ import android.os.Process;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 
+import com.simonlee.widget.lib.application.ApplicationProxy;
+
 /**
  * 未捕获异常处理工具抽象类，当异常发生时，通过全局广播主动结束所有进程
  * <p>
- * 注意{@link #killCurProcess()}方法可能需要复写
+ * 注意多进程应用需要复写{@link #killCurProcess(ActivityManager.RunningAppProcessInfo)}，不同进程进行差异化处理
  *
  * @author Simon Lee
  * @e-mail jmlixiaomeng@163.com
@@ -45,19 +48,6 @@ public abstract class UncaughtExceptionHandler {
     private final String mProcessKillAction;
 
     /**
-     * 结束当前进程所有Activity
-     */
-    protected abstract void finishCurProcessActivitys();
-
-    /**
-     * 处理未捕获的异常
-     *
-     * @param thread    线程
-     * @param throwable 异常
-     */
-    protected abstract void handleUncaughtException(Thread thread, Throwable throwable);
-
-    /**
      * @param application         Application实例
      * @param broadcastPermission 私有广播权限，防止三方应用干扰
      */
@@ -77,6 +67,19 @@ public abstract class UncaughtExceptionHandler {
     }
 
     /**
+     * 结束当前进程所有Activity
+     */
+    protected abstract void finishCurProcessActivitys();
+
+    /**
+     * 处理未捕获的异常
+     *
+     * @param thread    线程
+     * @param throwable 异常
+     */
+    protected abstract void handleUncaughtException(Thread thread, Throwable throwable);
+
+    /**
      * 返回杀进程广播实例
      */
     private BroadcastReceiver getKillProcessReceiver() {
@@ -84,7 +87,7 @@ public abstract class UncaughtExceptionHandler {
             @Override
             public void onReceive(Context context, Intent intent) {
                 //杀死当前进程
-                killCurProcess();
+                killCurProcess((ActivityManager.RunningAppProcessInfo) intent.getParcelableExtra("processInfo"));
             }
         };
     }
@@ -98,10 +101,15 @@ public abstract class UncaughtExceptionHandler {
             public void uncaughtException(Thread thread, Throwable throwable) {
                 //处理未捕获的异常
                 handleUncaughtException(thread, throwable);
+
                 //发送杀进程广播
-                mApplication.sendBroadcast(new Intent(mProcessKillAction), mBroadcastPermission);
+                Intent intent = new Intent(mProcessKillAction);
+                //进程信息
+                intent.putExtra("processInfo", ApplicationProxy.getCurProcessInfo());
+                mApplication.sendBroadcast(intent, mBroadcastPermission);
+
                 //杀死当前进程
-                killCurProcess();
+                killCurProcess(ApplicationProxy.getCurProcessInfo());
             }
         };
     }
@@ -110,9 +118,11 @@ public abstract class UncaughtExceptionHandler {
      * 杀死当前进程
      * <p>
      * 注意：要考虑应用存在多进程以及后台服务的情况，若清理不完全，可能导致应用自动重启
+     *
+     * @param processInfo 出现异常的进程信息
      */
     @CallSuper
-    protected void killCurProcess() {
+    protected void killCurProcess(ActivityManager.RunningAppProcessInfo processInfo) {
         //结束当前进程所有Activity（防止自动重启）
         finishCurProcessActivitys();
         //杀死当前进程

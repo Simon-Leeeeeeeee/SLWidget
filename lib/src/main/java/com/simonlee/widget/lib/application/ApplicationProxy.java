@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,7 +20,7 @@ import java.util.List;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2019-07-17
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ApplicationProxy {
 
     /**
@@ -48,19 +49,29 @@ public class ApplicationProxy {
     private final boolean isDebug;
 
     /**
-     * 版本号
-     */
-    private int mVersionCode;
-
-    /**
      * 当前进程名称
      */
     private String mProcessName;
 
     /**
+     * 当前进程信息
+     */
+    private ActivityManager.RunningAppProcessInfo mProcessInfo;
+
+    /**
+     * 版本号
+     */
+    private int mVersionCode;
+
+    /**
      * 版本名
      */
     private String mVersionName;
+
+    /**
+     * 应用包信息
+     */
+    private PackageInfo mPackageInfo;
 
     private ApplicationProxy(@NonNull Application application) {
         mApplication = application;
@@ -106,10 +117,10 @@ public class ApplicationProxy {
     }
 
     /**
-     * 获取当前进程名
+     * 获取当前进程信息
      */
-    public static String getCurProcessName() {
-        if (mInstance.mProcessName == null) {
+    public static ActivityManager.RunningAppProcessInfo getCurProcessInfo() {
+        if (mInstance.mProcessInfo == null) {
             ActivityManager activityManager = (ActivityManager) mInstance.mApplication.getSystemService(Context.ACTIVITY_SERVICE);
             if (activityManager == null) {
                 return null;
@@ -121,53 +132,74 @@ public class ApplicationProxy {
             final int curProcessPid = android.os.Process.myPid();
             for (ActivityManager.RunningAppProcessInfo processInfo : processInfoList) {
                 if (processInfo.pid == curProcessPid) {
-                    mInstance.mProcessName = processInfo.processName;
+                    mInstance.mProcessInfo = processInfo;
                     break;
                 }
             }
         }
-        return mInstance.mProcessName;
+        return mInstance.mProcessInfo;
+    }
+
+    /**
+     * 获取当前进程名
+     */
+    public static String getCurProcessName() {
+        ActivityManager.RunningAppProcessInfo processInfo = getCurProcessInfo();
+        if (processInfo != null) {
+            return processInfo.processName;
+        }
+        return null;
+    }
+
+    /**
+     * 获取应用包信息
+     */
+    public static PackageInfo getPackageInfo() {
+        if (mInstance.mPackageInfo == null) {
+            try {
+                mInstance.mPackageInfo = mInstance.mApplication.getPackageManager()
+                        .getPackageInfo(mInstance.mApplication.getPackageName(), PackageManager.GET_CONFIGURATIONS);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return mInstance.mPackageInfo;
     }
 
     /**
      * 获取应用版本名
      */
     public static String getVersionName() {
-        if (mInstance.mVersionName == null) {
-            try {
-                mInstance.mVersionName = mInstance.mApplication.getPackageManager()
-                        .getPackageInfo(mInstance.mApplication.getPackageName(), PackageManager.GET_CONFIGURATIONS).versionName;
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+        PackageInfo packageInfo = getPackageInfo();
+        if (packageInfo != null) {
+            return packageInfo.versionName;
         }
-        return mInstance.mVersionName;
+        return null;
     }
 
     /**
      * 获取应用版本号
      */
     public static int getVersionCode() {
-        if (mInstance.mVersionCode == 0) {
-            try {
-                mInstance.mVersionCode = mInstance.mApplication.getPackageManager()
-                        .getPackageInfo(mInstance.mApplication.getPackageName(), PackageManager.GET_CONFIGURATIONS).versionCode;
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+        PackageInfo packageInfo = getPackageInfo();
+        if (packageInfo != null) {
+            return packageInfo.versionCode;
         }
-        return mInstance.mVersionCode;
+        return 0;
+    }
+
+    /**
+     * 判断当前是否在主线程运行
+     */
+    public static boolean isOnUiThread() {
+        return Thread.currentThread() == mInstance.mMainThread;
     }
 
     /**
      * 在主线程运行
      */
     public static void runOnUiThread(Runnable action) {
-        if (Thread.currentThread() != mInstance.mMainThread) {
-            mInstance.mMainThreadHandler.post(action);
-        } else {
-            action.run();
-        }
+        mInstance.mMainThreadHandler.post(action);
     }
 
     /**
