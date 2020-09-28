@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 20200928
+        versionName "1.0.1"
     }
 
     buildTypes {
@@ -30,3 +30,6 @@ dependencies {
     //api: 参与编译√，参与打包√，向外暴露√
     api 'cn.simonlee.widget:watermark:1.0.3'// 水印
 }
+
+//gradlew bintrayUpload
+//apply from: 'bintray.gradle'
