@@ -17,7 +17,7 @@
 
 |Demo下载(1.5MB)|示例效果|
 |:---:|:---:|
-|[点此下载](http://fir.im/SLWidget) 或扫描下面二维码<br/>[![demo](../download.png)](http://fir.im/SLWidget  "扫码下载示例程序")|![png](./demo_scrollpicker.png)&#32;&#32;&#32;![gif](./demo_scrollpicker.gif)|
+|[点此下载](https://d.firim.pro/SLWidget) 或扫描下面二维码<br/>[![demo](../download.png)](https://d.firim.pro/SLWidget  "扫码下载示例程序")|![png](./demo_scrollpicker.png)&#32;&#32;&#32;![gif](./demo_scrollpicker.gif)|
 
 ## 功能介绍
 
@@ -32,8 +32,9 @@
     }
 ```
 
-## 使用方式（示例日期选择）
+## 使用方式
 
+示例日期选择
 * **STEP.1**
 
     构造一个适配器继承自`cn.simonlee.widget.scrollpicker.PickAdapter`，主要实现`int getCount()`和`String getItem(int position)`两个方法。

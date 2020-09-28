@@ -14,7 +14,7 @@
 
 [点此下载（1.7MB）](http://d.6short.com/SLWidget) 或扫描下方二维码
 
-[![demo](./download.png)](https://fir.im/SLWidget  "扫码下载示例程序")
+[![demo](./download.png)](https://d.firim.pro/SLWidget  "扫码下载示例程序")
 
 ## BadgeView
 

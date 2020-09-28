@@ -16,9 +16,9 @@ Android侧滑返回方案，实现沉浸式状态栏，支持SDK19(Android4.4)�
 
 * **Demo下载(1.5MB)**
 
-    [点此下载](http://fir.im/SLWidget) 或扫描下方二维码
+    [点此下载](https://d.firim.pro/SLWidget) 或扫描下方二维码
 
-    [![demo](../download.png)](http://fir.im/SLWidget  "扫码下载示例程序")
+    [![demo](../download.png)](https://d.firim.pro/SLWidget  "扫码下载示例程序")
 
 * **示例效果**
 

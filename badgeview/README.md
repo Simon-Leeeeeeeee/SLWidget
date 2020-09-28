@@ -18,7 +18,7 @@
 
 |Demo下载(1.5MB)|示例效果|
 |:---:|:---:|
-|[点此下载](http://fir.im/SLWidget) 或扫描下面二维码<br/>[![demo](../download.png)](http://fir.im/SLWidget  "扫码下载示例程序")|[![gif](./demo_badgeview.png)](http://fir.im/SLWidget  "示例效果")|
+|[点此下载](https://d.firim.pro/SLWidget) 或扫描下面二维码<br/>[![demo](../download.png)](https://d.firim.pro/SLWidget  "扫码下载示例程序")|[![gif](./demo_badgeview.png)](https://d.firim.pro/SLWidget  "示例效果")|
 
 ## 功能介绍
 
