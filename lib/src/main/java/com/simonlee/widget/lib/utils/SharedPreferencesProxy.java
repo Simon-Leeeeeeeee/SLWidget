@@ -2,7 +2,6 @@ package com.simonlee.widget.lib.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.simonlee.widget.lib.application.ApplicationProxy;
@@ -10,6 +9,8 @@ import com.simonlee.widget.lib.application.ApplicationProxy;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import androidx.annotation.Nullable;
 
 /**
  * SharedPreferences工具类

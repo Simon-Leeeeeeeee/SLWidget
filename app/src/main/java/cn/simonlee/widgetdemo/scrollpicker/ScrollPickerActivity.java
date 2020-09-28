@@ -2,7 +2,6 @@ package cn.simonlee.widgetdemo.scrollpicker;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
@@ -16,6 +15,7 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Random;
 
+import androidx.annotation.Nullable;
 import cn.simonlee.widget.scrollpicker.ScrollPickerView;
 import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;

@@ -2,12 +2,12 @@ package cn.simonlee.widgetdemo.swiperefreshlayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
+import androidx.viewpager.widget.ViewPager;
 import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;
 

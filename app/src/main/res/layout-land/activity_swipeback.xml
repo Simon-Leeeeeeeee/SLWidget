@@ -32,7 +32,7 @@
 
     </ScrollView>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/swipeback_layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -84,6 +84,6 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/swipeback_et_hello" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

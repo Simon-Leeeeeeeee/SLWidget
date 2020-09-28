@@ -1,11 +1,11 @@
 package cn.simonlee.widgetdemo.slidingtablayout;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
+import androidx.viewpager.widget.ViewPager;
 import cn.simonlee.widget.slidingtablayout.SlidingTabLayout;
 import cn.simonlee.widgetdemo.CommonActivity;
 import cn.simonlee.widgetdemo.R;

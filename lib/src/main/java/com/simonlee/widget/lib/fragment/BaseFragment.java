@@ -2,10 +2,6 @@ package com.simonlee.widget.lib.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +11,11 @@ import android.widget.FrameLayout;
 import com.simonlee.widget.lib.activity.BaseActivity;
 import com.simonlee.widget.lib.dialog.BaseDialog;
 import com.simonlee.widget.lib.permission.PermissionManager;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 /**
  * Fragment基类

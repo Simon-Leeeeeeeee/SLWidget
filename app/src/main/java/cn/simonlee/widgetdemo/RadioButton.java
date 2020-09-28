@@ -1,8 +1,9 @@
 package cn.simonlee.widgetdemo;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatRadioButton;
 import android.util.AttributeSet;
+
+import androidx.appcompat.widget.AppCompatRadioButton;
 
 /**
  * @author Simon Lee

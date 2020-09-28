@@ -1,10 +1,11 @@
 package com.simonlee.widget.lib.dialog;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+
+import androidx.annotation.NonNull;
 
 /**
  * Dialog回调监听

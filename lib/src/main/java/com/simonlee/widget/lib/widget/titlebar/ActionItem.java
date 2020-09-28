@@ -2,10 +2,11 @@ package com.simonlee.widget.lib.widget.titlebar;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.StringRes;
 import android.view.View;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.StringRes;
 
 /**
  * {@link TitleBar}中专用的菜单Item

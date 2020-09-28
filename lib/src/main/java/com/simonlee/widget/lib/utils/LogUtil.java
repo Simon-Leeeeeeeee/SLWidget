@@ -1,9 +1,10 @@
 package com.simonlee.widget.lib.utils;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.simonlee.widget.lib.application.ApplicationProxy;
+
+import androidx.annotation.NonNull;
 
 /**
  * 日志工具

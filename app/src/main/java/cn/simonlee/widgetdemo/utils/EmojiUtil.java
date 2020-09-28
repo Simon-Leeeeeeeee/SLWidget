@@ -2,7 +2,6 @@ package cn.simonlee.widgetdemo.utils;
 
 import android.content.res.Configuration;
 import android.os.Build;
-import android.support.annotation.LayoutRes;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,8 @@ import android.widget.FrameLayout;
 
 import com.simonlee.widget.lib.activity.BaseActivity;
 import com.simonlee.widget.lib.utils.SharedPreferencesProxy;
+
+import androidx.annotation.LayoutRes;
 
 /**
  * Emoji工具

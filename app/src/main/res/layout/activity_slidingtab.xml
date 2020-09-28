@@ -142,7 +142,7 @@
 
     </cn.simonlee.widget.slidingtablayout.SlidingTabLayout>
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/slidingtab_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

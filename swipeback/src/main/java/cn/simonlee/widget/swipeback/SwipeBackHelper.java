@@ -8,7 +8,6 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -22,6 +21,9 @@ import android.widget.EditText;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 /**
  * Activity侧滑返回
@@ -56,7 +58,7 @@ import java.lang.reflect.Proxy;
  * @createdTime 2018-06-19
  */
 @SuppressWarnings({"unused", "WeakerAccess", "PrivateApi", "JavaReflectionMemberAccess", "JavaReflectionInvocation", "BooleanMethodIsAlwaysInverted", "FieldCanBeLocal"})
-@android.support.annotation.RequiresApi(api = Build.VERSION_CODES.KITKAT)
+@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class SwipeBackHelper {
 
     /**

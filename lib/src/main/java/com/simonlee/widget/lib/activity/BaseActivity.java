@@ -6,11 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ContentFrameLayout;
 import android.util.AttributeSet;
 import android.view.DisplayCutout;
 import android.view.View;
@@ -28,6 +23,11 @@ import com.simonlee.widget.lib.dialog.BaseDialog;
 import com.simonlee.widget.lib.permission.PermissionManager;
 import com.simonlee.widget.lib.widget.watermark.WaterMarkContentFrameLayout;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ContentFrameLayout;
 import cn.simonlee.widget.watermark.WaterMark;
 
 /**

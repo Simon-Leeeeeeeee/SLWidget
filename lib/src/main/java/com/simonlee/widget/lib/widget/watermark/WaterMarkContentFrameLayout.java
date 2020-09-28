@@ -3,10 +3,10 @@ package com.simonlee.widget.lib.widget.watermark;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.ContentFrameLayout;
 import android.util.AttributeSet;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.ContentFrameLayout;
 import cn.simonlee.widget.watermark.IWaterMark;
 import cn.simonlee.widget.watermark.WaterMark;
 

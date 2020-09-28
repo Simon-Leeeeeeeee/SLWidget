@@ -1,7 +1,5 @@
 package cn.simonlee.widgetdemo.slidingtablayout;
 
-import android.support.annotation.NonNull;
-import android.support.v4.view.PagerAdapter;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -10,6 +8,8 @@ import android.widget.TextView;
 
 import java.util.LinkedList;
 
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.PagerAdapter;
 import cn.simonlee.widgetdemo.R;
 
 /**

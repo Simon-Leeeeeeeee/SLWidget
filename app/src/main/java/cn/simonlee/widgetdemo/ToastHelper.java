@@ -3,8 +3,9 @@ package cn.simonlee.widgetdemo;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Looper;
-import android.support.annotation.StringRes;
 import android.widget.Toast;
+
+import androidx.annotation.StringRes;
 
 /**
  * Toast帮助类

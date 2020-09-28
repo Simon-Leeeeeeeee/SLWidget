@@ -1,10 +1,11 @@
 package com.simonlee.widget.lib.annotation;
 
-import android.support.annotation.IntDef;
 import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
 
 import static com.simonlee.widget.lib.annotation.ImmersiveFlag.FLAG_NONE;
 import static com.simonlee.widget.lib.annotation.ImmersiveFlag.FLAG_IMMERSIVE;

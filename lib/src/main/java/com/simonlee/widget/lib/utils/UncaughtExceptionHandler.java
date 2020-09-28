@@ -9,10 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Process;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 
 import com.simonlee.widget.lib.application.ApplicationProxy;
+
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
 
 /**
  * 未捕获异常处理工具抽象类，当异常发生时，通过全局广播主动结束所有进程
