@@ -1,4 +1,4 @@
-package cn.simonlee.widgetdemo.fragment;
+package cn.simonlee.widgetdemo.swiperefreshlayout;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -14,7 +14,31 @@ import java.util.List;
  * @github https://github.com/Simon-Leeeeeeeee/SLWidget
  * @createdTime 2019-08-27
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class FragmentDispatcher {
+
+    /**
+     * 分发事件：ContentParent适应窗口变化
+     *
+     * @param fragmentManager Fragment管理器
+     */
+    public static void dispatchContentParentResized(FragmentManager fragmentManager, int safeLeft, int safeTop, int safeRight, int safeBottom) {
+        if (fragmentManager == null) {
+            return;
+        }
+        //获取Fragment列表
+        List<Fragment> fragmentList = fragmentManager.getFragments();
+        for (int index = fragmentList.size() - 1; index >= 0; index--) {
+            Fragment fragment = fragmentList.get(index);
+            if (fragment != null && fragment.isAdded()) {
+                //分发给Fragment的child处理
+                dispatchContentParentResized(fragment.getChildFragmentManager(), safeLeft, safeTop, safeRight, safeBottom);
+                if (fragment instanceof OnContentParentResizedInterface) {
+                    ((OnContentParentResizedInterface) fragment).onContentParentResized(safeLeft, safeTop, safeRight, safeBottom);
+                }
+            }
+        }
+    }
 
     /**
      * 分发返回键事件给前台Fragment
@@ -42,29 +66,6 @@ public class FragmentDispatcher {
             }
         }
         return false;
-    }
-
-    /**
-     * 分发标题栏高度变化事件
-     *
-     * @param fragmentManager Fragment管理器
-     */
-    public static void dispatchTitleBarHeightResized(FragmentManager fragmentManager, int titleBarHeight) {
-        if (fragmentManager == null) {
-            return;
-        }
-        //获取Fragment列表
-        List<Fragment> fragmentList = fragmentManager.getFragments();
-        for (int index = fragmentList.size() - 1; index >= 0; index--) {
-            Fragment fragment = fragmentList.get(index);
-            if (fragment != null && fragment.isAdded()) {
-                //分发给Fragment的child处理
-                dispatchTitleBarHeightResized(fragment.getChildFragmentManager(), titleBarHeight);
-                if (fragment instanceof OnTitleBarHeightResizedInterface) {
-                    ((OnTitleBarHeightResizedInterface) fragment).onTitleBarHeightResized(titleBarHeight);
-                }
-            }
-        }
     }
 
     /**
@@ -104,12 +105,12 @@ public class FragmentDispatcher {
     /**
      * onTitleBarHeightResized接口
      */
-    public interface OnTitleBarHeightResizedInterface {
+    public interface OnContentParentResizedInterface {
 
         /**
          * 标题栏高度变化
          */
-        void onTitleBarHeightResized(int titleBarHeight);
+        void onContentParentResized(int safeLeft, int safeTop, int safeRight, int safeBottom);
     }
 
 }

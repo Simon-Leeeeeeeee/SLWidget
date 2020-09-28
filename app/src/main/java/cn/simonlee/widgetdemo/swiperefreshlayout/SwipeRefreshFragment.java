@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.simonlee.widget.lib.fragment.BaseFragment;
+
 import cn.simonlee.widget.swiperefreshlayout.SwipeRefreshLayout;
-import cn.simonlee.widgetdemo.fragment.BaseFragment;
 import cn.simonlee.widgetdemo.R;
-import cn.simonlee.widgetdemo.fragment.FragmentDispatcher;
 
 /**
  * 下拉刷新的Fragment
@@ -25,7 +25,7 @@ import cn.simonlee.widgetdemo.fragment.FragmentDispatcher;
  */
 @SuppressWarnings("InflateParams")
 public class SwipeRefreshFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener
-        , SwipeRefreshLayout.OnRefreshListener, FragmentDispatcher.OnTitleBarHeightResizedInterface {
+        , SwipeRefreshLayout.OnRefreshListener, FragmentDispatcher.OnContentParentResizedInterface {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private AlertDialog.Builder mAlertDialogBuilder;
@@ -33,10 +33,8 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            setContentView(bundle.getInt("layoutResID", View.NO_ID));
-        }
+        //noinspection ConstantConditions
+        setContentView(getArguments().getInt("layoutResID", View.NO_ID));
     }
 
     @Override
@@ -48,34 +46,30 @@ public class SwipeRefreshFragment extends BaseFragment implements View.OnClickLi
     }
 
     @Override
-    public void onTitleBarHeightResized(int titleBarHeight) {
-        View contentView = findViewById(R.id.swiperefresh_iv_top);
-        if (contentView != null) {
-            ViewGroup.LayoutParams lp = contentView.getLayoutParams();
-            if (lp == null) {
-                lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, titleBarHeight);
-            }
-            lp.height = titleBarHeight;
-            contentView.setLayoutParams(lp);
-        }
-    }
-
-    @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (getUserVisibleHint() && isAdded()) {
+        if (getUserVisibleHint() && isVisible()) {
             initView();
         }
     }
 
     @Override
-    public void onEnterAnimationComplete() {
-        if (isVisible() && mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.requestHeaderRefresh();
+    public void onContentParentResized(int safeLeft, int safeTop, int safeRight, int safeBottom) {
+        View contentView = findViewById(R.id.swiperefresh_iv_top);
+        if (contentView != null) {
+            ViewGroup.LayoutParams lp = contentView.getLayoutParams();
+            if (lp == null) {
+                lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, safeTop);
+            }
+            lp.height = safeTop;
+            contentView.setLayoutParams(lp);
         }
     }
 
     private void initView() {
+        if (mSwipeRefreshLayout != null) {
+            return;
+        }
         mSwipeRefreshLayout = findViewById(R.id.swiperefreshfragment_swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 

@@ -2,7 +2,6 @@ package cn.simonlee.widgetdemo.swiperefreshlayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +9,7 @@ import android.view.ViewGroup;
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import cn.simonlee.widgetdemo.CommonActivity;
-import cn.simonlee.widgetdemo.fragment.BaseFragment;
 import cn.simonlee.widgetdemo.R;
-import cn.simonlee.widgetdemo.fragment.FragmentDispatcher;
 
 /**
  * 刷新页面
@@ -27,7 +24,6 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
     private ViewPager mViewPager;
     private View mCurrentLable;
     private View mLable_Button, mLable_ScrollView, mLable_ViewPager;
-    private SwipeRefreshPagerAdapter mSwipeRefreshPagerAdapter;
     private ViewGroup mLayout_Lable;
 
     @Override
@@ -44,8 +40,7 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
 
         mViewPager = findViewById(R.id.swiperefresh_viewpager);
 
-        mSwipeRefreshPagerAdapter = new SwipeRefreshPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mSwipeRefreshPagerAdapter);
+        mViewPager.setAdapter(new SwipeRefreshPagerAdapter(getSupportFragmentManager()));
         mViewPager.addOnPageChangeListener(this);
 
         mLayout_Lable = findViewById(R.id.swiperefreshlayout_layout_lable);
@@ -66,15 +61,7 @@ public class SwipeRefreshActivity extends CommonActivity implements View.OnClick
     protected void resizeContentParent(int safeLeft, int safeTop, int safeRight, int safeBottom) {
         super.resizeContentParent(safeLeft, 0, safeRight, 0);
         mLayout_Lable.setPadding(0, 0, 0, safeBottom);
-        FragmentDispatcher.dispatchTitleBarHeightResized(getSupportFragmentManager(), safeTop);
-    }
-
-    @Override
-    public void onEnterAnimationComplete() {
-        Fragment curFragment = mSwipeRefreshPagerAdapter.getCurrentFragment();
-        if (curFragment instanceof BaseFragment) {
-            ((BaseFragment) curFragment).onEnterAnimationComplete();
-        }
+        FragmentDispatcher.dispatchContentParentResized(getSupportFragmentManager(), safeLeft, safeTop, safeRight, safeBottom);
     }
 
     @Override

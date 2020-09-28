@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.simonlee.widget.lib.widget.titlebar.ActionItem;
 import com.simonlee.widget.lib.widget.titlebar.TitleBar;
 
 import cn.simonlee.widgetdemo.autowraplayout.AutoWrapActivity;
